@@ -1,0 +1,112 @@
+<table class="table table-striped">
+	<tr ng-repeat="column in columns" ng-if="model">
+		<td nowrap class="ilDetail_key_td">
+			{{column.title}}
+		</td>
+		<td width="100%" ng-click="rowClick(model,column)">
+			<span ng-if="_if(column,'text')">{{model[column.field]}}</span>
+			<span ng-if="_if(column,'textarea')">{{model[column.field]}}</span>
+			
+			<span ng-if="_if(column,'boolean')">
+				<span ng-if="checkBoolean(model,column) && column.options.true_html" ng-bind-html="column.options.true_html"></span>
+				<span ng-if="!checkBoolean(model,column) && column.options.false_html" ng-bind-html="column.options.false_html"></span>
+				<span ng-if="checkBoolean(model,column) && !column.options.true_html">{{'yes'|translate}}</span>
+				<span ng-if="!checkBoolean(model,column) && !column.options.false_html">{{'no'|translate}}</span>
+			</span>
+			
+			<span ng-if="_if(column,'select-object')||_if(column,'autocomplete-object')">{{model[column.field][column.options.field]|translate}}</span>
+			<span ng-if="_if(column,'select')||_if(column,'autocomplete')">{{getValue(model,column)|translate}}</span>
+			<div ng-if="getType(column)=='html'" ng-bind-html="model[column.field] | ilTableSanitice"></div>
+			<div ng-if="getType(column)=='template'" ng-include="column.options.url"></div>
+			<div ng-if="getType(column)=='func'" ng-bind-html="column.func(model) | ilTableSanitice"></div>
+
+			<div class="form-group has-feedback"
+				ng-class="{'has-success':verify(column),'has-error':!verify(column)}"
+				>
+				<input
+					ng-if="_ifEdit(column,'text')"
+					class="form-control"
+					type="text" 
+					ng-model="model[column.field]" 
+					style="width: 100%; padding: 0px" 
+					ng-change="_onChange(column)"></input>
+				
+				<textarea 
+					ng-if="_ifEdit(column,'textarea')"
+					class="form-control" 
+					ng-model="model[column.field]" 
+					ng-change="_onChange(column)" 
+					style="width: 100%; padding: 0px"></textarea>
+	
+				<span ng-if="_ifEdit(column,'boolean')">
+					<span 
+						ng-if="checkBoolean(model,column) && column.options.true_html" 
+						ng-bind-html="column.options.true_html" 
+						ng-click="toggleBoolean(column)" 
+						style="cursor: pointer"></span>
+					
+					<span 
+						ng-if="!checkBoolean(model,column) && column.options.false_html" 
+						ng-bind-html="column.options.false_html" 
+						ng-click="toggleBoolean(column)" 
+						style="cursor: pointer"></span>
+					
+					<span 
+						ng-if="checkBoolean(model,column) && !column.options.true_html" 
+						ng-click="toggleBoolean(column)" 
+						style="cursor: pointer">{{'yes'|translate}}</span>
+						
+					<span 
+						ng-if="!checkBoolean(model,column) && !column.options.false_html" 
+						ng-click="toggleBoolean(column)" 
+						style="cursor: pointer">{{'no'|translate}}</span>
+				</span>
+	
+				<select
+					ng-if="_ifEdit(column,'select')"
+					class="form-control" 
+					type="text" 
+					ng-model="model[column.field]" 
+					ng-options="selectItem.value as selectItem.label|translate for selectItem in column.options.list" 
+					style="width: 100%; padding: 0px"  
+					ng-change="_onChange(column)"></select>
+	
+				<select 
+					ng-if="_ifEdit(column,'select-object')"
+					class="form-control" 
+					type="text"  
+					ng-model="model[column.field]" 
+					ng-options="selectItem as selectItem[column.options.field]|translate for selectItem in column.options.list"  style="width: 100%; padding: 0px"  
+					ng-change="_onChange(column)"></select>
+					
+				<input 
+					ng-if="_ifEdit(column,'autocomplete-object')"
+					class="form-control"
+					type="text"   
+					ng-model="model[column.field]"
+					typeahead="selectItem as selectItem[column.options.field]|translate for selectItem in column.options.list | filter:_autocompleteFilter(column,$viewValue)"
+					typeahead-editable="false"
+					typeahead-on-select="_onChange(column)" 
+					style="width: 100%; padding: 0px" >
+					
+				<input 
+					ng-if="_ifEdit(column,'autocomplete')"
+					class="form-control"
+					type="text"
+					ng-model="model[column.field]" 
+					typeahead="selectItem as selectItem.label|translate for selectItem in column.options.list | filter:_autocompleteFilter(column,$viewValue)"
+					typeahead-editable="false"
+					typeahead-on-select="_onTypeheadSelect($item, $model, $label,editedObject,column)" 
+					typeahead-input-formatter="autocompleteFormat(editedObject,$model,column)"
+					placeholder="{{autocompleteFormat(editedObject,undefined,column)}}" 
+					style="width: 100%; padding: 0px">
+				
+				<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="_ifFeedback(column) && verify(column)"></span>
+				<span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="_ifFeedback(column) && !verify(column)"></span>
+			</div>
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="2" ng-if="!model">{{'No object'|translate}}</td>
+	</tr>
+</table>

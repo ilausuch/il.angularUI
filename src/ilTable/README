@@ -1,0 +1,34 @@
+
+Optional:
+
+search(boolean), default true
+order(boolean), default true
+editable(boolean), default false
+
+editable="true" 
+autoupdate="true" 
+on-autoupdate="mc.c.save2(item)"
+
+
+
+this.columns=[
+		{
+			"readonly":true,
+			"title":"id",
+			"field":"Id"
+		},
+		{
+			"title":"Nombre",
+			"field":"Nombre"
+		},
+		{
+			"type":"select-object",
+			"title":"Tipo titulación",
+			"field":"TipoTitulacion",
+			"options":{
+				"list":mc.tiposTitulacion,
+				"field":"Tipo"
+			}
+		},
+		
+	]
