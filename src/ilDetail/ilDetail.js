@@ -111,15 +111,31 @@ angular.module("il.ui.detail", ['ngSanitize','pascalprecht.translate','ui.bootst
 
 			$scope._onChange=function(column){
 				if ($scope.onChange!=undefined)
-					$scope.onChange($scope.model,column);
+					$scope.onChange({model:$scope.model,column:column});
 			}
 			
-			$scope.verify=function(column){
+			$scope._verify=function(column){
 				var required=column.required || false;
 				if (required && ( $scope.model[column.field]==undefined || $scope.model[column.field]==""))
 					return false;
+				
+				if ($scope.validationFnc!=undefined)
+					return $scope.validationFnc({model:$scope.model,column:column});
+				else
+					return true;
+			}
+			
+			$scope.verify=function(column){
+				var res=$scope._verify(column);
+				
+				$scope.validated=true;
+				for (k in $scope.columns)
+					if (!$scope._verify($scope.columns[k])){
+						$scope.validated=false;
+						break;
+					}
 					
-				return true;
+				return res;
 			}
 		}];
 		
@@ -131,7 +147,9 @@ angular.module("il.ui.detail", ['ngSanitize','pascalprecht.translate','ui.bootst
 	              model: '=',
 	              columns: '=',
 	              editMode: '=?',
-	              onChange:'=?'
+	              onChange:'&',
+	              validated:'=?',
+	              validationFnc:'&'
 			},
 			controller: controller,
 			template:template

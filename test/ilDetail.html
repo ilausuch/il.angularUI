@@ -128,8 +128,11 @@
 			columns="mc.columns" 
 			edit-mode="mc.editMode"
 			on-change="mc.onChange"
+			validated="mc.validated"
 		></il-detail>
 		<button class="btn btn-default" ng-click="mc.editMode=true">Edit</button>
 		<button class="btn btn-default" ng-click="mc.editMode=false">No edit</button>
+		
+		Validated: {{mc.validated}}
 	</body>
 </html>
