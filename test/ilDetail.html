@@ -115,6 +115,10 @@
 					console.debug("change",item,column);
 				}
 				
+				this.validate=function(model,column){
+					return true;
+				}
+				
 				this.editMode=true;
 			});
 		</script>
@@ -127,8 +131,9 @@
 			model="mc.item"
 			columns="mc.columns" 
 			edit-mode="mc.editMode"
-			on-change="mc.onChange"
+			on-change="mc.onChange(model,column)"
 			validated="mc.validated"
+			validation-fnc="mc.validate(model,column)"
 		></il-detail>
 		<button class="btn btn-default" ng-click="mc.editMode=true">Edit</button>
 		<button class="btn btn-default" ng-click="mc.editMode=false">No edit</button>
