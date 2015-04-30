@@ -38,9 +38,9 @@
 			</td>
 			
 			<td ng-repeat="column in columns" style="cursor:pointer;vertical-align: middle" ng-click="clickToEdit&&editRow(item)" class="ilTable_td_field_{{column.field}}">
-				<span ng-if="getType(column)=='text'">{{item[column.field]}}</span>
-				<span ng-if="getType(column)=='textarea'">{{item[column.field]}}</span>
-				
+				<span ng-if="getType(column)=='text'||getType(column)=='textarea'">{{item[column.field]}}</span>
+				<span ng-if="getType(column)=='date'">{{item[column.field]|date}}</span>
+			
 				<span ng-if="getType(column)=='boolean'">
 					<span ng-if="checkBoolean(item,column) && column.options.true_html" ng-bind-html="column.options.true_html"></span>
 					<span ng-if="!checkBoolean(item,column) && column.options.false_html" ng-bind-html="column.options.false_html"></span>
@@ -72,7 +72,8 @@
 
 			
 			<td ng-repeat="column in columns" class="ilTable_td_field ilTable_td_editing ilTable_td_field_{{column.field}}">
-				<span class="ilTable_edit_readonly ilTable_edit_readonly_text"ng-if="column.readonly && getType(column)=='text'">{{item[column.field]}}</span>
+				<span class="ilTable_edit_readonly ilTable_edit_readonly_text"ng-if="column.readonly && (getType(column)=='text'||getType(column)=='textarea')">{{item[column.field]}}</span>
+				<span class="ilTable_edit_readonly ilTable_edit_readonly_date"ng-if="column.readonly && getType(column)=='date'">{{item[column.field]|date}}</span>
 				<span class="ilTable_edit_readonly ilTable_edit_readonly_select" ng-if="column.readonly && getType(column)=='select-object'">{{item[column.field][column.options.field]}}</span>
 				<span class="ilTable_edit_readonly ilTable_readonly_boolean" ng-if="column.readonly && getType(column)=='boolean'" ng-class="{'glyphicon glyphicon-check':checkBoolean(item,column), 'glyphicon glyphicon-unchecked':!checkBoolean(item,column)}"></span>
 				
@@ -171,6 +172,14 @@
 					ng-if="_if(item,column,'func')"
 					class="ilTable_edit ilTable_edit_func"
 					ng-bind-html="column.func(item) | ilTableSanitice"></div>
+					
+				<p class="input-group" ng-if="_if(item,column,'date')">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="openDatePicker($event,column)"><i class="glyphicon glyphicon-calendar"></i></button>
+					</span>
+					
+					<input type="text" class="form-control" datepicker-popup="{{column.options.format||'fullDate'}}" ng-model="item[column.field]" is-open="column.$$opened" datepicker-options="dateOptions" ng-required="{{column.required||false}}" close-text="Close" ng-change="_onChange(editedObject,column)" readonly="true" datepicker-popup datepicker-localdate/>
+				</p>
 			</td>
 			
 			<td nowrap class="ilTable_td_operations" style="vertical-align: middle">

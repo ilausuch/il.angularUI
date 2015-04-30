@@ -1,11 +1,11 @@
-<table class="table table-striped">
+<table>
 	<tr ng-repeat="column in columns" ng-if="model">
 		<td nowrap class="ilDetail_key_td">
 			{{column.title}}
 		</td>
 		<td width="100%" ng-click="rowClick(model,column)">
-			<span ng-if="_if(column,'text')">{{model[column.field]}}</span>
-			<span ng-if="_if(column,'textarea')">{{model[column.field]}}</span>
+			<span ng-if="_if(column,'text')||_if(column,'textarea')">{{model[column.field]}}</span>
+			<span ng-if="_if(column,'date')">{{model[column.field]|date}}</span>
 			
 			<span ng-if="_if(column,'boolean')">
 				<span ng-if="checkBoolean(model,column) && column.options.true_html" ng-bind-html="column.options.true_html"></span>
@@ -100,6 +100,14 @@
 					typeahead-input-formatter="autocompleteFormat(editedObject,$model,column)"
 					placeholder="{{autocompleteFormat(editedObject,undefined,column)}}" 
 					style="width: 100%; padding: 0px">
+				
+				<p class="input-group" ng-if="_ifEdit(column,'date')">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="openDatePicker($event,column)"><i class="glyphicon glyphicon-calendar"></i></button>
+					</span>
+					<input type="text" class="form-control" datepicker-popup="{{column.options.format||'fullDate'}}" ng-model="model[column.field]" is-open="column.$$opened" datepicker-options="dateOptions" ng-required="{{column.required||false}}" close-text="Close" ng-change="_onChange(column)" readonly="true" datepicker-popup datepicker-localdate/>
+					
+				</p>
 				
 				<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="_ifFeedback(column) && verify(column)"></span>
 				<span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="_ifFeedback(column) && !verify(column)"></span>
