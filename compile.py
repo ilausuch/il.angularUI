@@ -19,3 +19,5 @@ def compile(name):
 
 compile("ilTable")
 compile("ilDetail")
+compile("ilModal")
+compile("ilAdvancedCombo")

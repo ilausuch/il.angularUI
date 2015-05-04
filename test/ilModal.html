@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html class="bg">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, target-densitydpi=device-dpi" />
+		<meta name="msapplication-tap-highlight" content="no" />
+		<title>test ilModal</title>
+		
+		<!-- Angular -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/i18n/angular-locale_es-es.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bower-angular-translate/2.6.1/angular-translate.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.min.js"></script>
+
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>		
+		
+		<script type="text/javascript" src="../dist/ilTable.min.js"></script>
+		<script type="text/javascript" src="../dist/ilDetail.min.js"></script>
+		<script type="text/javascript" src="../dist/ilModal.min.js"></script>
+
+		<style type="text/css">
+			.ilDetail_key_td{
+				font-weight: bold;
+				text-align: right;
+				padding-right: 2em;	
+			}
+
+			.mini{
+				width: 2em;
+			}
+		</style>
+
+		<script>
+			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.modal']);
+			var mc;
+
+			app.controller("MainController", function($rootScope,$scope,$timeout,$http,$q){
+				mc=this;
+				this.$rootScope=$rootScope;
+				this.$scope=$scope;
+				this.$timeout=$timeout;
+				this.$http=$http;
+				this.$q=$q;
+				
+				this.show=true;
+				this.text="Hola";
+				
+				this.end=function(success){
+					if (success)
+						alert("You have pressed success");
+					else
+						alert("You have pressed cancel");
+						
+					this.show=false;
+				}
+			});
+		</script>
+	</head>
+	
+	
+	<body ng-app="app" ng-controller="MainController as mc" style="padding:1em">
+		<il-modal 
+			show="mc.show" 
+			title="'Hola mundo'" 
+			cancel-label="'Cancelar'" 
+			success-label="'Guardar'"
+			on-cancel="mc.end(false)"
+			on-success="mc.end(true)"
+			auto-close="false"
+		>
+			<input ng-model="mc.text">
+			<p>{{mc.text}}</p>
+		</il-modal>
+		
+		<button class="btn btn-default" ng-click="mc.show=true">Modal</button>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus. Sed tempus mauris nec diam facilisis placerat. Nullam posuere ex quam, eget fermentum orci consectetur ac. Integer est nunc, luctus sit amet nisl in, tristique feugiat est. Pellentesque mattis nisl ipsum, at vehicula lorem bibendum varius. Suspendisse non tortor eget lorem porta tempus ut vitae dui. Donec hendrerit in urna eget tempus. In posuere blandit euismod. Cras eget eleifend nibh, at fermentum magna. Maecenas iaculis diam in porta fringilla. In id consectetur est, eget volutpat sem.
+
+Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam volutpat elementum pretium. Aenean blandit urna vel rutrum volutpat. Cras ornare volutpat viverra. Nunc fermentum mauris lorem, vel venenatis purus luctus eget. Suspendisse sed suscipit massa. Vestibulum lacinia dolor sit amet est mollis fermentum eu a purus. Donec imperdiet enim porta nisi faucibus imperdiet. Phasellus ut nibh eu dui interdum tempor. Donec ultricies lectus vehicula tellus mollis ullamcorper. Integer augue mi, porta at ornare a, faucibus at leo. Vestibulum feugiat nunc sit amet neque vestibulum lacinia in nec risus. Vivamus mattis, sapien in hendrerit tempor, nibh ligula congue nunc, a efficitur dolor sem ac erat. Vestibulum in scelerisque dui. Proin aliquet commodo ligula, ac dictum turpis semper eleifend.
+
+Pellentesque vel lectus ac lectus ullamcorper mollis. Maecenas interdum, dui eget pretium molestie, libero ipsum finibus ex, eu molestie dui dolor tincidunt elit. Quisque pulvinar magna et purus interdum consequat. Nullam fermentum libero euismod metus tristique pretium. Maecenas est lorem, posuere vulputate consequat a, maximus non quam. Aenean aliquet commodo dignissim. Proin venenatis, mauris eu maximus tincidunt, ante nulla placerat eros, vel accumsan enim eros sit amet enim. Phasellus facilisis vehicula turpis, in pretium turpis venenatis nec. Fusce ex lacus, feugiat sed condimentum eget, aliquet nec lacus. Nullam interdum ante non tincidunt fermentum. Ut id cursus velit. Nunc gravida interdum volutpat. Pellentesque ac semper tortor. Donec pulvinar condimentum mauris nec suscipit.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus. Sed tempus mauris nec diam facilisis placerat. Nullam posuere ex quam, eget fermentum orci consectetur ac. Integer est nunc, luctus sit amet nisl in, tristique feugiat est. Pellentesque mattis nisl ipsum, at vehicula lorem bibendum varius. Suspendisse non tortor eget lorem porta tempus ut vitae dui. Donec hendrerit in urna eget tempus. In posuere blandit euismod. Cras eget eleifend nibh, at fermentum magna. Maecenas iaculis diam in porta fringilla. In id consectetur est, eget volutpat sem.
+
+Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam volutpat elementum pretium. Aenean blandit urna vel rutrum volutpat. Cras ornare volutpat viverra. Nunc fermentum mauris lorem, vel venenatis purus luctus eget. Suspendisse sed suscipit massa. Vestibulum lacinia dolor sit amet est mollis fermentum eu a purus. Donec imperdiet enim porta nisi faucibus imperdiet. Phasellus ut nibh eu dui interdum tempor. Donec ultricies lectus vehicula tellus mollis ullamcorper. Integer augue mi, porta at ornare a, faucibus at leo. Vestibulum feugiat nunc sit amet neque vestibulum lacinia in nec risus. Vivamus mattis, sapien in hendrerit tempor, nibh ligula congue nunc, a efficitur dolor sem ac erat. Vestibulum in scelerisque dui. Proin aliquet commodo ligula, ac dictum turpis semper eleifend.
+
+Pellentesque vel lectus ac lectus ullamcorper mollis. Maecenas interdum, dui eget pretium molestie, libero ipsum finibus ex, eu molestie dui dolor tincidunt elit. Quisque pulvinar magna et purus interdum consequat. Nullam fermentum libero euismod metus tristique pretium. Maecenas est lorem, posuere vulputate consequat a, maximus non quam. Aenean aliquet commodo dignissim. Proin venenatis, mauris eu maximus tincidunt, ante nulla placerat eros, vel accumsan enim eros sit amet enim. Phasellus facilisis vehicula turpis, in pretium turpis venenatis nec. Fusce ex lacus, feugiat sed condimentum eget, aliquet nec lacus. Nullam interdum ante non tincidunt fermentum. Ut id cursus velit. Nunc gravida interdum volutpat. Pellentesque ac semper tortor. Donec pulvinar condimentum mauris nec suscipit.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus. Sed tempus mauris nec diam facilisis placerat. Nullam posuere ex quam, eget fermentum orci consectetur ac. Integer est nunc, luctus sit amet nisl in, tristique feugiat est. Pellentesque mattis nisl ipsum, at vehicula lorem bibendum varius. Suspendisse non tortor eget lorem porta tempus ut vitae dui. Donec hendrerit in urna eget tempus. In posuere blandit euismod. Cras eget eleifend nibh, at fermentum magna. Maecenas iaculis diam in porta fringilla. In id consectetur est, eget volutpat sem.
+
+Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam volutpat elementum pretium. Aenean blandit urna vel rutrum volutpat. Cras ornare volutpat viverra. Nunc fermentum mauris lorem, vel venenatis purus luctus eget. Suspendisse sed suscipit massa. Vestibulum lacinia dolor sit amet est mollis fermentum eu a purus. Donec imperdiet enim porta nisi faucibus imperdiet. Phasellus ut nibh eu dui interdum tempor. Donec ultricies lectus vehicula tellus mollis ullamcorper. Integer augue mi, porta at ornare a, faucibus at leo. Vestibulum feugiat nunc sit amet neque vestibulum lacinia in nec risus. Vivamus mattis, sapien in hendrerit tempor, nibh ligula congue nunc, a efficitur dolor sem ac erat. Vestibulum in scelerisque dui. Proin aliquet commodo ligula, ac dictum turpis semper eleifend.
+
+Pellentesque vel lectus ac lectus ullamcorper mollis. Maecenas interdum, dui eget pretium molestie, libero ipsum finibus ex, eu molestie dui dolor tincidunt elit. Quisque pulvinar magna et purus interdum consequat. Nullam fermentum libero euismod metus tristique pretium. Maecenas est lorem, posuere vulputate consequat a, maximus non quam. Aenean aliquet commodo dignissim. Proin venenatis, mauris eu maximus tincidunt, ante nulla placerat eros, vel accumsan enim eros sit amet enim. Phasellus facilisis vehicula turpis, in pretium turpis venenatis nec. Fusce ex lacus, feugiat sed condimentum eget, aliquet nec lacus. Nullam interdum ante non tincidunt fermentum. Ut id cursus velit. Nunc gravida interdum volutpat. Pellentesque ac semper tortor. Donec pulvinar condimentum mauris nec suscipit.
+	</body>
+</html>
