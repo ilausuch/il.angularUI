@@ -1,0 +1,30 @@
+<div ng-if="!editMode" ng-click="clickToEdit()" style="cursor:pointer">
+	{{model[field]}}
+</div>
+
+<div class="form-group has-feedback" ng-class="{'has-success':_validated, 'has-error':!_validated}" ng-if="editMode">
+	<label ng-if="label" class="control-label">{{label}}</label>
+	<div class="input-group">
+		<input type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()">
+		<div class="input-group-addon" style="padding: 0px">
+			<button class="btn btn-success" style="padding: 0.3em 1em 0.4em 1em" ng-click="show=true"><span class="glyphicon glyphicon-ok"></span></button>
+			<button class="btn" style="padding: 0.4em 1em 0.3em 0.7em" ng-click="show=true"><span class="glyphicon glyphicon-remove"></span></button>
+		</div>
+	</div>
+	<span class="glyphicon glyphicon-ok form-control-feedback" ng-if="_validated" aria-hidden="true"></span>
+	<span class="glyphicon glyphicon-remove form-control-feedback" ng-if="!_validated" aria-hidden="true"></span>
+</div>
+
+<!--
+<form class="form-inline" ng-if="editMode">
+	<div class="form-group">
+		<div class="input-group">
+			<input type="text" class="form-control" ng-disabled="isDisable()" ng-model="model[field]" style="background-color: white">
+			<div class="input-group-addon" style="padding: 0px" ng-if="showEditButtons">
+				<button class="btn btn-success" style="padding: 0.3em 1em 0.4em 1em" ng-click="show=true"><span class="glyphicon glyphicon-ok"></span></button>
+				<button class="btn" style="padding: 0.4em 1em 0.3em 0.7em" ng-click="show=true"><span class="glyphicon glyphicon-remove"></span></button>
+			</div>
+		</div>
+	</div>
+</form>
+-->

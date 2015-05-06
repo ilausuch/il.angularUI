@@ -34,10 +34,14 @@ angular.module("il.ui.detail", ['ngSanitize','pascalprecht.translate','ui.bootst
 			 
 			// called with a JavaScript Date object when picked from the datepicker
 			ngModelController.$parsers.push(function (viewValue) {
-			// undo the timezone adjustment we did during the formatting
-			viewValue.setMinutes(viewValue.getMinutes() - viewValue.getTimezoneOffset());
-			// we just want a local date in ISO format
-			return viewValue.toISOString().substring(0, 10);
+				if (typeof viewValue == "string" )
+					viewValue=new Date(viewValue);
+				
+				// undo the timezone adjustment we did during the formatting
+				viewValue.setMinutes(viewValue.getMinutes() - viewValue.getTimezoneOffset());
+				
+				// we just want a local date in ISO format
+				return viewValue.toISOString().substring(0, 10);
 			});
 			 
 			// called with a 'yyyy-mm-dd' string to format

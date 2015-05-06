@@ -26,13 +26,20 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 		 
 		function link(scope, element, attr, ctrls) {
 			var ngModelController = ctrls[0];
-			 
+			
+				
 			// called with a JavaScript Date object when picked from the datepicker
 			ngModelController.$parsers.push(function (viewValue) {
-			// undo the timezone adjustment we did during the formatting
-			viewValue.setMinutes(viewValue.getMinutes() - viewValue.getTimezoneOffset());
-			// we just want a local date in ISO format
-			return viewValue.toISOString().substring(0, 10);
+				if (viewValue==undefined)
+					return undefined;
+				
+				if (typeof viewValue == "string" )
+					viewValue=new Date(viewValue);
+					
+				// undo the timezone adjustment we did during the formatting
+				viewValue.setMinutes(viewValue.getMinutes() - viewValue.getTimezoneOffset());
+				// we just want a local date in ISO format
+				return viewValue.toISOString().substring(0, 10);
 			});
 			 
 			// called with a 'yyyy-mm-dd' string to format
