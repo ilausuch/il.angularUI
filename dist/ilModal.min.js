@@ -24,13 +24,13 @@ angular.module("il.ui.modal", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.close=function(success){
 				if ($scope.autoClose==undefined||$scope.autoClose)
 					$scope.show=false;
-				console.debug(success,$scope.onSuccess,$scope.onCancel);
+				
 				if (success){
 					if ($scope.onSuccess!=undefined)
-						$scope.onSuccess();
+						$scope.onSuccess({});
 				}else{
 					if ($scope.onCancel!=undefined)
-						$scope.onCancel();
+						$scope.onCancel({});
 				}
 			}
 		}];
