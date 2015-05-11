@@ -24,9 +24,10 @@
 		<script type="text/javascript" src="../dist/ilModal.min.js"></script>
 		<script type="text/javascript" src="../dist/ilAdvancedCombo.min.js"></script>
 		<script type="text/javascript" src="../dist/ilInput.min.js"></script>
+		<script type="text/javascript" src="../dist/ilTable2.min.js"></script>
 
 		<script>
-			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.table','il.ui.modal','il.ui.advancedCombo','il.ui.input']);
+			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.table','il.ui.table2','il.ui.modal','il.ui.advancedCombo','il.ui.input']);
 			var mc;
 
 			app.controller("MainController", function($rootScope,$scope,$timeout,$http,$q){
@@ -103,137 +104,6 @@
 	
 	
 	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
-		<table class="table">
-			<tr>
-				<td>
-					<il-input
-						model="mc.model"
-						field="'number'"
-						edit-mode="mc.edit"
-						label="'Text not empty'"
-						required="true"
-						verify-fnc="mc.verify(model,value)"
-						on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
-						
-					>	
-					</il-input>
-				</td>
-				<td>
-					<il-input
-						model="mc.model"
-						field="'date'"
-						type="'time'"
-						label="'Time'"
-						edit-mode="mc.edit"
-						verify-fnc="mc.verifyTime(model,value)"
-						inner-awesome-icon="'clock-o'"
-						time-seconds="true"
-					>	
-					</il-input>
-				</td>
-				<td>
-					<il-input
-						model="mc.model"
-						field="'pet'"
-						type="'select'"
-						label="'Select an pet (Object)'"
-						edit-mode="mc.edit"
-						verify-fnc="mc.verify(model,value)"
-						inner-awesome-icon="'paw'"
-						required="true"
-						
-						select-options="mc.pets"
-						select-label-field="label"
-						select-label-fnc="item.label+' ('+model.number+')'"
-					>	
-					</il-input>
-					<!-- select-value-field="'value'"-->
-				</td>
-				
-				<td>
-					<il-input
-						model="mc.model"
-						field="'minutes'"
-						type="'select'"
-						label="'Select a value'"
-						edit-mode="mc.edit"
-						inner-awesome-icon="'male'"
-						required="true"
-						
-						select-options="mc.values"
-					>	
-					</il-input>
-				</td>
-				
-				<td>
-					<il-input
-						model="mc.model"
-						field="'date'"
-						type="'date'"
-						label="'Select a date'"
-						edit-mode="mc.edit"
-						required="true"
-						date-locale="'es'"
-						inner-awesome-icon="'calendar'"
-					>	
-					</il-input>
-				</td>
-				<td>
-					
-					<il-input
-						model="mc.model"
-						field="'date'"
-						type="'dateTime'"
-						label="'Select a date and time'"
-						edit-mode="mc.edit"
-						required="true"
-						date-locale="'es'"
-						inner-awesome-icon="'calendar'"
-					>	
-					</il-input>
-				</td>
-			</tr>
-		</table>
-		<il-input
-			model="mc.model"
-			field="'number'"
-			edit-mode="mc.edit"
-			label="'Only integer numbers'"
-			required="true"
-			text-verify-int="true"
-			verify-fnc="mc.verify(model,value)"
-			on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
-			
-		>	
-		</il-input>
-		<il-input
-			model="mc.model"
-			field="'number'"
-			edit-mode="mc.edit"
-			label="'Only decimal numbers'"
-			required="true"
-			text-verify-float="true"
-			verify-fnc="mc.verify(model,value)"
-			on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
-			
-		>	
-		</il-input>
-		<il-input
-			model="mc.model"
-			field="'boolean'"
-			type="'boolean'"
-			label="'Boolean'"
-			edit-mode="mc.edit"
-			boolean-true-html="'<span class=\'label label-success\'>Yes, of course</span>'"
-			boolean-false-html="'<span class=\'label label-danger\'>No</span>'"
-		>	
-		</il-input>
-		Validated this? {{mc.validated1}}
-		<br>
-		{{mc.model}}
-		<br>
-		<button class="btn" ng-click="mc.edit=true">Edit</button>
-		<button class="btn" ng-click="mc.edit=false">No Edit</button>
-		<button class="btn" ng-click="mc.addPet()">Add pet</button>
+		<il-table2></il-table2>
 	</body>
 </html>

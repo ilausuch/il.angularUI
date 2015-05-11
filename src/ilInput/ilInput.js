@@ -3,11 +3,16 @@ LICENSE MIT 2015 ilausuch@gmail.com
 */
 
 angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstrap'])
-	.filter('twoDecimals', function() {
+	.filter('twoDigits', function() {
 		return function(input) {
 			return input<10 ? "0"+input : input;
 		};
 	})
+	.filter("ilSanitize", ['$sce', function($sce) {
+	  return function(htmlCode){
+	    return $sce.trustAsHtml(htmlCode);
+	  }
+	}])
 	.directive('ilInput', function() {
 		var controller = ['$scope','$timeout','$attrs', function ($scope,$timeout,$attrs) {
 			if ($scope.type==undefined)
@@ -31,20 +36,35 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.modalStyle={top: "0px"};
 				
 			if ($scope.type=="time" || $scope.type=="dateTime" ){
-				$scope.hours2=[];
+				$scope.hours=[];
 				for (var r=0; r<6; r++){
-					$scope.hours2[r]=[];
+					$scope.hours[r]=[];
 					for (var c=0; c<4; c++)
-						$scope.hours2[r][c]=c+r*4;
+						$scope.hours[r][c]=c+r*4;
 				}
 				
-				$scope.minutes2=[];
+				$scope.minutes=[];
 				for (var r=0; r<6; r++){
-					$scope.minutes2[r]=[];
+					$scope.minutes[r]=[];
 					for (var c=0; c<10; c++)
-						$scope.minutes2[r][c]={v:c+r*10,k:(c+r*10)%15==0};
+						$scope.minutes[r][c]={v:c+r*10,k:(c+r*10)%15==0};
 				}
 			}
+			
+			if ($scope.booleanTrue==undefined)
+				$scope.booleanTrue=true;
+				
+			if ($scope.booleanFalse==undefined)
+				$scope.booleanFalse=false;
+				
+			if ($scope.booleanTrueHtml==undefined)
+				$scope.booleanTrueHtml='<span class="glyphicon glyphicon-check"></span>';
+			
+			if ($scope.booleanFalseHtml==undefined)
+				$scope.booleanFalseHtml='<span class="glyphicon glyphicon-unchecked"></span>';
+				
+			
+			//Functions --->
 				
 			$scope.isDisable=function(){
 				return false;
@@ -129,14 +149,6 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.checkValidate();
 			
-			$scope.hours=[];
-			for(i=0;i<24;i++)
-				$scope.hours.push(i);
-
-			$scope.minutes=[];
-			for(i=0;i<59;i++)
-				$scope.minutes.push(i);
-			
 			$scope._selectValueFnc=function(item){
 				var v=$scope.selectValueFnc({item:item,model:$scope.model});
 				if (v!=undefined)
@@ -183,7 +195,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					$scope.weeks[w]=[];
 					for(d=0;d<7;d++){
 						var _d=w*7+d-firstWeekday+2;
-						if (_d<=0 || _d>lastDateOfMonth)
+						if (_d<=0 || _d>lastDateOfMonth)
 							$scope.weeks[w][d]={label:""};
 						else{
 							var nd=moment({y:date.year(),M:date.month(),d:_d});
@@ -268,6 +280,14 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.date_openModal();
 			}
 			
+			$scope.boolean_tonggle=function(){
+				if ($scope.model[$scope.field]==$scope.booleanTrue)
+					$scope.model[$scope.field]=$scope.booleanFalse;
+				else
+					$scope.model[$scope.field]=$scope.booleanTrue;
+					
+				this._onChange();
+			}
 			
 		}];
 		
@@ -308,6 +328,11 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  dateLocale:"=?",
 				  
 				  modalOnTop:"=?",
+				  
+				  booleanTrue:"=?",
+				  booleanFalse:"=?",
+				  booleanTrueHtml:"=?",
+				  booleanFalseHtml:"=?",
 				  
 	              
 			},
