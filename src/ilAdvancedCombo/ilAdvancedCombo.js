@@ -6,7 +6,7 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 	.directive('ilAdvancedCombo', function() {
 		var controller = ['$scope','$timeout','$attrs', function ($scope,$timeout,$attrs) {
 			$scope.onSelectItem=function(item){
-				$scope.model=item;
+				$scope.model[$scope.field]=item;
 				$scope.show=false;
 			}
 		}];
@@ -22,6 +22,7 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 	              list:'=',
 	              model:'&',
 	              field:'=',
+	              labelField:'=',
 	              itemsPerPage:"=",
 	              size:'=',
 			},
