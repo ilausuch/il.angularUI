@@ -63,8 +63,15 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			if ($scope.booleanFalseHtml==undefined)
 				$scope.booleanFalseHtml='<span class="glyphicon glyphicon-unchecked"></span>';
 				
-			
+		
 			//Functions --->
+			
+			$scope.undefinedIs=function(value,defaultValue){
+				if (value==undefined)
+					return defaultValue;
+				else
+					return value;
+			}
 				
 			$scope.isDisable=function(){
 				return false;
@@ -82,8 +89,6 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						return moment();
 					else
 						return moment(date);
-					
-					
 				}
 				else
 					return $scope.model[$scope.field];
@@ -101,6 +106,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				if ($scope.required){
 					switch($scope.type){
 						case "text":
+						case "password":
 							if ($scope.getValue()==undefined || $scope.getValue()==""){
 								$scope._validated=false;
 								return;
@@ -118,7 +124,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					}
 				}	
 					
-				if ($scope.type=="text"){
+				if ($scope.type=="text" || $scope.type=="password"){
 					if ($scope.textVerifyInt && parseInt($scope.getValue())!=$scope.getValue()){
 						$scope._validated=false;
 						return;
@@ -299,8 +305,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              model:'=',
 	              field:"=",
 	              type:'=?',
-	              editMode:'=?',
+	              onlyText:'=?',
 	              z:'=?',
+	              verifyShow:'=?',
 	              
 				  onChange:'&',
 	              verifyFnc:"&",

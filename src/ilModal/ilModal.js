@@ -40,7 +40,7 @@ angular.module("il.ui.modal", ['ngSanitize','pascalprecht.translate','ui.bootstr
 		return {
 			restrict: 'E',
 			scope: {
-	              show: '=',
+	              show: '=?',
 	              z:'=',
 	              title:'=',
 	              

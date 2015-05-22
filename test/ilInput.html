@@ -109,7 +109,7 @@
 					<il-input
 						model="mc.model"
 						field="'number'"
-						edit-mode="mc.edit"
+						only-text="mc.edit"
 						label="'Text not empty'"
 						required="true"
 						verify-fnc="mc.verify(model,value)"
@@ -124,7 +124,7 @@
 						field="'date'"
 						type="'time'"
 						label="'Time'"
-						edit-mode="mc.edit"
+						only-text="mc.edit"
 						verify-fnc="mc.verifyTime(model,value)"
 						inner-awesome-icon="'clock-o'"
 						time-seconds="true"
@@ -137,7 +137,7 @@
 						field="'pet'"
 						type="'select'"
 						label="'Select an pet (Object)'"
-						edit-mode="mc.edit"
+						only-text="mc.edit"
 						verify-fnc="mc.verify(model,value)"
 						inner-awesome-icon="'paw'"
 						required="true"
@@ -156,7 +156,7 @@
 						field="'minutes'"
 						type="'select'"
 						label="'Select a value'"
-						edit-mode="mc.edit"
+						only-text="mc.edit"
 						inner-awesome-icon="'male'"
 						required="true"
 						
@@ -171,7 +171,7 @@
 						field="'date'"
 						type="'date'"
 						label="'Select a date'"
-						edit-mode="mc.edit"
+						only-text="mc.edit"
 						required="true"
 						date-locale="'es'"
 						inner-awesome-icon="'calendar'"
@@ -185,7 +185,7 @@
 						field="'date'"
 						type="'dateTime'"
 						label="'Select a date and time'"
-						edit-mode="mc.edit"
+						only-text="mc.edit"
 						required="true"
 						date-locale="'es'"
 						inner-awesome-icon="'calendar'"
@@ -197,7 +197,7 @@
 		<il-input
 			model="mc.model"
 			field="'number'"
-			edit-mode="mc.edit"
+			only-text="mc.edit"
 			label="'Only integer numbers'"
 			required="true"
 			text-verify-int="true"
@@ -209,7 +209,7 @@
 		<il-input
 			model="mc.model"
 			field="'number'"
-			edit-mode="mc.edit"
+			only-text="mc.edit"
 			label="'Only decimal numbers'"
 			required="true"
 			text-verify-float="true"
@@ -223,9 +223,10 @@
 			field="'boolean'"
 			type="'boolean'"
 			label="'Boolean'"
-			edit-mode="mc.edit"
+			only-text="mc.edit"
 			boolean-true-html="'<span class=\'label label-success\'>Yes, of course</span>'"
 			boolean-false-html="'<span class=\'label label-danger\'>No</span>'"
+			verify-show="false"
 		>	
 		</il-input>
 		Validated this? {{mc.validated1}}

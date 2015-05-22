@@ -93,17 +93,20 @@
 				for(i=0;i<100;i++)
 					this.values.push(i);
 				
-				this.model={
+				this.model=[{
 					number:"3",
 					date:new Date(),
 					pet:this.pets[1]
-				}
+				}]
 			});
 		</script>
 	</head>
 	
 	
 	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
-		<il-table2></il-table2>
+		<il-table2 model="mc.model">
+			<td>bla bla</td>
+			<td>asdsd</td>
+		</il-table2>
 	</body>
 </html>
