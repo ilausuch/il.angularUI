@@ -20,11 +20,11 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 	              title:'=',
 	              columns:'=',
 	              list:'=',
-	              model:'&',
+	              model:'=?',
 	              field:'=',
 	              labelField:'=',
 	              itemsPerPage:"=",
-	              size:'=',
+	              modalSize:'=',
 			},
 			controller: controller,
 			template:template

@@ -55,6 +55,8 @@
 
 				this.items=[];
 				
+				this.model={};
+				
 				for (var i=0; i<100; i++)
 					this.items.push({name:"name "+i,lastname:"lastname "+i});
 			});
@@ -69,8 +71,9 @@
 			columns="mc.columns"
 			list="mc.items"
 			model="mc.model"
-			field="'name'"
-			size="'80%'"
+			field="'selected'"
+			label-field="'name'"
+			modal-size="'80%'"
 		>
 		</il-advanced-combo>
 	
