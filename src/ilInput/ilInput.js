@@ -13,6 +13,31 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	    return $sce.trustAsHtml(htmlCode);
 	  }
 	}])
+	.filter('filerFullDate', function(){
+		return function(input){
+			return moment.utc(input).format("LL");
+		}
+	})
+	.filter('filterTimeSeconds', function(){
+		return function(input){
+			return moment.utc(input).format("LTS");
+		}
+	})
+	.filter('filterTime', function(){
+		return function(input){
+			return moment.utc(input).format("LT");
+		}
+	})
+	.filter('filterDate', function(){
+		return function(input){
+			return moment.utc(input).format("LL");
+		}
+	})
+	.filter('filterDateTime', function(){
+		return function(input){
+			return moment.utc(input).format("LLL");
+		}
+	})
 	.directive('ilInput', function() {
 		var controller = ['$scope','$timeout','$attrs', function ($scope,$timeout,$attrs) {
 			if ($scope.type==undefined)
@@ -31,9 +56,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.z=10000;
 				
 			if ($scope.modalOnTop==true)
-				$scope.modalStyle={bottom:"1em"};
+				$scope.modalStyle={bottom:"1em",backgroundColor:"white"};
 			else
-				$scope.modalStyle={top: "0px"};
+				$scope.modalStyle={top: "0px",backgroundColor:"white"};
+				
 				
 			if ($scope.type=="time" || $scope.type=="dateTime" ){
 				$scope.hours=[];
@@ -82,13 +108,16 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.getValue=function(){
+				if ($scope.model==undefined || $scope.model[$scope.field]==undefined)
+					return "";
+					
 				if ($scope.type=="date"||$scope.type=="dateTime"||$scope.type=="time"){
 					var date=$scope.model[$scope.field];
 					
 					if (date==undefined)
 						return moment();
 					else
-						return moment(date);
+						return moment(moment.utc(date),"es");
 				}
 				else
 					return $scope.model[$scope.field];
@@ -151,6 +180,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope._onChange=function(){
 				$scope.checkValidate();
+				if ($scope._validated)
+					$scope.onChange();
 			}
 			
 			$scope.checkValidate();
@@ -204,7 +235,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						if (_d<=0 || _d>lastDateOfMonth)
 							$scope.weeks[w][d]={label:""};
 						else{
-							var nd=moment({y:date.year(),M:date.month(),d:_d});
+							var nd=moment({y:date.year(),M:date.month(),d:_d+1});
 							$scope.weeks[w][d]={
 								label:_d,
 								date:nd,
@@ -234,9 +265,20 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.date_showModal=false;
 				
 				if ($scope.type=="date"){
-					$scope.model[$scope.field].setFullYear(d.date.year());
-					$scope.model[$scope.field].setMonth(d.date.month());
-					$scope.model[$scope.field].setDate(d.date.day());
+					var set=false;
+					try{
+						$scope.model[$scope.field].setFullYear(d.date.year());
+						$scope.model[$scope.field].setMonth(d.date.month());
+						$scope.model[$scope.field].setDate(d.date.day());
+						set=true;
+					}catch(e){}
+					
+					if (!set)
+						try{
+							$scope.model[$scope.field]=d.date;
+						}catch(e){}
+						
+					$scope._onChange();
 				}else
 					$scope.time_openModal();
 			}
@@ -280,6 +322,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.model[$scope.field].setHours($scope.time_selected.h);
 				$scope.model[$scope.field].setMinutes($scope.time_selected.m);
 				$scope.model[$scope.field].setSeconds($scope.time_selected.s);
+				
+				$scope._onChange();
 			}
 			
 			$scope.dateTime_openModal=function(){

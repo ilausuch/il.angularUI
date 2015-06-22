@@ -164,9 +164,14 @@
 					ng-bind-html="editedObject[column.field] | ilTableSanitice"></div>
 					
 				<div 
-					ng-if="_if(item,column,'template')" 
+					ng-if="_if(item,column,'template') && !column.options.urlEdit" 
 					class="ilTable_edit ilTable_edit_template" 
 					ng-include="column.options.url"></div>
+					
+				<div 
+					ng-if="_if(item,column,'template') && column.options.urlEdit" 
+					class="ilTable_edit ilTable_edit_template" 
+					ng-include="column.options.urlEdit"></div>
 					
 				<div
 					ng-if="_if(item,column,'func')"

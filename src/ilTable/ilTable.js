@@ -408,6 +408,7 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 		return {
 			restrict: 'A',
 			scope: {
+				  mc: '=',
 	              model: '=',
 	              columns: '=',
 	              editable: '=?',
