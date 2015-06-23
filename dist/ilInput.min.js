@@ -2,6 +2,26 @@
 LICENSE MIT 2015 ilausuch@gmail.com	
 */
 
+function ilInputVerificationGroup(){
+	this.registry={}
+	
+	this.register=function(name){
+		this.registry[name]=false;	
+	}
+	
+	this.update=function(name,value){
+		this.registry[name]=value;	
+	}
+		
+	this.check=function(){
+		for (k in this.registry)
+			if (this.registry[k]==false)
+				return false;
+			
+		return true;		
+	}
+}
+
 angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstrap'])
 	.filter('twoDigits', function() {
 		return function(input) {
@@ -90,6 +110,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.booleanFalseHtml='<span class="glyphicon glyphicon-unchecked"></span>';
 				
 		
+			if ($scope.verifyGroup!=undefined)
+				$scope.verifyGroup.register($scope.field);
+		
 			//Functions --->
 			
 			$scope.undefinedIs=function(value,defaultValue){
@@ -132,12 +155,20 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.checkValidate=function(){
 				$scope._validated=true;
 				
+				if ($scope.verifyGroup!=undefined)
+					$scope.verifyGroup.update($scope.field,true);
+
+				
 				if ($scope.required){
 					switch($scope.type){
 						case "text":
 						case "password":
 							if ($scope.getValue()==undefined || $scope.getValue()==""){
 								$scope._validated=false;
+								
+								if ($scope.verifyGroup!=undefined)
+									$scope.verifyGroup.update($scope.field,false);
+								
 								return;
 							}
 						break;
@@ -147,6 +178,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						case "dateTime":
 							if ($scope.model[$scope.field]==undefined){
 								$scope._validated=false;
+								
+								if ($scope.verifyGroup!=undefined)
+									$scope.verifyGroup.update($scope.field,false);
+								
 								return;
 							}
 						break;
@@ -156,11 +191,19 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				if ($scope.type=="text" || $scope.type=="password"){
 					if ($scope.textVerifyInt && parseInt($scope.getValue())!=$scope.getValue()){
 						$scope._validated=false;
+						
+						if ($scope.verifyGroup!=undefined)
+							$scope.verifyGroup.update($scope.field,false);
+						
 						return;
 					}
 					
 					if ($scope.textVerifyFloat && parseFloat($scope.getValue())!=$scope.getValue()){
 						$scope._validated=false;
+						
+						if ($scope.verifyGroup!=undefined)
+							$scope.verifyGroup.update($scope.field,false);
+						
 						return;
 					}
 				}
@@ -170,7 +213,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					valid=$scope.verifyFnc({model:$scope.model,value:$scope.getValue()});
 
 					if (valid!=undefined)
-						$scope._validated=valid;	
+						$scope._validated=valid;
+						
+					if ($scope.verifyGroup!=undefined)
+						$scope.verifyGroup.update($scope.field,$scope._validated);	
 				}
 									
 				if ($scope.onVerify!=undefined)
@@ -356,6 +402,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  onChange:'&',
 	              verifyFnc:"&",
 	              onVerify:"&",
+	              verifyGroup:"=?",
 	              
 	              label:"=?",
 	              innerLabel:"=?",

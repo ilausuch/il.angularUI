@@ -63,7 +63,7 @@
 					
 				
 				
-				this.edit=true;
+				this.edit=false;
 				
 				this.verify=function(model,value){
 					console.debug("Verify",model,value);
@@ -97,6 +97,8 @@
 					date:new Date(),
 					pet:this.pets[1]
 				}
+				
+				this.verifyGroup=new ilInputVerificationGroup();
 			});
 		</script>
 	</head>
@@ -114,7 +116,7 @@
 						required="true"
 						verify-fnc="mc.verify(model,value)"
 						on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
-						
+						verify-group="mc.verifyGroup"
 					>	
 					</il-input>
 				</td>
@@ -159,8 +161,8 @@
 						only-text="mc.edit"
 						inner-awesome-icon="'male'"
 						required="true"
-						
 						select-options="mc.values"
+						verify-group="mc.verifyGroup"
 					>	
 					</il-input>
 				</td>
