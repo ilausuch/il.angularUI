@@ -2,8 +2,9 @@
 LICENSE MIT 2015 ilausuch@gmail.com	
 */
 
-function ilInputVerificationGroup(){
+function ilInputVerificationGroup(callback){
 	this.registry={}
+	this.callback=callback;
 	
 	this.register=function(name){
 		this.registry[name]=false;	
@@ -11,6 +12,8 @@ function ilInputVerificationGroup(){
 	
 	this.update=function(name,value){
 		this.registry[name]=value;	
+		if (this.callback!=undefined)
+			this.callback(this.check());
 	}
 		
 	this.check=function(){
@@ -79,7 +82,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.modalStyle={bottom:"1em",backgroundColor:"white"};
 			else
 				$scope.modalStyle={top: "0px",backgroundColor:"white"};
-				
+			
+			
+			$scope.selectors={}
+							
 				
 			if ($scope.type=="time" || $scope.type=="dateTime" ){
 				$scope.hours=[];
@@ -95,7 +101,26 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					for (var c=0; c<10; c++)
 						$scope.minutes[r][c]={v:c+r*10,k:(c+r*10)%15==0};
 				}
+				
 			}
+			
+			
+			if ($scope.type=="date" || $scope.type=="dateTime"){
+				if ($scope.timeMinYear==undefined)
+					$scope.timeMinYear=moment().year()-10;
+					
+				if ($scope.timeMaxYear==undefined)
+					$scope.timeMaxYear=moment().year()+1;
+					
+				if ($scope.timeShowYearCombo==undefined)
+					$scope.timeShowYearCombo=false;
+					
+				$scope.yearList=[];
+				for(var i=$scope.timeMinYear; i<=$scope.timeMaxYear; i++)
+					$scope.yearList.push(i);
+				
+			}
+			
 			
 			if ($scope.booleanTrue==undefined)
 				$scope.booleanTrue=true;
@@ -108,28 +133,11 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			if ($scope.booleanFalseHtml==undefined)
 				$scope.booleanFalseHtml='<span class="glyphicon glyphicon-unchecked"></span>';
-				
-		
+						
 			if ($scope.verifyGroup!=undefined)
-				$scope.verifyGroup.register($scope.field);
+					$scope.verifyGroup.register($scope.field);
 		
 			//Functions --->
-			
-			$scope.undefinedIs=function(value,defaultValue){
-				if (value==undefined)
-					return defaultValue;
-				else
-					return value;
-			}
-				
-			$scope.isDisable=function(){
-				return false;
-			}
-			
-			$scope.clickToEdit=function(){
-				$scope.editMode=true;
-			}
-			
 			$scope.getValue=function(){
 				if ($scope.model==undefined || $scope.model[$scope.field]==undefined)
 					return "";
@@ -145,6 +153,25 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				else
 					return $scope.model[$scope.field];
 			}
+
+				
+				
+			$scope.undefinedIs=function(value,defaultValue){
+				if (value==undefined)
+					return defaultValue;
+				else
+					return value;
+			}
+				
+			$scope.isDisable=function(){
+				return false;
+			}
+			
+			$scope.clickToEdit=function(){
+				$scope.editMode=true;
+			}
+			
+			
 			
 			$scope.$watch("model."+$scope.field,function updateModel(){
 				$scope.checkValidate();
@@ -293,6 +320,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						
 					}
 				}
+				
+				$scope.date_updateSelectedYear();
 			}
 			
 			$scope.date_openModal=function(){
@@ -329,14 +358,45 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					$scope.time_openModal();
 			}
 			
-			$scope.date_previousMonth=function(){
-				$scope.date_selected.subtract(1,'month');
+			$scope.date_update=function(newDate){
+				if (newDate.year()<$scope.timeMinYear || newDate.year()>$scope.timeMaxYear)
+					return;
+				
+				$scope.date_selected=newDate;
 				$scope.date_prepareCalendar();
+				$scope.date_updateSelectedYear();
+			}
+			
+			$scope.date_previousMonth=function(){
+				$scope.date_update(moment($scope.date_selected).subtract(1,'month'));
+				
 			}
 			
 			$scope.date_nextMonth=function(){
+				$scope.date_update(moment($scope.date_selected).add(1,'month'));
+				/*
 				$scope.date_selected.add(1,'month');
 				$scope.date_prepareCalendar();
+				$scope.date_updateSelectedYear();
+				*/
+			}
+			
+			$scope.date_selectedYearChanged=function(value){
+				$scope.date_selected.year(value);
+				$scope.date_prepareCalendar();
+				console.debug("Selected Year changed",$scope.selectedYear,$scope.date_selected,value);
+			}
+			
+			$scope.date_updateSelectedYear=function(){
+				year=Math.floor($scope.date_getYear());
+				$scope.selectors.selectedYear=year;
+				console.debug("Searching",year,$scope.date_getYear());
+				/*$scope.yearList.forEach(function(item){
+					if (item==year){
+						$scope.selectedYear=item;
+						console.debug("found",year,item,$scope.selectedYear);
+					}	
+				});*/
 			}
 			
 			$scope.time_openModal=function(){
@@ -415,6 +475,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              textVerifyFloat:"=?",
 	              
 				  timeSeconds:"=?",
+				  timeMinYear:"=?",
+				  timeMaxYear:"=?",
+				  timeShowYearCombo:"=?",
 
 				  selectVerifyRequired:"=?",
 				  selectOptions:"=?",
@@ -431,8 +494,6 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  booleanFalse:"=?",
 				  booleanTrueHtml:"=?",
 				  booleanFalseHtml:"=?",
-				  
-	              
 			},
 			controller: controller,
 			template:template

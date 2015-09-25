@@ -69,7 +69,10 @@
 		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver"> 
 			<tr> 
 				<td ng-click="date_previousMonth()" style="cursor: pointer">&lt;</td> 
-				<td colspan="5">{{date_getMonth()}} {{date_getYear()}}</td> 
+				<td colspan="5">{{date_getMonth()}} <span ng-if="!timeShowYearCombo">{{date_getYear()}}</span>
+					<select ng-if="timeShowYearCombo" ng-model="selectors.selectedYear" ng-options="y for y in yearList" ng-change="date_selectedYearChanged(selectors.selectedYear)">
+					</select>
+				</td> 
 				<td ng-click="date_nextMonth()" style="cursor: pointer">&gt;</td> 
 			</tr> 
 			<tr> 
