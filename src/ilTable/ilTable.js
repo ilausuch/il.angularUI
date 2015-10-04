@@ -210,12 +210,12 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				if ($scope.searchCad=="")
 					return true;
 					
-				var searchCad=$scope.accentFold($scope.searchCad).toLowerCase();
+				var searchCad=$scope.accentFold($scope.searchCad.toLowerCase());
 				
 				for (k in $scope.columns){
 					var column=$scope.columns[k];
 
-					if ($scope.accentFold($scope.getValue(item,column)).toLowerCase().indexOf(searchCad)>-1)
+					if ($scope.accentFold($scope.getValue(item,column).toLowerCase()).indexOf(searchCad)>-1)
 						return true;
 				}
 				

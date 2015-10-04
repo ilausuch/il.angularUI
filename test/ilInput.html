@@ -93,7 +93,7 @@
 					this.values.push(i);
 				
 				this.model={
-					number:"3",
+					number:Math.round(Math.random()*100),
 					date:new Date(),
 					pet:this.pets[1]
 				}
@@ -117,6 +117,7 @@
 						verify-fnc="mc.verify(model,value)"
 						on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
 						verify-group="mc.verifyGroup"
+						placeholder="'Ecrive aquí el número'"
 					>	
 					</il-input>
 				</td>
@@ -145,8 +146,25 @@
 						required="true"
 						
 						select-options="mc.pets"
-						select-label-field="label"
+						select-label-field="'label'"
 						select-label-fnc="item.label+' ('+model.number+')'"
+						
+					>	
+					</il-input>
+					</br>
+					<il-input
+						model="mc.model"
+						field="'pet'"
+						type="'autocomplete'"
+						label="'Select an pet (Object)'"
+						only-text="mc.edit"
+						verify-fnc="mc.verify(model,value)"
+						inner-awesome-icon="'paw'"
+						required="true"
+						
+						select-options="mc.pets"
+						select-label-field="'label'"
+						select-value-field2="'value'"
 					>	
 					</il-input>
 					<!-- select-value-field="'value'"-->
@@ -163,6 +181,21 @@
 						required="true"
 						select-options="mc.values"
 						verify-group="mc.verifyGroup"
+					>	
+					</il-input>
+					</br>
+					<il-input
+						model="mc.model"
+						field="'minutes'"
+						type="'autocomplete'"
+						label="'Select a value (Object)'"
+						only-text="mc.edit"
+						inner-awesome-icon="'male'"
+						required="true"
+						
+						select-options="mc.values"
+						verify-group="mc.verifyGroup"
+						placeholder="'Escribe aquí'"
 					>	
 					</il-input>
 				</td>

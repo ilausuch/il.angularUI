@@ -13,7 +13,7 @@
 		<div ng-if="model[field]==booleanTrue" ng-bind-html="booleanTrueHtml | ilSanitize"></div>
 		<div ng-if="model[field]!=booleanTrue" ng-bind-html="booleanFalseHtml | ilSanitize"></div> 
 	</div>
-	<div ng-if="type=='select'">
+	<div ng-if="type=='select' || type=='autocomplete'">
 		{{_selectLabelFnc(model[field])}}
 	</div>
 	<div ng-if="type=='text'">
@@ -36,8 +36,8 @@
 			<span class="fa fa-{{innerAwesomeIcon}}"></span>
 		</span> 
 		
-		<input ng-if="type=='text'" type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()"> 
-		<input ng-if="type=='password'" type="password" class="form-control" ng-model="model[field]" ng-change="_onChange()"> 
+		<input ng-if="type=='text'" type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}"> 
+		<input ng-if="type=='password'" type="password" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}"> 
 		
 		<div ng-if="type=='time'" class="form-control" ng-click="time_openModal()">
 			<span ng-if="!timeSeconds">{{model[field]|filterTime}}</span>
@@ -45,6 +45,8 @@
 		</div> 
 		
 		<select ng-if="type=='select'" class="form-control" ng-model="model[field]" ng-options="_selectValueFnc(item) as _selectLabelFnc(item) for item in selectOptions" ng-change="_onChange()" style="-webkit-appearance: none; -moz-appearance:none;padding: 0px"></select>
+		
+		<input ng-if="type=='autocomplete'" type="text" class="form-control" ng-model="model[field]" typeahead="_selectValueFnc(item) as _selectLabelFnc(item) for item in selectOptions | filter:autocomplete_filter($viewValue)" typeahead-editable="false" typeahead-on-select="autocomplete_onChange()" placeholder="{{placeholder}}"> 
 				
 		<div ng-if="type=='date'" class="form-control" ng-click="date_openModal()" style="cursor: pointer">
 			{{model[field]|filterDate}}

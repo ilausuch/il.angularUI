@@ -63,6 +63,13 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	})
 	.directive('ilInput', function() {
 		var controller = ['$scope','$timeout','$attrs', function ($scope,$timeout,$attrs) {
+			$scope.accentFold=function(inStr) {
+				if (inStr==undefined) return "";
+				inStr=""+inStr;
+				return inStr.replace(/([àáâãäå])|([ç])|([èéêë])|([ìíîï])|([ñ])|([òóôõöø])|([ß])|([ùúûü])|([ÿ])|([æ])/g, function(str,a,c,e,i,n,o,s,u,y,ae) { if(a) return 'a'; else if(c) return 'c'; else if(e) return 'e'; else if(i) return 'i'; else if(n) return 'n'; else if(o) return 'o'; else if(s) return 's'; else if(u) return 'u'; else if(y) return 'y'; else if(ae) return 'ae'; });
+			}
+
+
 			if ($scope.type==undefined)
 				$scope.type="text"
 				
@@ -136,6 +143,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						
 			if ($scope.verifyGroup!=undefined)
 					$scope.verifyGroup.register($scope.field);
+					
+			if ($scope.placeholder==undefined)
+				$scope.placeholder="";
+			
 		
 			//Functions --->
 			$scope.getValue=function(){
@@ -212,6 +223,27 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 								return;
 							}
 						break;
+						
+						case "autocomplete":
+							if ($scope.model[$scope.field]==undefined){
+								$scope._validated=false;
+								
+								if ($scope.verifyGroup!=undefined)
+									$scope.verifyGroup.update($scope.field,false);
+								
+								return;
+							}else{
+								found=false;
+								for (i in $scope.selectOptions)
+									if ($scope.selectOptions[i]==$scope.model[$scope.field])
+										found=true;
+										
+								if (!found){
+									$scope._validated=false;
+									return;
+								}
+							}
+						break;
 					}
 				}	
 					
@@ -260,9 +292,14 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.checkValidate();
 			
 			$scope._selectValueFnc=function(item){
-				var v=$scope.selectValueFnc({item:item,model:$scope.model});
-				if (v!=undefined)
-					return v;
+				if (item==undefined)
+					return "Configuration error!";
+					
+				if ($scope.selectValueFnc!=undefined){
+					var v=$scope.selectValueFnc({item:item,model:$scope.model});
+					if (v!=undefined)
+						return v;
+				}
 				
 				if ($scope.selectValueField!=undefined)
 					return item[$scope.selectValueField];
@@ -271,14 +308,19 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}	
 			
 			$scope._selectLabelFnc=function(item){
-				var v=$scope.selectLabelFnc({item:item,model:$scope.model});
-				if (v!=undefined)
-					return v;
+				if (item==undefined)
+					return "Configuration error!";
+					
+				if ($scope.selectLabelFnc!=undefined){
+					var v=$scope.selectLabelFnc({item:item,model:$scope.model});
+					if (v!=undefined)
+						return v;
+				}
 				
 				if ($scope.selectLabelField!=undefined)
 					return item[$scope.selectLabelField];
 					
-				return item;
+				return ""+item;
 			}
 			
 			$scope.date_getMonth=function(){
@@ -344,7 +386,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					try{
 						$scope.model[$scope.field].setFullYear(d.date.year());
 						$scope.model[$scope.field].setMonth(d.date.month());
-						$scope.model[$scope.field].setDate(d.date.day());
+						$scope.model[$scope.field].setDate(d.date.date()-1);
 						set=true;
 					}catch(e){}
 					
@@ -374,29 +416,16 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.date_nextMonth=function(){
 				$scope.date_update(moment($scope.date_selected).add(1,'month'));
-				/*
-				$scope.date_selected.add(1,'month');
-				$scope.date_prepareCalendar();
-				$scope.date_updateSelectedYear();
-				*/
 			}
 			
 			$scope.date_selectedYearChanged=function(value){
 				$scope.date_selected.year(value);
 				$scope.date_prepareCalendar();
-				console.debug("Selected Year changed",$scope.selectedYear,$scope.date_selected,value);
 			}
 			
 			$scope.date_updateSelectedYear=function(){
 				year=Math.floor($scope.date_getYear());
 				$scope.selectors.selectedYear=year;
-				console.debug("Searching",year,$scope.date_getYear());
-				/*$scope.yearList.forEach(function(item){
-					if (item==year){
-						$scope.selectedYear=item;
-						console.debug("found",year,item,$scope.selectedYear);
-					}	
-				});*/
 			}
 			
 			$scope.time_openModal=function(){
@@ -445,6 +474,17 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				this._onChange();
 			}
 			
+			$scope.autocomplete_filter=function(search){
+				return function(value,index) {
+					search=$scope.accentFold(search.toLowerCase());
+					return $scope.accentFold($scope._selectLabelFnc(value).toLowerCase()).substr(0, search.length)==search;
+			    }
+			}
+			
+			$scope.autocomplete_onChange=function(){
+				$scope._onChange();
+			}
+			
 		}];
 		
 		template='%%TEMPLATE%%';
@@ -458,6 +498,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              onlyText:'=?',
 	              z:'=?',
 	              verifyShow:'=?',
+	              placeholder:"=?",
 	              
 				  onChange:'&',
 	              verifyFnc:"&",
@@ -494,6 +535,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  booleanFalse:"=?",
 				  booleanTrueHtml:"=?",
 				  booleanFalseHtml:"=?",
+				  
+				  
 			},
 			controller: controller,
 			template:template
