@@ -38,27 +38,42 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	}])
 	.filter('filerFullDate', function(){
 		return function(input){
-			return moment.utc(input).format("LL");
+			if (input!=undefined)
+				return moment.utc(input).format("LL");
+			else
+				return "Select date..."
 		}
 	})
 	.filter('filterTimeSeconds', function(){
 		return function(input){
-			return moment.utc(input).format("LTS");
+			if (input!=undefined)
+				return moment.utc(input).format("LTS");
+			else
+				return "Select time..."
 		}
 	})
 	.filter('filterTime', function(){
 		return function(input){
-			return moment.utc(input).format("LT");
+			if (input!=undefined)
+				return moment.utc(input).format("LT");
+			else
+				return "Select time..."
 		}
 	})
 	.filter('filterDate', function(){
 		return function(input){
-			return moment.utc(input).format("LL");
+			if (input!=undefined)
+				return moment.utc(input).format("LL");
+			else
+				return "Select date..."
 		}
 	})
 	.filter('filterDateTime', function(){
 		return function(input){
-			return moment.utc(input).format("LLL");
+			if (input!=undefined)
+				return moment.utc(input).format("LLL");
+			else
+				return "Select date/time..."
 		}
 	})
 	.directive('ilInput', function() {
@@ -81,6 +96,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.days.shift();
 				$scope.days.push(moment.weekdaysMin()[0]);
 			}
+			
+			if ($scope.dateCanChangeMonth==undefined)
+				$scope.dateCanChangeMonth=true;
 				
 			if ($scope.z==undefined)
 				$scope.z=10000;
@@ -90,7 +108,14 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			else
 				$scope.modalStyle={top: "0px",backgroundColor:"white"};
 			
+			$scope.hidden_date_selected=moment();
 			
+			if ($scope.dateFixModal==undefined)
+				$scope.dateFixModal=false;
+			
+			if ($scope.dateFixModal)
+				$timeout(function(){$scope.date_openModal()});
+					
 			$scope.selectors={}
 							
 				
@@ -113,17 +138,17 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			
 			if ($scope.type=="date" || $scope.type=="dateTime"){
-				if ($scope.timeMinYear==undefined)
-					$scope.timeMinYear=moment().year()-10;
+				if ($scope.dateMinYear==undefined)
+					$scope.dateMinYear=moment().year()-10;
 					
-				if ($scope.timeMaxYear==undefined)
-					$scope.timeMaxYear=moment().year()+1;
+				if ($scope.dateMaxYear==undefined)
+					$scope.dateMaxYear=moment().year()+1;
 					
-				if ($scope.timeShowYearCombo==undefined)
-					$scope.timeShowYearCombo=false;
+				if ($scope.dateShowYearCombo==undefined)
+					$scope.dateShowYearCombo=false;
 					
 				$scope.yearList=[];
-				for(var i=$scope.timeMinYear; i<=$scope.timeMaxYear; i++)
+				for(var i=$scope.dateMinYear; i<=$scope.dateMaxYear; i++)
 					$scope.yearList.push(i);
 				
 			}
@@ -182,10 +207,19 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.editMode=true;
 			}
 			
-			
-			
 			$scope.$watch("model."+$scope.field,function updateModel(){
 				$scope.checkValidate();
+			});
+			
+			$scope.$watch("dateAvailableDates",function updateModel(){
+				if ($scope.dateAvailableDates!=undefined)
+					for (i in $scope.dateAvailableDates)
+						if ($scope.dateAvailableDates[i]._isAMomentObject!=undefined){
+							$scope.dateAvailableDates[i]=$scope.date_getNumeric($scope.dateAvailableDates[i]);
+						}else{
+							$scope.dateAvailableDates[i][0]=$scope.date_getNumeric($scope.dateAvailableDates[i][0]);
+							$scope.dateAvailableDates[i][1]=$scope.date_getNumeric($scope.dateAvailableDates[i][1]);
+						}
 			});
 			
 			$scope._validated=false;
@@ -324,20 +358,29 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.date_getMonth=function(){
-				if ($scope.date_selected!=undefined)
+				if ($scope.date_selected!=undefined && $scope.date_selected._isAMomentObject)
 					return $scope.date_selected.format("MMMM");
+				else
+					return $scope.hidden_date_selected.format("MMMM");
 			}
 			
 			$scope.date_getYear=function(){
-				if ($scope.date_selected!=undefined)
+				if ($scope.date_selected!=undefined && $scope.date_selected._isAMomentObject)
 					return $scope.date_selected.format("YYYY");
+				else
+					return $scope.hidden_date_selected.format("YYYY");
 			}
 			
 			
 			$scope.date_prepareCalendar=function(){
 				date=$scope.date_selected;
+				if (date==undefined || date._isAMomentObject==undefined)
+					date=$scope.hidden_date_selected;
+					
 				firstWeekday = new Date(date.year(), date.month(), 1).getDay();
 				lastDateOfMonth = new Date(date.year(), date.month() + 1, 0).getDate();
+					
+					
 				if (firstWeekday==0)
 					firstWeekday=7;
 				
@@ -401,31 +444,69 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.date_update=function(newDate){
-				if (newDate.year()<$scope.timeMinYear || newDate.year()>$scope.timeMaxYear)
+				if (newDate.year()<$scope.dateMinYear || newDate.year()>$scope.dateMaxYear)
 					return;
 				
-				$scope.date_selected=newDate;
+				if ($scope.date_selected!=undefined && $scope.date_selected._isAMomentObject)
+					$scope.date_selected=newDate;
+				else
+					$scope.hidden_date_selected=newDate;
+					
 				$scope.date_prepareCalendar();
 				$scope.date_updateSelectedYear();
 			}
 			
 			$scope.date_previousMonth=function(){
-				$scope.date_update(moment($scope.date_selected).subtract(1,'month'));
-				
+				if ($scope.date_selected!=undefined && $scope.date_selected._isAMomentObject)
+					$scope.date_update(moment($scope.date_selected).subtract(1,'month'));
+				else
+					$scope.date_update(moment($scope.hidden_date_selected).subtract(1,'month'));
 			}
 			
 			$scope.date_nextMonth=function(){
-				$scope.date_update(moment($scope.date_selected).add(1,'month'));
+				if ($scope.date_selected!=undefined && $scope.date_selected._isAMomentObject)
+					$scope.date_update(moment($scope.date_selected).add(1,'month'));
+				else
+					$scope.date_update(moment($scope.hidden_date_selected).add(1,'month'));
 			}
 			
 			$scope.date_selectedYearChanged=function(value){
-				$scope.date_selected.year(value);
+				$scope.hidden_date_selected.year(value);
+				
+				if ($scope.date_selected!=undefined && $scope.date_selected._isAMomentObject)
+					$scope.date_selected.year(value);
+					
 				$scope.date_prepareCalendar();
 			}
 			
 			$scope.date_updateSelectedYear=function(){
 				year=Math.floor($scope.date_getYear());
 				$scope.selectors.selectedYear=year;
+			}
+			
+			$scope.date_checkDate=function(date){
+				if ($scope.dateAvailableDates==undefined || date.date==undefined)
+					return true;
+					
+				comp=$scope.date_getNumeric(date.date);
+				
+				for (i in $scope.dateAvailableDates)
+					if (!Array.isArray($scope.dateAvailableDates[i])){
+						if ($scope.dateAvailableDates[i]==comp)
+							return true;
+					}else{
+						if (comp>=$scope.dateAvailableDates[i][0] && comp<=$scope.dateAvailableDates[i][1])
+							return true;
+					}
+					
+				return false;
+			}
+			
+			$scope.date_getNumeric=function(date){
+				if (date!=undefined)
+					return date.date()+date.month()*100+date.year()*10000;
+				else
+					return 0;
 			}
 			
 			$scope.time_openModal=function(){
@@ -465,6 +546,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.date_openModal();
 			}
 			
+			
+			
 			$scope.boolean_tonggle=function(){
 				if ($scope.model[$scope.field]==$scope.booleanTrue)
 					$scope.model[$scope.field]=$scope.booleanFalse;
@@ -484,6 +567,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.autocomplete_onChange=function(){
 				$scope._onChange();
 			}
+			
 			
 		}];
 		
@@ -516,9 +600,13 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              textVerifyFloat:"=?",
 	              
 				  timeSeconds:"=?",
-				  timeMinYear:"=?",
-				  timeMaxYear:"=?",
-				  timeShowYearCombo:"=?",
+				  
+				  dateMinYear:"=?",
+				  dateMaxYear:"=?",
+				  dateShowYearCombo:"=?",
+				  dateAvailableDates:"=?",
+				  dateCanChangeMonth:"=?",
+				  dateFixModal:"=?",
 
 				  selectVerifyRequired:"=?",
 				  selectOptions:"=?",

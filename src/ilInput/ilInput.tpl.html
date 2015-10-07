@@ -66,24 +66,31 @@
 
 <!-- MODALS --> 
 
-<div ng-if="type=='date'||type=='dateTime'" style="position: relative" ng-show="date_showModal"> 
+<div ng-if="type=='date'||type=='dateTime'" style="position: relative" ng-show="date_showModal || dateFixModal"> 
 	<div style="position: absolute; border-color: silver; z-index: {{z}}; left: 0px; right: 0px;" ng-style="modalStyle"> 
 		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver"> 
 			<tr> 
-				<td ng-click="date_previousMonth()" style="cursor: pointer">&lt;</td> 
-				<td colspan="5">{{date_getMonth()}} <span ng-if="!timeShowYearCombo">{{date_getYear()}}</span>
-					<select ng-if="timeShowYearCombo" ng-model="selectors.selectedYear" ng-options="y for y in yearList" ng-change="date_selectedYearChanged(selectors.selectedYear)">
+				<td>
+					<span ng-if="dateCanChangeMonth" ng-click="date_previousMonth()" style="cursor: pointer">&lt;</span>
+				</td> 
+				<td colspan="5">{{date_getMonth()}} <span ng-if="!dateShowYearCombo">{{date_getYear()}}</span>
+					<select ng-if="dateShowYearCombo" ng-model="selectors.selectedYear" ng-options="y for y in yearList" ng-change="date_selectedYearChanged(selectors.selectedYear)">
 					</select>
 				</td> 
-				<td ng-click="date_nextMonth()" style="cursor: pointer">&gt;</td> 
+				<td>
+					<span ng-if="dateCanChangeMonth" ng-click="date_nextMonth()" style="cursor: pointer">&gt;</span>
+				</td> 
 			</tr> 
 			<tr> 
 				<td ng-repeat="day in days">{{day}}</td> 
 			</tr> 
 			<tr ng-repeat="w in weeks"> 
-				<td ng-repeat="d in w" style="cursor: pointer" ng-click="date_selectDate(d)"> 
-					<span style="color:gray" ng-if="!d.selected">{{d.label}}</span> 
+				<td ng-repeat="d in w" > 
+					<div ng-if="!d.selected && date_checkDate(d)" style="color:#337AB7;cursor: pointer" ng-click="date_selectDate(d)">{{d.label}}</div> 
+					<span ng-if="!d.selected && !date_checkDate(d)" style="color:silver">{{d.label}}</span> 
 					<span ng-if="d.selected" class="label label-primary">{{d.label}}</span> 
+					
+					
 				</td> 
 			</tr> 
 		</table> 

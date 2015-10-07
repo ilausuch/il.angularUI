@@ -66,16 +66,16 @@
 				this.edit=false;
 				
 				this.verify=function(model,value){
-					console.debug("Verify",model,value);
+					//console.debug("Verify",model,value);
 					return true;
 				}
 				
 				this.onVerify=function(valid,model,value){
-					console.debug("Verify?",valid,model,value);
+					//console.debug("Verify?",valid,model,value);
 				}
 				
 				this.verifyTime=function(model,value){
-					console.debug("Verify",model,value);
+					//console.debug("Verify",model,value);
 					return value.h<12;
 				}
 				
@@ -99,6 +99,12 @@
 				}
 				
 				this.verifyGroup=new ilInputVerificationGroup();
+				
+				this.dates=[
+					moment().add(1,'days'),
+					moment().add(2,'days'),
+					[moment().add(5,'days'),moment().add(10,'days')]
+				]
 			});
 		</script>
 	</head>
@@ -210,7 +216,7 @@
 						required="true"
 						date-locale="'es'"
 						inner-awesome-icon="'calendar'"
-						time-show-year-combo="true"
+						date-show-year-combo="true"
 					>	
 					</il-input>
 				</td>
@@ -273,5 +279,24 @@
 		<button class="btn" ng-click="mc.edit=true">Edit</button>
 		<button class="btn" ng-click="mc.edit=false">No Edit</button>
 		<button class="btn" ng-click="mc.addPet()">Add pet</button>
+		
+		<div style="max-width: 300px">
+			<il-input
+				
+				model="mc.model"
+				field="'date2'"
+				type="'date'"
+				label="'Select a date'"
+				only-text="mc.edit"
+				required="true"
+				date-locale="'es'"
+				inner-awesome-icon="'calendar'"
+				date-show-year-combo="false"
+				date-can-change-month="false"
+				date-fix-modal="true"
+				date-available-dates="mc.dates"
+			>	
+			</il-input>
+		</div>
 	</body>
 </html>
