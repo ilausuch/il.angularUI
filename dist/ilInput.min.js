@@ -81,7 +81,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.accentFold=function(inStr) {
 				if (inStr==undefined) return "";
 				inStr=""+inStr;
-				return inStr.replace(/([àáâãäå])|([ç])|([èéêë])|([ìíîï])|([ñ])|([òóôõöø])|([ß])|([ùúûü])|([ÿ])|([æ])/g, function(str,a,c,e,i,n,o,s,u,y,ae) { if(a) return 'a'; else if(c) return 'c'; else if(e) return 'e'; else if(i) return 'i'; else if(n) return 'n'; else if(o) return 'o'; else if(s) return 's'; else if(u) return 'u'; else if(y) return 'y'; else if(ae) return 'ae'; });
+				return inStr.toLowerCase().replace(/([àáâãäå])|([ç])|([èéêë])|([ìíîï])|([ñ])|([òóôõöø])|([ß])|([ùúûü])|([ÿ])|([æ])/g, function(str,a,c,e,i,n,o,s,u,y,ae) { if(a) return 'a'; else if(c) return 'c'; else if(e) return 'e'; else if(i) return 'i'; else if(n) return 'n'; else if(o) return 'o'; else if(s) return 's'; else if(u) return 'u'; else if(y) return 'y'; else if(ae) return 'ae'; });
 			}
 
 
@@ -171,6 +171,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					
 			if ($scope.placeholder==undefined)
 				$scope.placeholder="";
+				
+			if ($scope.autocompleteSearchMethod==undefined)
+				$scope.autocompleteSearchMethod="normal";
 			
 		
 			//Functions --->
@@ -559,8 +562,42 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.autocomplete_filter=function(search){
 				return function(value,index) {
-					search=$scope.accentFold(search.toLowerCase());
-					return $scope.accentFold($scope._selectLabelFnc(value).toLowerCase()).substr(0, search.length)==search;
+					search=$scope.accentFold(search);
+					
+					switch ($scope.autocompleteSearchMethod){
+						case "starWith":
+							
+							return $scope.accentFold($scope._selectLabelFnc(value)).substr(0, search.length)==search;
+						break;
+						
+						case "anyPosition":
+							return $scope.accentFold($scope._selectLabelFnc(value)).search(search)>=0;
+						break;
+						
+						case "anyWord":
+							search2=search.split(" ");
+							for(i in search2){
+								
+								if ($scope.accentFold($scope._selectLabelFnc(value)).search(search2[i])>=0)
+									return true;
+							}
+							return false;
+						break;
+						
+						case "allWords":
+						case "normal":
+						default:
+							search2=search.split(" ");
+							for(i in search2)
+								if ($scope.accentFold($scope._selectLabelFnc(value)).search(search2[i])<0)
+									return false;
+							
+							return true;
+							
+							
+							
+					}
+						
 			    }
 			}
 			
@@ -623,6 +660,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  booleanFalse:"=?",
 				  booleanTrueHtml:"=?",
 				  booleanFalseHtml:"=?",
+				  
+				  autocompleteSearchMethod:"=?",
 				  
 				  
 			},
