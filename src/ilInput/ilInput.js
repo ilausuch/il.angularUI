@@ -84,12 +84,19 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				return inStr.toLowerCase().replace(/([àáâãäå])|([ç])|([èéêë])|([ìíîï])|([ñ])|([òóôõöø])|([ß])|([ùúûü])|([ÿ])|([æ])/g, function(str,a,c,e,i,n,o,s,u,y,ae) { if(a) return 'a'; else if(c) return 'c'; else if(e) return 'e'; else if(i) return 'i'; else if(n) return 'n'; else if(o) return 'o'; else if(s) return 's'; else if(u) return 'u'; else if(y) return 'y'; else if(ae) return 'ae'; });
 			}
 
+			$scope.defaultValue=function(varName,value){
+				if ($scope[varName]==undefined)
+					$scope[varName]=value;
+			}
 
+			$scope.defaultValue("type","text");
+			/*
 			if ($scope.type==undefined)
 				$scope.type="text"
-				
+			*/	
 			if ($scope.dateLocale!=undefined)
 				moment.locale($scope.dateLocale);
+			
 				
 			$scope.days=moment.weekdaysMin();
 			if (moment.localeData().firstDayOfWeek()==1){
@@ -97,12 +104,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.days.push(moment.weekdaysMin()[0]);
 			}
 			
-			if ($scope.dateCanChangeMonth==undefined)
-				$scope.dateCanChangeMonth=true;
-				
-			if ($scope.z==undefined)
-				$scope.z=10000;
-				
+			$scope.defaultValue("dateCanChangeMonth",true);
+			$scope.defaultValue("z",10000);
+			
 			if ($scope.modalOnTop==true)
 				$scope.modalStyle={bottom:"1em",backgroundColor:"white"};
 			else
@@ -110,8 +114,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.hidden_date_selected=moment();
 			
-			if ($scope.dateFixModal==undefined)
-				$scope.dateFixModal=false;
+			$scope.defaultValue("dateFixModal",false);
 			
 			if ($scope.dateFixModal)
 				$timeout(function(){$scope.date_openModal()});
@@ -153,29 +156,19 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				
 			}
 			
+			$scope.defaultValue("requiredVisible",true);
+			$scope.defaultValue("requiredLabel","*");
+			$scope.defaultValue("booleanTrue",true);
+			$scope.defaultValue("booleanFalse",false);
+			$scope.defaultValue("booleanTrueHtml",'<span class="glyphicon glyphicon-check"></span>');
+			$scope.defaultValue("booleanFalseHtml",'<span class="glyphicon glyphicon-unchecked"></span>');
+			$scope.defaultValue("placeholder","");
+			$scope.defaultValue("autocompleteSearchMethod","normal");
+			$scope.defaultValue("verifyIfVoid",false);
 			
-			if ($scope.booleanTrue==undefined)
-				$scope.booleanTrue=true;
-				
-			if ($scope.booleanFalse==undefined)
-				$scope.booleanFalse=false;
-				
-			if ($scope.booleanTrueHtml==undefined)
-				$scope.booleanTrueHtml='<span class="glyphicon glyphicon-check"></span>';
-			
-			if ($scope.booleanFalseHtml==undefined)
-				$scope.booleanFalseHtml='<span class="glyphicon glyphicon-unchecked"></span>';
-						
 			if ($scope.verifyGroup!=undefined)
 					$scope.verifyGroup.register($scope.field);
-					
-			if ($scope.placeholder==undefined)
-				$scope.placeholder="";
-				
-			if ($scope.autocompleteSearchMethod==undefined)
-				$scope.autocompleteSearchMethod="normal";
 			
-		
 			//Functions --->
 			$scope.getValue=function(){
 				if ($scope.model==undefined || $scope.model[$scope.field]==undefined)
@@ -327,6 +320,16 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.checkValidate();
+			
+			$scope.feedbackVisible=function(){
+				if ($scope.verifyIfVoid)
+					return true;
+					
+				if ($scope.getValue()==undefined || $scope.getValue()=="")
+					return false;
+				else
+					return true;
+			}
 			
 			$scope._selectValueFnc=function(item){
 				if (item==undefined)
@@ -565,7 +568,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					search=$scope.accentFold(search);
 					
 					switch ($scope.autocompleteSearchMethod){
-						case "starWith":
+						case "startWith":
 							
 							return $scope.accentFold($scope._selectLabelFnc(value)).substr(0, search.length)==search;
 						break;
@@ -625,6 +628,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              verifyFnc:"&",
 	              onVerify:"&",
 	              verifyGroup:"=?",
+	              verifyIfVoid:"=?",
 	              
 	              label:"=?",
 	              innerLabel:"=?",
@@ -632,6 +636,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              innerAwesomeIcon:"=?",
 	              
 	              required:"=?",
+	              requiredVisible:"=?",
+	              requiredLabel:"=?",
 	              
 	              textVerifyInt:"=?",
 	              textVerifyFloat:"=?",

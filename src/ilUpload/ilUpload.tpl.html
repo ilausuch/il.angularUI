@@ -1,0 +1,55 @@
+<div>
+	<div ng-if="!multiple">
+		<table class="table">
+			<tr ng-if="model[field].length==0">
+				<td  colspan="3" style="vertical-align: middle">
+					{{'No file'|translate}}
+				</td>
+				<td style="vertical-align: middle">
+					<button type="button" class="btn btn-primary" ng-click="pick()">{{'Select file'|translate}}</button>
+				</td>
+			</tr>
+			<tr ng-if="model[field].length>0">
+				<td style="vertical-align: middle">
+					<img ng-if="isImage(model[field][0])" ng-src="{{model[field][0].url}}" style="max-height: 3em; max-width: 10em">
+					<span ng-if="!isImage(model[field][0])"><i class="fa" ng-class="getMimeAwesomeClass(model[field][0])" style="margin-right: 0.5em"></i> {{getMime(model[field][0])}}</span>
+				</td>
+				<td style="vertical-align: middle">
+					{{model[field][0].filename}}
+				</td>
+				<td style="vertical-align: middle">
+					{{getSize(model[field][0])}}
+				</td>
+				<td style="vertical-align: middle">
+					<button type="button" class="btn btn-primary" ng-click="pick()">{{'Change file'|translate}}</button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div ng-if="multiple">
+		<table class="table">
+			<tr ng-if="model[field].length==0">
+				<td  colspan="4" style="vertical-align: middle">
+					{{'No files'|translate}}
+				</td>
+			</tr>
+			<tr ng-repeat="file in model[field]">
+				<td style="vertical-align: middle; text-align: center">
+					<img ng-if="isImage(file)" ng-src="{{file.url}}" style="max-height: 3em; max-width: 10em">
+					<span ng-if="!isImage(file)"><i class="fa" ng-class="getMimeAwesomeClass(file)" style="margin-right: 0.5em"></i> {{getMime(file)}}</span>
+				</td>
+				<td style="vertical-align: middle">
+					{{file.filename}}
+				</td>
+				<td style="vertical-align: middle">
+					{{getSize(file)}}
+				</td>
+				<td style="vertical-align: middle">
+					<span class="glyphicon glyphicon-trash" style="cursor:pointer" ng-click="removeFile(file)"></span>
+				</td>
+			</tr>
+		</table>
+		<button type="button" class="btn btn-primary" ng-click="pick()">{{'Select file'|translate}}</button>
+	</div>
+</div>

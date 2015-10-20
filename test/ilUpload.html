@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html class="bg">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, target-densitydpi=device-dpi" />
+		<meta name="msapplication-tap-highlight" content="no" />
+		<title>test ilUploader</title>
+		
+		<!-- Angular -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/i18n/angular-locale_es-es.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bower-angular-translate/2.6.1/angular-translate.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.min.js"></script>
+		
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>		
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"/>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
+		
+		<script type="text/javascript" src="http://api.filepicker.io/v2/filepicker.js"></script>
+		<script type="text/javascript" src="../dist/ilUpload.min.js"></script>
+
+		<script>
+			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.upload']);
+			var mc;
+			
+			app.config(function($translateProvider) {
+			  $translateProvider.translations('es', {
+			    "Select file": 'Selecciona fichero',
+			  });
+			});
+
+			app.controller("MainController", function($rootScope,$scope,$timeout,$translate,$http,$q){
+				mc=this;
+				this.$rootScope=$rootScope;
+				this.$scope=$scope;
+				this.$timeout=$timeout;
+				this.$http=$http;
+				this.$q=$q;
+				
+				this.model={}
+				
+				$translate.use('es');
+				
+				this.uploadSystem=new ilUpload_FilePiker("INSERT HERE YOUR APIKEY",
+														{
+															services: ['COMPUTER', 'FACEBOOK', 'CLOUDAPP']
+														});
+				
+				this.onChange=function(list){
+					console.debug("EVENT","On Change!",list);
+				}
+			});
+		</script>
+	</head>
+	
+	
+	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
+		<il-upload model="mc.model" field="'files'" system="mc.uploadSystem" multiple="false" on-change="mc.onChange(list)"></il-upload>
+	</body>
+</html>

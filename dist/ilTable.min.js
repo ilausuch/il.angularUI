@@ -83,6 +83,9 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.pagination_pages=1;
 			$scope.visual="$visual"+Math.round(Math.random()*100000);
 			
+			if ($scope.showTitleColumn==undefined)
+				$scope.showTitleColumn=true;	
+			
 			
 			$scope.$watch("pagination_page",function(){
 				$scope.pagination_desp=($scope.pagination_page-1)*$scope.itemsPerPage;
@@ -355,7 +358,7 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope._onSelectAll=function(){
 				for (k in $scope.results){
-					$scope.prepareVisual($scope.result[k]);
+					$scope.prepareVisual($scope.results[k]);
 						
 					if ($scope.allSelected)
 						$scope.results[k][$scope.visual].selected=true;
@@ -439,7 +442,8 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              textSaveConfirm:"=?",
 	              textDeleteConfirm:"=?",
 	              itemsPerPageOptions:"=?",
-	              operationsLabel:"=?"
+	              operationsLabel:"=?",
+	              showTitleColumn:"=?"
 			},
 			controller: controller,
 			/*emplateUrl:'src/ilTable/ilTable.tpl.html',*/
