@@ -25,7 +25,6 @@ function ilUpload_FilePiker(secret,config){
 		filepicker.setKey(this.secret);
 		filepicker.pick(config,
 			function(Blob){
-				console.debug(Blob);
 				successCallback(Blob)
 			},
 			function(FPError){
@@ -58,6 +57,7 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 			$scope.getFiles=function(){
 				return $scope.model[$scope.field];
 			}
+			
 			
 			$scope.getSize=function(file){
 				if (file.size/(1024*1024)>=1)
@@ -185,7 +185,7 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 						
 					},
 					function(errorText){
-						console.debug("Error")
+						if (console) console.debug("Error",errorText);
 					}
 				);
 			}
@@ -213,7 +213,8 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 				field:"=",
 				system:"=",
 				multiple:"=?",
-				onChange:"&"				  
+				userFields:"=?",
+				onChange:"&",			  
 			},
 			controller: controller,
 			template:template

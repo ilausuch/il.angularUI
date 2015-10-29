@@ -1,16 +1,16 @@
 <div>
 	<div ng-repeat="section in model.sections" ng-if="currentSection==section">
 		<div class="alert alert-info" role="alert">
-			<h2>{{section.title}}</h2>
-			<p ng-if="section.description">
-				{{section.description}}
+			<h2 ng-bind-html="section.title"></h2>
+			<p ng-if="section.description" ng-bind-html="section.description" style="font-style: italic;">
+				
 			</p>
 		</div>
 		
 		<div class="panel" ng-class={'panel-success':checkQuestion(question),'panel-default':!checkQuestion(question)} ng-repeat="question in section.questions">
-			<div class="panel-heading">{{question.title}}
-				<p ng-if="question.description">
-					<i>{{question.description}}</i>
+			<div class="panel-heading">
+				<p ng-bind-html="question.title"></p>
+				<p ng-if="question.description " ng-bind-html="question.description"  style="font-style: italic;">
 				</p>
 			</div>
 			<div class="panel-body">

@@ -43,8 +43,8 @@
 				this.model={}
 				
 				$translate.use('es');
-				
-				this.uploadSystem=new ilUpload_FilePiker("INSERT HERE YOUR APIKEY",
+
+				this.uploadSystem=new ilUpload_FilePiker("",
 														{
 															services: ['COMPUTER', 'FACEBOOK', 'CLOUDAPP']
 														});
@@ -52,12 +52,51 @@
 				this.onChange=function(list){
 					console.debug("EVENT","On Change!",list);
 				}
+				
+				this.fields=[
+					{
+						id:"documentType",
+						label:"Document type",
+						type:"combobox",
+						options:[
+							{label:"Photo",value:"photo"},
+							{label:"Passport",value:"passport"},
+						]
+					},
+					{
+						id:"info",
+						label:"Aditional info",
+						type:"text",
+					},
+					{
+						id:"verified",
+						label:"Verified",
+						type:"checkbox",
+					}
+				]
 			});
 		</script>
 	</head>
 	
 	
 	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
-		<il-upload model="mc.model" field="'files'" system="mc.uploadSystem" multiple="false" on-change="mc.onChange(list)"></il-upload>
+		
+		<p>
+			Insert filepicker key here <input ng-model="mc.uploadSystem.secret">
+		</p>
+	
+		<div class="panel panel-default">
+			<div class="panel-heading">Múltiple files</div>
+			<div class="panel-body">
+				<il-upload model="mc.model" field="'files'" system="mc.uploadSystem" multiple="true" on-change="mc.onChange(list)" user-fields="mc.fields"></il-upload>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">One file</div>
+			<div class="panel-body">
+				<il-upload model="mc.model" field="'files2'" system="mc.uploadSystem" multiple="false" on-change="mc.onChange(list)" user-fields="mc.fields"></il-upload>
+			</div>
+		</div>
 	</body>
 </html>
