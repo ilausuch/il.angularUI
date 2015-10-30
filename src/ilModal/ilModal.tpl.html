@@ -3,7 +3,7 @@
 <div style="z-index: {{_zIndex}}; position: fixed; left: 0px; right: 0px;" ng-if="show">
 	<div style="margin: 0 auto; background-color: white">
 		<div class="modal" style="display: block">
-			<div class="modal-dialog" style="width: {{size||'600px'}};">
+			<div class="modal-dialog" style="width: {{size||'600px'}}; top:{{top||'20px'}};">
 				<div class="modal-content">
 					<div class="modal-header" ng-if="trueIfUndefined(titleVisible)">
 						<button type="button" class="close" ng-click="close(false)" ng-show="trueIfUndefined(closeVisible)"><span aria-hidden="true">&times;</span></button>

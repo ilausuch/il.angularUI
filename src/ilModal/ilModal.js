@@ -10,6 +10,7 @@ angular.module("il.ui.modal", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope._zIndex=100;
 			else
 				$scope._zIndex=$scope.z*100;
+			
 				
 			$scope._zIndexBg=$scope._zIndex-1;
 			
@@ -58,7 +59,9 @@ angular.module("il.ui.modal", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              
 	              size:'=',
 	              
-	              autoClose:'='
+	              autoClose:'=',
+	              
+	              top:'=',
 	              
 			},
 			controller: controller,

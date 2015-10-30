@@ -25,6 +25,7 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 	              labelField:'=',
 	              itemsPerPage:"=",
 	              modalSize:'=',
+	              top:'=?',
 			},
 			controller: controller,
 			template:template
