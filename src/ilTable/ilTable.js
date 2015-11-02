@@ -209,7 +209,6 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 
 			$scope.searchFilter=function(item){
-				
 				if ($scope.searchCad=="")
 					return true;
 					
@@ -217,9 +216,11 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				
 				for (k in $scope.columns){
 					var column=$scope.columns[k];
-
-					if ($scope.accentFold($scope.getValue(item,column).toLowerCase()).indexOf(searchCad)>-1)
-						return true;
+					
+					var value=$scope.getValue(item,column);
+					if (typeof value === 'string')
+						if ($scope.accentFold(value.toLowerCase()).indexOf(searchCad)>-1)
+							return true;
 				}
 				
 				return false;	
@@ -287,7 +288,6 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope._onExpand=function(item){
-				console.debug("ITEM",item);
 				$scope.prepareVisual(item);
 									
 				if (item[$scope.visual].expand==undefined)
