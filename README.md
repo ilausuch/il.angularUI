@@ -75,7 +75,7 @@ requiredVisible controls if required label is visible or not.
 
 
 
-### onChange
+### onChange, onChangeOnlyWhenValidate
 
 ### z, modalOnTop
 

@@ -105,6 +105,13 @@
 					moment().add(2,'days'),
 					[moment().add(5,'days'),moment().add(10,'days')]
 				]
+				
+				this.onChangeTest=function(){
+					console.debug("Change!!");
+				}
+				this.onChangeTestValidated=function(){
+					console.debug("Change & validated!!");
+				}
 			});
 		</script>
 	</head>
@@ -259,6 +266,8 @@
 			text-verify-float="true"
 			verify-fnc="mc.verify(model,value)"
 			on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
+			on-change="mc.onChangeTest()"
+			on-change-only-when-validate="mc.onChangeTestValidated()"
 			
 		>	
 		</il-input>

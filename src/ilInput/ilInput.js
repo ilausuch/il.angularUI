@@ -315,8 +315,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope._onChange=function(){
 				$scope.checkValidate();
+				$scope.onChange();
 				if ($scope._validated)
-					$scope.onChange();
+					$scope.onChangeOnlyWhenValidate();
 			}
 			
 			$scope.checkValidate();
@@ -625,6 +626,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              placeholder:"=?",
 	              
 				  onChange:'&',
+				  onChangeOnlyWhenValidate:"&",
 	              verifyFnc:"&",
 	              onVerify:"&",
 	              verifyGroup:"=?",
