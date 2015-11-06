@@ -59,6 +59,10 @@
 				
 				for (var i=0; i<100; i++)
 					this.items.push({name:"name "+i,lastname:"lastname "+i});
+					
+				this.onChange=function(item){
+					console.debug("OnChange",item);
+				}
 			});
 		</script>
 	</head>
@@ -75,6 +79,7 @@
 			label-field="'name'"
 			modal-size="'80%'"
 			top="'100px'"
+			on-change="mc.onChange(item)"
 		>
 		</il-advanced-combo>
 	

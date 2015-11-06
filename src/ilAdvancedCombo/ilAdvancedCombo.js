@@ -8,6 +8,8 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 			$scope.onSelectItem=function(item){
 				$scope.model[$scope.field]=item;
 				$scope.show=false;
+				if ($scope.onChange!=undefined)
+					$scope.onChange({item:item});
 			}
 		}];
 		
@@ -26,6 +28,7 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 	              itemsPerPage:"=",
 	              modalSize:'=',
 	              top:'=?',
+	              onChange:"&",
 			},
 			controller: controller,
 			template:template
