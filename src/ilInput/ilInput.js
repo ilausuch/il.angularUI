@@ -165,6 +165,11 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.defaultValue("placeholder","");
 			$scope.defaultValue("autocompleteSearchMethod","normal");
 			$scope.defaultValue("verifyIfVoid",false);
+			$scope.defaultValue("checkboxMax",1);
+			$scope.defaultValue("checkboxMin",1);
+			$scope.defaultValue("requiredIconVisible",true);
+			$scope.defaultValue("textRows",5);
+			
 			
 			if ($scope.verifyGroup!=undefined)
 					$scope.verifyGroup.register($scope.field);
@@ -220,6 +225,13 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope._validated=false;
 			
+			$scope.checkValidated=function(status){
+				$scope._validated=status;
+								
+				if ($scope.verifyGroup!=undefined)
+					$scope.verifyGroup.update($scope.field,status);
+			}
+			
 			$scope.checkValidate=function(){
 				$scope._validated=true;
 				
@@ -232,11 +244,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						case "text":
 						case "password":
 							if ($scope.getValue()==undefined || $scope.getValue()==""){
-								$scope._validated=false;
-								
-								if ($scope.verifyGroup!=undefined)
-									$scope.verifyGroup.update($scope.field,false);
-								
+								$scope.checkValidated(false);
 								return;
 							}
 						break;
@@ -245,22 +253,14 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						case "date":
 						case "dateTime":
 							if ($scope.model[$scope.field]==undefined){
-								$scope._validated=false;
-								
-								if ($scope.verifyGroup!=undefined)
-									$scope.verifyGroup.update($scope.field,false);
-								
+								$scope.checkValidated(false);
 								return;
 							}
 						break;
 						
 						case "autocomplete":
 							if ($scope.model[$scope.field]==undefined){
-								$scope._validated=false;
-								
-								if ($scope.verifyGroup!=undefined)
-									$scope.verifyGroup.update($scope.field,false);
-								
+								$scope.checkValidated(false);
 								return;
 							}else{
 								found=false;
@@ -269,30 +269,40 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 										found=true;
 										
 								if (!found){
-									$scope._validated=false;
-									return;
+									//$scope._validated=false;
+									//return;
+									$scope.checkValidated(false);
 								}
 							}
+						break;
+						case "checkbox":
+							if ($scope.model[$scope.field]==undefined){
+								$scope.checkValidated(false);
+								return;
+							}
+							
+							var len=0;
+							if (Array.isArray($scope.model[$scope.field]))
+								len=$scope.model[$scope.field].length;
+							else
+								len=1;
+							
+							if (($scope.checkboxMax==0 || len<=$scope.checkboxMax) && ($scope.checkboxMin==0 || len>=$scope.checkboxMin))
+								$scope.checkValidated(true);
+							else
+								$scope.checkValidated(false);
 						break;
 					}
 				}	
 					
 				if ($scope.type=="text" || $scope.type=="password"){
 					if ($scope.textVerifyInt && parseInt($scope.getValue())!=$scope.getValue()){
-						$scope._validated=false;
-						
-						if ($scope.verifyGroup!=undefined)
-							$scope.verifyGroup.update($scope.field,false);
-						
+						$scope.checkValidated(false);
 						return;
 					}
 					
 					if ($scope.textVerifyFloat && parseFloat($scope.getValue())!=$scope.getValue()){
-						$scope._validated=false;
-						
-						if ($scope.verifyGroup!=undefined)
-							$scope.verifyGroup.update($scope.field,false);
-						
+						$scope.checkValidated(false);
 						return;
 					}
 				}
@@ -610,6 +620,58 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			
+			$scope.checkbox_checkOptions=function(item){
+				val=$scope.getValue();
+				if (val==undefined)
+					return false;
+					
+				if (Array.isArray(val)){
+					for (i in val){
+						if (val[i]==item)
+							return true;
+					}
+				}
+				else{
+					return val==item
+				}
+				
+				return false;
+			}
+			
+			$scope.checkbox_select=function(item){
+				if ($scope.checkbox_checkOptions(item)) {
+					if ($scope.checkboxMax==1)
+						$scope.model[$scope.field]=undefined;
+					else{
+						if (!Array.isArray($scope.model[$scope.field]))
+							$scope.model[$scope.field]=[];
+							
+						var list2=[];
+						$scope.model[$scope.field].forEach(function(item2){
+							if (item2!=item)
+								list2.push(item2);
+						})
+						
+						$scope.model[$scope.field]=list2;
+					}
+				}
+				else {
+					if ($scope.checkboxMax==1)
+						$scope.model[$scope.field]=item;
+					else{
+						if (!Array.isArray($scope.model[$scope.field]))
+							$scope.model[$scope.field]=[];
+							
+						$scope.model[$scope.field].push(item);
+						
+						if ($scope.model[$scope.field].length>$scope.checkboxMax)
+							$scope.model[$scope.field].shift();
+						
+					}
+				}
+				$scope._onChange();
+			}
+			
 		}];
 		
 		template='%%TEMPLATE%%';
@@ -636,10 +698,12 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              innerLabel:"=?",
 	              innerIcon:"=?",
 	              innerAwesomeIcon:"=?",
+	              description:"=?",
 	              
 	              required:"=?",
 	              requiredVisible:"=?",
 	              requiredLabel:"=?",
+	              requiredIconVisible:"=?",
 	              
 	              textVerifyInt:"=?",
 	              textVerifyFloat:"=?",
@@ -670,6 +734,11 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  booleanFalseHtml:"=?",
 				  
 				  autocompleteSearchMethod:"=?",
+				  
+				  checkboxMax:"=?",
+				  checkboxMin:"=?",
+				  
+				  textRows:"=?",
 				  
 				  
 			},

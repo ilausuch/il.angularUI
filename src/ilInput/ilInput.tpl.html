@@ -25,9 +25,10 @@
 </div>
 
 <div ng-if="!onlyText" class="form-group has-feedback" ng-class="{'has-success':_validated && undefinedIs(verifyShow,true) && feedbackVisible(), 'has-error':!_validated && undefinedIs(verifyShow,true) && feedbackVisible()}"> 
-	<label ng-if="label" class="control-label">{{label}}
+	<label ng-if="label" class="control-label">{{label|translate}}
 		<span ng-if="required && requiredVisible" style="color:red">{{requiredLabel}}</span>
 	</label> 
+	<p ng-if="description"><i>{{description|translate}}</i></p>
 	
 	<div class="input-group" style="width: 100%">
 		<span class="input-group-addon" ng-if="innerLabel">{{innerLabel}}</span> 
@@ -61,8 +62,31 @@
 		<div ng-if="model[field]!=booleanTrue" ng-click="boolean_tonggle()" style="cursor:pointer" ng-bind-html="booleanFalseHtml | ilSanitize"></div> 
 	</div> 
 
-	<span class="glyphicon glyphicon-ok form-control-feedback" ng-if="_validated && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
-	<span class="glyphicon glyphicon-remove form-control-feedback" ng-if="!_validated && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
+	
+	
+	<div ng-if="type=='checkbox'"
+		style="padding:1em; border:1px solid silver"
+		>
+		<p ng-repeat="item in selectOptions"
+			ng-click="checkbox_select(item)"
+			style="cursor:pointer;"
+				
+			>
+			<span class="glyphicon glyphicon-unchecked" ng-if="!checkbox_checkOptions(item)"></span>
+			<span class="glyphicon glyphicon-check" ng-if="checkbox_checkOptions(item)"></span>
+			{{_selectLabelFnc(item)|translate}}
+		</p>
+	</div>
+	
+	<div ng-if="type=='textarea'">
+		<textarea class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" rows="{{textRows}}"
+			style="width: 100%; padding: 0.5em" ng-class="{'has-success':_validated && undefinedIs(verifyShow,true) && feedbackVisible(), 'has-error':!_validated && undefinedIs(verifyShow,true) && feedbackVisible()}"
+		>
+		</textarea>
+	</div>
+	
+	<span class="glyphicon glyphicon-ok form-control-feedback" ng-if="_validated && requiredIconVisible && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
+	<span class="glyphicon glyphicon-remove form-control-feedback" ng-if="!_validated && requiredIconVisible && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
 				
 </div> 
 
