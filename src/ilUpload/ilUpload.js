@@ -51,8 +51,11 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 			}
 			
 			$scope.defaultValue("multiple",false);
+			$scope.defaultValue("slim",false);
 			
-			$scope.model[$scope.field]=[];
+			
+			if (!Array.isArray($scope.model[$scope.field]))
+				$scope.model[$scope.field]=[];
 							
 			$scope.getFiles=function(){
 				return $scope.model[$scope.field];
@@ -214,6 +217,7 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 				system:"=",
 				multiple:"=?",
 				userFields:"=?",
+				slim:"=?",
 				onChange:"&",			  
 			},
 			controller: controller,

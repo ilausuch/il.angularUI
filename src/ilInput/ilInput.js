@@ -39,7 +39,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	.filter('filerFullDate', function(){
 		return function(input){
 			if (input!=undefined)
-				return moment.utc(input).format("LL");
+				return moment(input).format("LL");
 			else
 				return "Select date..."
 		}
@@ -47,7 +47,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	.filter('filterTimeSeconds', function(){
 		return function(input){
 			if (input!=undefined)
-				return moment.utc(input).format("LTS");
+				return moment(input).format("LTS");
 			else
 				return "Select time..."
 		}
@@ -55,7 +55,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	.filter('filterTime', function(){
 		return function(input){
 			if (input!=undefined)
-				return moment.utc(input).format("LT");
+				return moment(input).format("LT");
 			else
 				return "Select time..."
 		}
@@ -63,7 +63,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	.filter('filterDate', function(){
 		return function(input){
 			if (input!=undefined)
-				return moment.utc(input).format("LL");
+				return moment(input).format("LL");
 			else
 				return "Select date..."
 		}
@@ -71,7 +71,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	.filter('filterDateTime', function(){
 		return function(input){
 			if (input!=undefined)
-				return moment.utc(input).format("LLL");
+				return moment(input).format("LLL");
 			else
 				return "Select date/time..."
 		}
@@ -112,7 +112,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			else
 				$scope.modalStyle={top: "0px",backgroundColor:"white"};
 			
-			$scope.hidden_date_selected=moment();
+			if ($scope.dateStartAt!=undefined && $scope.dateStartAt._isAMomentObject!=undefined)
+				$scope.hidden_date_selected=$scope.dateStartAt;
+			else
+				$scope.hidden_date_selected=moment();
 			
 			$scope.defaultValue("dateFixModal",false);
 			
@@ -169,6 +172,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.defaultValue("checkboxMin",1);
 			$scope.defaultValue("requiredIconVisible",true);
 			$scope.defaultValue("textRows",5);
+			$scope.defaultValue("dateSelectOnlyAvailableDates",true);
+			
 			
 			
 			if ($scope.verifyGroup!=undefined)
@@ -182,10 +187,11 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				if ($scope.type=="date"||$scope.type=="dateTime"||$scope.type=="time"){
 					var date=$scope.model[$scope.field];
 					
-					if (date==undefined)
+					if (date==undefined){
 						return moment();
+					}
 					else
-						return moment(moment.utc(date),"es");
+						return moment(date);
 				}
 				else
 					return $scope.model[$scope.field];
@@ -228,7 +234,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.checkValidated=function(status){
 				$scope._validated=status;
 								
-				if ($scope.verifyGroup!=undefined)
+				if ($scope.verifyGroup!=undefined && $scope.required)
 					$scope.verifyGroup.update($scope.field,status);
 			}
 			
@@ -325,9 +331,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope._onChange=function(){
 				$scope.checkValidate();
-				$scope.onChange();
+				$scope.onChange({model:$scope.model,value:$scope.getValue()});
 				if ($scope._validated)
-					$scope.onChangeOnlyWhenValidate();
+					$scope.onChangeOnlyWhenValidate({model:$scope.model,value:$scope.getValue()});
 			}
 			
 			$scope.checkValidate();
@@ -402,7 +408,6 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					firstWeekday=7;
 				
 				$scope.weeks=[];
-				
 				for(w=0;w<6;w++){
 					$scope.weeks[w]=[];
 					for(d=0;d<7;d++){
@@ -410,14 +415,15 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						if (_d<=0 || _d>lastDateOfMonth)
 							$scope.weeks[w][d]={label:""};
 						else{
-							var nd=moment({y:date.year(),M:date.month(),d:_d+1});
+							var nd=moment({y:date.year(),M:date.month(),d:_d,h:0,m:0,s:0});
 							$scope.weeks[w][d]={
-								label:_d,
 								date:nd,
-								selected:nd.isSame($scope.getValue(),"day") 
-										&& nd.isSame($scope.getValue(),"month") 
-										&& nd.isSame($scope.getValue(),"year") 
 							};
+							
+							if ($scope.getValue()!=undefined && typeof $scope.getValue()=="object"){
+								$scope.weeks[w][d].selected=
+										nd.format("LL")==$scope.getValue().format("LL")
+							}
 						}
 						
 					}
@@ -440,24 +446,26 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.date_selectDate=function(d){
 				$scope.date_showModal=false;
-				
+										
 				if ($scope.type=="date"){
-					var set=false;
-					try{
-						$scope.model[$scope.field].setFullYear(d.date.year());
-						$scope.model[$scope.field].setMonth(d.date.month());
-						$scope.model[$scope.field].setDate(d.date.date()-1);
-						set=true;
-					}catch(e){}
-					
-					if (!set)
-						try{
-							$scope.model[$scope.field]=d.date;
-						}catch(e){}
+					if ($scope.dateAvailableDates==undefined || !$scope.dateSelectOnlyAvailableDates || $scope.date_checkDate(d)){
 						
-					$scope._onChange();
+						$scope.model[$scope.field]=moment(d.date);	
+						
+						$scope._onChange();
+						
+						$scope.date_prepareCalendar();
+						$scope.date_updateSelectedYear();
+					}
 				}else
 					$scope.time_openModal();
+			}
+			
+			$scope.date_style=function(d){
+				if ($scope.dateAvailableDates==undefined || !$scope.dateSelectOnlyAvailableDates || $scope.date_checkDate(d))
+					return {cursor:"pointer"};
+				else
+					return {};
 			}
 			
 			$scope.date_update=function(newDate){
@@ -506,7 +514,6 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					return true;
 					
 				comp=$scope.date_getNumeric(date.date);
-				
 				for (i in $scope.dateAvailableDates)
 					if (!Array.isArray($scope.dateAvailableDates[i])){
 						if ($scope.dateAvailableDates[i]==comp)
@@ -521,7 +528,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.date_getNumeric=function(date){
 				if (date!=undefined)
-					return date.date()+date.month()*100+date.year()*10000;
+					return date.date()+(date.month()+1)*100+date.year()*10000;
 				else
 					return 0;
 			}
@@ -552,9 +559,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					$scope.time_selected.s=v;
 					
 				$scope.time_showModal=false;
-				$scope.model[$scope.field].setHours($scope.time_selected.h);
-				$scope.model[$scope.field].setMinutes($scope.time_selected.m);
-				$scope.model[$scope.field].setSeconds($scope.time_selected.s);
+				$scope.model[$scope.field].hour($scope.time_selected.h);
+				$scope.model[$scope.field].minutes($scope.time_selected.m);
+				$scope.model[$scope.field].seconds($scope.time_selected.s);
 				
 				$scope._onChange();
 			}
@@ -707,6 +714,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              
 	              textVerifyInt:"=?",
 	              textVerifyFloat:"=?",
+	              textMaxLength:"=?",
 	              
 				  timeSeconds:"=?",
 				  
@@ -714,8 +722,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  dateMaxYear:"=?",
 				  dateShowYearCombo:"=?",
 				  dateAvailableDates:"=?",
+				  dateSelectOnlyAvailableDates:"=?",
 				  dateCanChangeMonth:"=?",
 				  dateFixModal:"=?",
+				  dateStartAt:"=?",
 
 				  selectVerifyRequired:"=?",
 				  selectOptions:"=?",

@@ -40,7 +40,35 @@
 				this.$http=$http;
 				this.$q=$q;
 				
-				this.model={}
+				this.model={
+					files:[
+						{
+							filename:"hola.png",
+							mimetype:"image/png",
+							size:29106,
+							url:"https://www.filepicker.io/api/file/gZMceivmS4K1bsudzoau",
+						},
+						{
+							url:'https://www.filepicker.io/api/file/kGnDYBOyR46QON2vRkeW',
+							filename:'DOC.txt',
+							mimetype:'text/plain',
+							size:3,
+							id:1,
+							client:'computer',
+							isWriteable:true
+						}
+					],
+					/*
+					files2:[
+						{
+							filename:"hola.png",
+							mimetype:"image/png",
+							size:29106,
+							url:"https://www.filepicker.io/api/file/gZMceivmS4K1bsudzoau",
+						},
+					]
+					*/
+				}
 				
 				$translate.use('es');
 
@@ -98,5 +126,13 @@
 				<il-upload model="mc.model" field="'files2'" system="mc.uploadSystem" multiple="false" on-change="mc.onChange(list)" user-fields="mc.fields"></il-upload>
 			</div>
 		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">Slim one file</div>
+			<div class="panel-body">
+				<il-upload model="mc.model" field="'files2'" system="mc.uploadSystem" multiple="false" on-change="mc.onChange(list)" user-fields="mc.fields" slim="true"></il-upload>
+			</div>
+		</div>
+
 	</body>
 </html>

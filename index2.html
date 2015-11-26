@@ -22,7 +22,36 @@
 				$.get( "README.md", function( data ) {
 					var converter = new showdown.Converter();
 					
-					$("#content").html(converter.makeHtml(data));	
+					$("#content").html(converter.makeHtml(data));
+					
+					data=data.split("\n");
+					
+					data.forEach(function(line){
+						if (/^#/.test(line)){
+							if (/^######/.test(line))
+								l=6;
+							else if (/^#####/.test(line))
+								l=5;	
+							else if (/^####/.test(line))
+								l=4;	
+							else if (/^###/.test(line))
+								l=3;	
+							else if (/^##/.test(line))
+								l=2;	
+							else
+								l=1;
+								
+							line=line.replace(/#/gi, "").trim();
+							$(".index").append("<h"+l+">"+line+"</h"+l+">");
+							//$('body').scrollTo
+						}
+					});
+					
+					$(".jump").click(function(){
+						console.debug($(this));
+					});
+					
+						
 				});
 			});
 		</script>
@@ -30,7 +59,7 @@
 	
 	<body>
 		<div class="row">
-		  <div class="col-md-2">Index</div>
+		  <div class="col-md-2" class="index"></div>
 		  <div class="col-md-10" id="content"></div>
 		</div>
 	</body>

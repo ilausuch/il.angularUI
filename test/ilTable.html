@@ -104,6 +104,13 @@
 					partner:true,
 					date:new Date(),
 					status:1
+				},{
+					name:"Ivan C.",
+					lastname:"Lausuch",
+					description:"This is a large text",
+					partner:true,
+					date:new Date(),
+					status:1
 				}]
 			});
 		</script>
@@ -115,12 +122,12 @@
 	        model="mc.items" columns="mc.columns"
 	        editable="true" click-to-edit="true"
 	        items-per-page="5" items-per-page-options="[5,20,50]"
-	        autoupdate="true" on-autoupdate="mc.c.onSave(item)" autoupdate-prompt="false"
+	        autoupdate="true" on-autoupdate="mc.c.onSave(item)" autoupdate-prompt="true"
 	        select="true" on-select="mc.c.onSelect(items)" select-multiple="true"
 	        delete="true" on-delete="mc.c.onDelete(item)"
-	        expand="true" expand-template="'test.html'" on-expand="mc.c.onExpand(item)"
+	        expand="true" expand-template="'template.html'" on-expand="mc.c.onExpand(item)"
 	        extra-buttons="mc.c.buttons" on-extra-buttons="mc.c.onExtraButton(item,button)"
-	        extra-footer-template="'test3.html'"
+	        extra-footer-template="'footer-template.html'"
 	        text-save-confirm="'¿Desea guardar los cambios?'"
 	        text-delete-confirm="'¿Estas seguro?'"
 	        class="table table-striped myTable"

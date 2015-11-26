@@ -7,21 +7,26 @@
 			</p>
 		</div>
 		
-		<div class="panel" ng-class={'panel-success':checkQuestion(question),'panel-default':!checkQuestion(question)} ng-repeat="question in section.questions">
+		<div class="panel" ng-class={'panel-success':checkQuestion(question),'panel-default':checkQuestionDefault(question),'panel-danger':checkQuestionError(question)} ng-repeat="question in section.questions">
 			<div class="panel-heading">
 				<p ng-bind-html="question.title"></p>
 				<p ng-if="question.description " ng-bind-html="question.description"  style="font-style: italic;">
 				</p>
 			</div>
 			<div class="panel-body">
+				
 				<div ng-if="question.type=='select'">
 					<div ng-repeat="option in question.options">
 						<div><input type="radio" name="question_{{question.uid}}" value="{{option.value}}" ng-model="result[question.uid].value"> {{option.title}}</div>
 						<div ng-if="option.comments && result[question.uid].value==option.value" style="margin: 0.6em 1.2em">
-							<textarea placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].comments" rows="4"></textarea>
+							
+							<textarea ng-if="!option.commentsRows || option.commentsRows>1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].comments" rows="{{option.commentsRows||4}}"></textarea>
+							
+							<input ng-if="option.commentsRows==1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].optionComments">
 						</div>
 					</div>
 				</div>
+				
 				<div ng-if="question.type=='multiselect'">
 					<div ng-repeat="option in question.options">
 						<div><input type="checkbox" name="question_{{question.uid}}" value="{{option.value}}" ng-model="result[question.uid][option.value].value"> {{option.title}}</div>
@@ -30,11 +35,17 @@
 						</div>
 					</div>
 				</div>
+				
 				<div ng-if="question.type=='text'">
-					<textarea placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value" rows="4"></textarea>
+					
+					<textarea ng-if="!question.rows || question.rows>1" placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value" rows="{{question.rows||4}}"></textarea>
+					
+					<input ng-if="question.rows && question.rows==1" placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value">
 				</div>
 				<div ng-if="question.comments" style="margin: 0.6em 0em">
-					<textarea placeholder="{{question.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].questionComments" rows="4"></textarea>
+					<textarea ng-if="!question.commentsRows || question.commentsRows>1" placeholder="{{question.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].questionComments" rows="{{question.commentsRows||4}}"></textarea>
+					
+					<input ng-if="question.commentsRows==1" placeholder="{{question.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].questionComments">
 				</div>
 			</div>
 		</div>

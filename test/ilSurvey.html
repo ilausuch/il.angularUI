@@ -51,6 +51,24 @@
 							description:"This is a test",
 							questions:[
 								{
+									uid:"text",
+									title:"Write a text",
+									type:"text",
+									required:true,
+									rows:1
+								},
+								{
+									uid:"number",
+									title:"Write an integer",
+									
+									type:"text",
+									required:true,
+									rows:1,
+									verify:function(value){
+										return value!=undefined && parseInt(value)==value
+									}
+								},
+								{
 									uid:"2/1",
 									title:"Question 1",
 									description:"This is a description",
@@ -64,9 +82,70 @@
 										{
 											title:"Option 2",
 											value:2,
+											comments:true,
+											commentsPlaceholder:"¿Por qué? (Escribe al menos 3 palabras)",
+											commentsRequired:true,
+											commentsRows:1,
+											commentsVerify:function(value){
+												return value!=undefined && value.split(" ").length>2
+											}
 										}
 									],
-								}
+									comments:true,
+									commentsPlaceholder:"Danos tu comentario  (Escribe al menos 3 palabras)",
+									commentsRequired:true,
+									commentsRows:2,
+									commentsVerify:function(value){
+										return value!=undefined && value.split(" ").length>2
+									}
+								},
+								{
+									uid:"3",
+									title:"Question 3",
+									type:"multiselect",
+									description:"Selecciona al menos 2",
+									min:1,
+									required:true,
+									options:[
+										{
+											title:"texto",
+											value:1,
+											comments:true,
+											commentsPlaceholder:"Comenta tu respuesta (al menos 3 palabras)",
+											commentsRequired:true,
+											commentsVerify:function(value){
+												return value!=undefined && value.split(" ").length>2
+											}
+										},
+										{
+											title:"Dinos un número",
+											value:2,
+											comments:true,
+											commentsRequired:true,
+											commentsVerify:function(value){
+												console.debug("+",value);
+												return value!=undefined && parseInt(value)==value;
+											}
+										},
+										{
+											title:"2*2=",
+											value:3,
+											comments:true,
+											commentsVerify:function(value){
+												return value!=undefined && value==4;
+											}
+										}
+									],
+									/*
+									comments:true,
+									commentsPlaceholder:"Danos tu comentario  (Escribe al menos 3 palabras)",
+									commentsRequired:true,
+									commentsRows:2,
+									commentsVerify:function(value){
+										return value!=undefined && value.split(" ").length>2
+									}
+									*/
+								},
 							]
 						},
 						{
@@ -88,47 +167,27 @@
 											title:"Option 2",
 											value:2,
 											comments:true,
-											commentsPlaceholder:"Comenta tu respuesta",
-											commentsRequired:true
+											commentsPlaceholder:"Comenta tu respuesta (Escribe al menos 3 palabras)",
+											commentsRequired:true,
+											commentsVerify:function(value){
+												return value!=undefined && value.split(" ").length>2
+											}
 										}
 									],
 									comments:true,
-									commentsPlaceholder:"Danos tu comentario",
+									commentsPlaceholder:"Danos tu comentario (Escribe al menos 3 palabras)",
 									commentsRequired:true,
+									commentsVerify:function(value){
+										return value!=undefined && value.split(" ").length>2
+									}
 								},
-								{
-									uid:"3",
-									title:"Question 3",
-									type:"multiselect",
-									min:2,
-									required:true,
-									options:[
-										{
-											title:"Option 1",
-											value:1,
-											comments:true,
-											commentsPlaceholder:"Comenta tu respuesta",
-											commentsRequired:true
-										},
-										{
-											title:"Option 2",
-											value:2,
-											comments:true,
-											commentsPlaceholder:"Comenta tu respuesta",
-										},
-										{
-											title:"Option 3",
-											value:3,
-											comments:true,
-											commentsPlaceholder:"Comenta tu respuesta",
-										}
-									]
-								},
+								
 								{
 									uid:"Comentarios",
 									title:"Comentarios",
 									type:"text",
-									placeholder:"Escribe aquí tu información"
+									placeholder:"Escribe aquí tu información",
+									rows:1
 								}
 							]
 						}

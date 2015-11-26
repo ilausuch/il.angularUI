@@ -33,22 +33,31 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 			})
 			
 			
-			
 			$scope.resetAll();
 			
-			$scope.checkQuestion=function(question){
+			$scope._checkQuestion=function(question){
 				if (question.required==undefined || !question.required)
-					return true;
+					return 1;
 				
 				var result=$scope.result[question.uid];
 					
-				if (question.commentsRequired!=undefined && question.commentsRequired && (result.questionComments==undefined || result.questionComments==""))
-					return false;
+				var commentsVerification=1;
+				
+				if (question.commentsRequired!=undefined && question.commentsRequired){
+					if (result.questionComments==undefined || result.questionComments=="")
+						commentsVerification=0;
+					else
+						if (question.commentsVerify==undefined || question.commentsVerify(result.questionComments))
+							commentsVerification=1;
+						else
+							return -1;
+				}
+					
 					
 				switch(question.type){
 					case "select":
 						if (result.value==undefined || result.value=="")
-							return false;
+							return 0;
 						
 						var option=undefined;
 						for (var i in question.options)
@@ -56,31 +65,97 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 								option=question.options[i];
 								break;
 							}
-						if (option==undefined)
-							return false;
-						
-						if (option.commentsRequired!=undefined && option.commentsRequired==true && 
-							(result.comments==undefined || result.comments==""))
-							return false;
 							
-						return true;
+						if (option==undefined)
+							return 0;
+							
+						if (option.commentsRequired!=undefined && option.commentsRequired==true){
+							if (result.optionComments==undefined || result.optionComments=="")
+								return 0;
+							else
+								if (option.commentsVerify==undefined || option.commentsVerify(result.optionComments))
+									if (commentsVerification)
+										return 1;
+									else
+										return 0;
+								else
+									return -1;
+						}
+
+							
+						return 1;
 					break;
+					
 					case "multiselect":
 						var count=0;
+						var verified=0;
+						console.debug(result);
+						
 						for(var i in result){
-							if (result[i].value!=undefined && result[i].value)
+							if (result[i].value!=undefined && result[i].value){
 								count++;
+								
+								var option=undefined;
+								for (var j in question.options)
+									if (question.options[j].value==result[i].value){
+										option=question.options[j];
+										break;
+									}
+									
+								console.debug(option.commentsVerify(result[i].comments));
+									
+								if (option.commentsRequired!=undefined && option.commentsRequired==true){
+									if (result[i].comments==undefined || result[i].comments==""){
+										console.debug("*",result[i].comments);
+									}
+									else
+										if (option.commentsVerify==undefined || option.commentsVerify(result[i].comments))
+											verified++;									
+										else
+											return -1;
+								}
+								else
+									verified++;
+							}
 						}
+						
+						console.debug(count,verified,commentsVerification);
+						
 						if (question.min==undefined)
-							return count>0;
+							return count>0 && commentsVerification && verified==count;
 						else
-							return count>=question.min;
+							return count>=question.min && commentsVerification && verified==count;
 					break;
+					
 					case "text":
-						return $result.value!=undefined && result.value!="";
+						if (result.value==undefined || result.value=="")
+							return 0;
+							
+						if (question.verify==undefined || question.verify(result.value))
+							return 1;
+						else
+							return -1;
+							
 					break;
 				}
+				
+				return 0;
 			}
+			
+			$scope.checkQuestion=function(question){
+				return $scope._checkQuestion(question)==1;
+			}
+			
+			$scope.checkQuestionError=function(question){
+				return $scope._checkQuestion(question)==-1;
+			}
+			
+			$scope.checkQuestionDefault=function(question){
+				return $scope._checkQuestion(question)==0;
+			}
+
+			
+			
 			
 			$scope.checSection=function(section){
 				for (i in section.questions)
@@ -145,7 +220,7 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 				result:'=?',
 				sendMessage:"=?",
 				onFinish:"&",
-				reset:"=?"
+				reset:"=?",
 			},
 			controller: controller,
 			template:template

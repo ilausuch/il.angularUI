@@ -39,8 +39,8 @@
 			<span class="fa fa-{{innerAwesomeIcon}}"></span>
 		</span> 
 		
-		<input ng-if="type=='text'" type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}"> 
-		<input ng-if="type=='password'" type="password" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}"> 
+		<input ng-if="type=='text'" type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" name="{{field}}" maxlength="{{textMaxLength||10000}}"> 
+		<input ng-if="type=='password'" type="password" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" maxlength="{{textMaxLength||10000}}"> 
 		
 		<div ng-if="type=='time'" class="form-control" ng-click="time_openModal()">
 			<span ng-if="!timeSeconds">{{model[field]|filterTime}}</span>
@@ -111,12 +111,10 @@
 				<td ng-repeat="day in days">{{day}}</td> 
 			</tr> 
 			<tr ng-repeat="w in weeks"> 
-				<td ng-repeat="d in w" > 
-					<div ng-if="!d.selected && date_checkDate(d)" style="color:#337AB7;cursor: pointer" ng-click="date_selectDate(d)">{{d.label}}</div> 
-					<span ng-if="!d.selected && !date_checkDate(d)" style="color:silver">{{d.label}}</span> 
-					<span ng-if="d.selected" class="label label-primary">{{d.label}}</span> 
-					
-					
+				<td ng-repeat="d in w" ng-click="date_selectDate(d)" ng-style="date_style(d)"> 
+					<div ng-if="!d.selected && date_checkDate(d)" style="color:#337AB7;font-weight: bold">{{d.date.date()}}</div> 
+					<span ng-if="!d.selected && !date_checkDate(d)" style="color:silver">{{d.date.date()}}</span> 
+					<span ng-if="d.selected" class="label label-primary">{{d.date.date()}}</span>
 				</td> 
 			</tr> 
 		</table> 

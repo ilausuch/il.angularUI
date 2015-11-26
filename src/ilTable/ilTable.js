@@ -259,7 +259,7 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			$scope.orderByFilter=function(item){
 				if ($scope.orderBy==undefined)
-					return 0;
+					return $scope.model.indexOf(item);
 				else
 					return $scope.getValue(item,$scope.orderBy.column);
 			}

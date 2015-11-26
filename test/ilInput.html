@@ -36,6 +36,8 @@
 				this.$timeout=$timeout;
 				this.$http=$http;
 				this.$q=$q;
+				
+				moment.locale("es");
 
 				this.columns=[
 					{
@@ -108,9 +110,13 @@
 				this.verifyGroup=new ilInputVerificationGroup();
 				
 				this.dates=[
+					moment(),
+					moment("2015-11-01"),
+					moment("2015-11-30")
+					/*
 					moment().add(1,'days'),
 					moment().add(2,'days'),
-					[moment().add(5,'days'),moment().add(10,'days')]
+					[moment().add(5,'days'),moment().add(10,'days')]*/
 				]
 				
 				this.onChangeTest=function(){
@@ -119,6 +125,10 @@
 				this.onChangeTestValidated=function(){
 					console.debug("Change & validated!!");
 				}
+				
+				//this.model.date2=moment().add("month",1);
+				
+				this.startAt=moment().add(1,'month');
 			});
 		</script>
 	</head>
@@ -133,7 +143,7 @@
 			select-label-field="'label'"
 			label="'Select one'"
 			required="true"
-			checkbox-max="2"
+			checkbox-max="1"
 			checkbox-min="1"
 			description="'Max 2, min 1'"
 		></il-input>
@@ -277,12 +287,12 @@
 			model="mc.model"
 			field="'number'"
 			only-text="mc.edit"
-			label="'Only integer numbers'"
+			label="'Only integer numbers (no more than 3 characters)'"
 			required="true"
 			text-verify-int="true"
 			verify-fnc="mc.verify(model,value)"
 			on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
-			
+			text-max-length="3"
 		>	
 		</il-input>
 		<il-input

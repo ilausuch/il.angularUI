@@ -11,6 +11,10 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 				if ($scope.onChange!=undefined)
 					$scope.onChange({item:item});
 			}
+			
+			$scope.delete=function(){
+				$scope.onSelectItem(undefined);
+			}
 		}];
 		
 		template='%%TEMPLATE%%';
@@ -24,6 +28,7 @@ angular.module("il.ui.advancedCombo", ['ngSanitize','pascalprecht.translate','ui
 	              list:'=',
 	              model:'=?',
 	              field:'=',
+	              canDelete:"=?",
 	              labelField:'=',
 	              itemsPerPage:"=",
 	              modalSize:'=',
