@@ -17,15 +17,20 @@ angular.module("il.ui.week", ['ngSanitize','pascalprecht.translate','ui.bootstra
 			
 			$scope.$timeout(function(){
 			$("#"+$scope.id).fullCalendar({
-				lang:byDefault($scope.lang,"es"),
 				defaultView:"agendaWeek",
-				editable:byDefault($scope.editable,false),
+				lang:byDefault($scope.lang,"es"),
+				height:byDefault($scope.height,'auto'),
 				columnFormat:"ddd",
 				allDaySlot:false,
 				defaultDate:'1990-01-01',
-				slotLabelFormat: "H:mm",
 				weekends:byDefault($scope.weekends,false),
-				eventOverlap:byDefault($scope.overlap,true),
+				
+				editable:byDefault($scope.editable,false),
+				selectable:true,
+				
+				slotDuration:byDefault($scope.interval,'00:30:00'),
+				slotLabelFormat: "H:mm",
+				
 				
 				header:{
 					left:"",
@@ -41,8 +46,6 @@ angular.module("il.ui.week", ['ngSanitize','pascalprecht.translate','ui.bootstra
 				},
 
 				events:function(start, end, timezone, callback) {
-					console.debug("Update?");
-					
 					if ($scope.data==undefined){
 						callback([]);
 						return;
@@ -105,42 +108,102 @@ angular.module("il.ui.week", ['ngSanitize','pascalprecht.translate','ui.bootstra
 						ev.push(o)
 					})
 
-					console.debug(ev);
 					callback(ev);
 				},
 					
 				eventDrop: function(event, delta, revertFunc) {
-					$scope.data.forEach(function(item){
-						if (item.id==event.id){
-							item.day=event.start._d.getDay()-1;
-							item.start.h=event.start._d.getUTCHours();
-							item.start.m=event.start._d.getUTCMinutes();
-							item.start.s=event.start._d.getUTCSeconds();
-							item.end.h=event.end._d.getUTCHours();
-							item.end.m=event.end._d.getUTCMinutes();
-							item.end.s=event.end._d.getUTCSeconds();
-
-							if ($scope.onChange!=undefined)
-								$scope.onChange({item:item})
-						}
-					})
+					if ($scope.onChange!=undefined)
+						$timeout(function(){
+							$scope.data.forEach(function(item){
+								update=function(item){
+									item.day=event.start._d.getDay()-1;
+									item.start.h=event.start._d.getUTCHours();
+									item.start.m=event.start._d.getUTCMinutes();
+									item.start.s=event.start._d.getUTCSeconds();
+									item.end.h=event.end._d.getUTCHours();
+									item.end.m=event.end._d.getUTCMinutes();
+									item.end.s=event.end._d.getUTCSeconds();
+									
+									$scope.onChange({item:item})
+								}
+								
+								if (item.id==event.id){
+									if ($scope.preChange!=undefined){
+										$scope.preChange({item:item,callback:function(value){
+											if (value)
+												update(item);
+											else
+												revertFunc();
+										}})
+									}
+									else
+										update(item);
+									
+								}
+							})
+						})
+				},
+							
+				eventResize: function(event, delta, revertFunc) {
+					if ($scope.onChange!=undefined)
+						$timeout(function(){
+							$scope.data.forEach(function(item){
+								update=function(item){
+									item.day=event.start._d.getDay()-1;
+									item.start.h=event.start._d.getUTCHours();
+									item.start.m=event.start._d.getUTCMinutes();
+									item.start.s=event.start._d.getUTCSeconds();
+									item.end.h=event.end._d.getUTCHours();
+									item.end.m=event.end._d.getUTCMinutes();
+									item.end.s=event.end._d.getUTCSeconds();
+									
+									$scope.onChange({item:item})
+								}
+								
+								if (item.id==event.id){
+									if ($scope.preChange!=undefined){
+										$scope.preChange({item:item,callback:function(value){
+											if (value)
+												update(item);
+											else
+												revertFunc();
+										}})
+									}
+									else
+										update(item);
+								}
+							})
+						});
 				},
 				
-				eventResize: function(event, delta, revertFunc) {
-					$scope.data.forEach(function(item){
-						if (item.id==event.id){
-							item.day=event.start._d.getDay()-1;
-							item.start.h=event.start._d.getUTCHours();
-							item.start.m=event.start._d.getUTCMinutes();
-							item.start.s=event.start._d.getUTCSeconds();
-							item.end.h=event.end._d.getUTCHours();
-							item.end.m=event.end._d.getUTCMinutes();
-							item.end.s=event.end._d.getUTCSeconds();
-							
-							if ($scope.onChange!=undefined)
-								$scope.onChange({item:item})
-						}
-					})
+				eventClick: function(event, jsEvent, view) {
+			    	if ($scope.onClick!=undefined)
+			    		$timeout(function(){
+					    	$scope.data.forEach(function(item){
+								if (item.id==event.id){
+									$scope.onClick({item:item})
+								}
+							});
+						});
+			    },
+				
+			    dayClick: function(date, jsEvent, view) {			
+			        if ($scope.onClickOut!=undefined)
+				        $timeout(function(){
+					        $scope.onClickOut({date:date});
+				        })
+			        
+			        
+			    },
+			    
+			    eventOverlap: function(stillEvent, movingEvent) {
+					if ($scope.overlapFnc!=undefined)
+						return $scope.overlapFnc(stillEvent, movingEvent);
+						
+					if ($scope.overlap!=undefined)
+						return $scope.overlap;
+					else
+						return false;
 				}
 			});//fullcalendar
 		},0,false)//timeout
@@ -151,21 +214,26 @@ angular.module("il.ui.week", ['ngSanitize','pascalprecht.translate','ui.bootstra
 		return {
 			restrict: 'E',
 			scope: {
-	             data:'=',
-	             onChange:'&',
-	             lang: '=?',
-	             editable:'=?',
-	             weekends:'=?',
-	             minTime:'=?',
-	             maxTime:'=?',
-	             overlap :'=?'
+				data:'=',
+				preChange:'&',
+				onChange:'&',
+				onClick:'&',
+				onClickOut:'&',
+				lang: '=?',
+				editable:'=?',
+				interval:'=?',
+				weekends:'=?',
+				minTime:'=?',
+				maxTime:'=?',
+				overlap :'=?',
+				overlapFnc:"&",
+				height:"=?"
 			},
 			controller: controller,
 			template:template,
 			link: function($scope, element, attrs) {
         		$scope.$watchCollection('data', function() {
-	        		console.debug("New data...",$scope.data);
-        			$("#"+$scope.id).fullCalendar("refetchEvents");
+	        		$("#"+$scope.id).fullCalendar("refetchEvents");
         		})
         	}
 		};

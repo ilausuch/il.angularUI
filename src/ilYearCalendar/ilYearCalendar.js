@@ -19,8 +19,7 @@ angular.module("il.ui.yearCalendar", ['ngSanitize','pascalprecht.translate'])
 			scope: {
 	              dayNames: "=?",
 	              enabledDays: '=?',
-	              year:"=?",
-	              
+	              year:"=?"
 			},
 			controller: controller,
 			template:template

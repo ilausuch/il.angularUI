@@ -5,18 +5,46 @@
 		<div class="modal" style="display: block">
 			<div class="modal-dialog" style="width: {{size||'600px'}}; top:{{top||'20px'}};">
 				<div class="modal-content">
-					<div class="modal-header" ng-if="trueIfUndefined(titleVisible)">
-						<button type="button" class="close" ng-click="close(false)" ng-show="trueIfUndefined(closeVisible)"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title">{{title}}</h4>
+					<div class="modal-header" ng-if="titleVisible">
+						<button type="button" class="close" ng-click="close(false)" ng-show="closeVisible"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">
+							<i ng-if="isInfo" class="fa fa-info-circle" style="color:cornflowerblue"></i>
+							<i ng-if="isAlert" class="fa fa-exclamation-circle" style="color:red"></i>
+							<i ng-if="isQuestion" class="fa fa-question-circle" style="color:blue"></i>
+							<i ng-if="isConfirm" class="fa fa-check-circle-o " style="color:#B0FF61"></i>
+							<i ng-if="customIconClass" class="fa {{customIconClass}}" style="color:{{customIconColor}}"></i>
+								{{headerTitle}}
+						</h4>
 					</div>
 					<div class="modal-body">
-						<div>
+						<div ng-if="isLoading" style="text-align: center">
+							<p><i class="fa fa-spinner fa-pulse fa-5x"></i></p>
+							<p>{{waitMessage||'Please wait...'}}</p>
+						</div>
+						<div ng-if="!isMessage">
 							<div ng-transclude></div>
 						</div>
+						<div ng-if="isMessage">
+							<table style="width: 100%">
+								<tr>
+									<td style="width:4em;">
+										<i ng-if="isInfo" class="fa fa-info-circle fa-3x" style="color:cornflowerblue"></i>
+										<i ng-if="isAlert" class="fa fa-exclamation-circle fa-3x" style="color:red"></i>
+										<i ng-if="isQuestion" class="fa fa-question-circle fa-3x" style="color:blue"></i>
+										<i ng-if="isConfirm" class="fa fa-check-circle-o  fa-3x" style="color:#B0FF61"></i>
+										<i ng-if="customIconClass" class="fa {{customIconClass}} fa-3x" style="color:{{customIconColor}}"></i>
+									</td>
+									<td>
+										<div ng-transclude></div>
+									</td>
+								</tr>
+							</table>
+							<button type="button" class="close" ng-click="close(false)" style="position: absolute; top: 2px; right: 8px;"><span aria-hidden="true">&times;</span></button>
+						</div>
 					</div>
-					<div class="modal-footer" ng-if="trueIfUndefined(footerVisible)">
-						<button type="button" class="btn btn-default" ng-click="close(false)" ng-if="trueIfUndefined(cancelVisible)">{{cancelLabel||'Cancel'}}</button>
-						<button type="button" class="btn btn-primary" ng-if="trueIfUndefined(successVisible)" ng-click="close(true)">{{successLabel||'Save changes'}}</button>
+					<div class="modal-footer" ng-if="footerVisible">
+						<button type="button" class="btn btn-default" ng-click="close(false)" ng-if="cancelVisible">{{cancelLabel||'Cancel'}}</button>
+						<button type="button" class="btn btn-primary" ng-if="successVisible" ng-click="close(true)" ng-disabled="_successDisableFnc()">{{successLabel||'Save changes'}}</button>
 					</div>
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal-dialog -->

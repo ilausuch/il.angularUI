@@ -21,6 +21,7 @@
 		
 		<script type="text/javascript" src="http://api.filepicker.io/v2/filepicker.js"></script>
 		<script type="text/javascript" src="../dist/ilSurvey.min.js"></script>
+		<link rel="stylesheet" href="../dist/ilSurvey.css"></link>
 
 		<script>
 			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.survey']);
@@ -43,19 +44,36 @@
 				this.$http=$http;
 				this.$q=$q;
 				
-				this.model={
-					
+				
+				this.model2={
+					survey:{
+						header:{
+							title:"Survey example",
+								
+						},
+						preHeader:{
+							template:"surveyTemplates/survey.html"
+						},
+						postHeader:{
+							html:"Esta encuesta forma parte de un estudio de mercado realizado sobre la utilidad de una plataforma web para facilitar la inversión en empresas de nueva creación (Start-up), que ponga en contacto proyectos emprendedores con inversores, garantizando su control posterior y seguimiento. No te llevará más de 2 minutos el completar la encuesta."
+						}
+						
+					},
 					sections:[
 						{
-							title:"Section 0",
+							title:"Información profesional",
 							description:"This is a test",
+							template:"surveyTemplates/section.html",
+							footer:{
+								html:"this is a <b>footer</b>",	
+							},
 							questions:[
 								{
 									uid:"text",
-									title:"Write a text",
+									title:"Indique su ocupación",
 									type:"text",
-									required:true,
-									rows:1
+									required:false,
+									rows:5
 								},
 								{
 									uid:"number",
@@ -66,13 +84,28 @@
 									rows:1,
 									verify:function(value){
 										return value!=undefined && parseInt(value)==value
+									},
+									verfyTextFnc:function(value){
+										return value.value+" debe ser un entero";
 									}
 								},
 								{
+									html:"Esto es un <b>label</b>",
+									type:"label",
+								},
+								{
+									type:"template",
+									template:"surveyTemplates/question.html",
+									variables:{
+										text:"Hola mundo",
+										text2:"simple and <b>bold</b>"
+									},
+								},
+								{
 									uid:"2/1",
-									title:"Question 1",
+									title:"Question combobox, oculta las demás",
 									description:"This is a description",
-									type:"select",
+									type:"combobox",
 									required:true,
 									options:[
 										{
@@ -83,7 +116,8 @@
 											title:"Option 2",
 											value:2,
 											comments:true,
-											commentsPlaceholder:"¿Por qué? (Escribe al menos 3 palabras)",
+											commentsPlaceholder:"Escribe al menos 3 palabras",
+											commentsTitle:"¿Por qué?",
 											commentsRequired:true,
 											commentsRows:1,
 											commentsVerify:function(value){
@@ -106,6 +140,10 @@
 									description:"Selecciona al menos 2",
 									min:1,
 									required:true,
+									visibleFnc:function(data){
+										result=data.result;
+										return result["2/1"]!=undefined && result["2/1"].value!=undefined && result["2/1"].value==1;
+									},
 									options:[
 										{
 											title:"texto",
@@ -151,6 +189,14 @@
 						{
 							title:"Section 1",
 							description:"This is a test",
+							visibleFnc:function(data){
+								result=data.result;
+								config={"visibleFnc" : "result['2/1'].value!='1'"};
+								
+								try{
+									return eval(config.visibleFnc)
+								}catch(err){return true}
+							},
 							questions:[
 								{
 									uid:"1",
@@ -167,7 +213,8 @@
 											title:"Option 2",
 											value:2,
 											comments:true,
-											commentsPlaceholder:"Comenta tu respuesta (Escribe al menos 3 palabras)",
+											commentsPlaceholder:"Escribe al menos 3 palabras",
+											commentsTitle:"Comenta tu respuesta",
 											commentsRequired:true,
 											commentsVerify:function(value){
 												return value!=undefined && value.split(" ").length>2
@@ -181,7 +228,59 @@
 										return value!=undefined && value.split(" ").length>2
 									}
 								},
-								
+								{
+									uid:2,
+									title:"Question 1",
+									description:"This is a description",
+									type:"multiselect",
+									required:true,
+									options:[
+										{
+											title:"Option 1",
+											value:1
+										},
+										{
+											title:"Option 2",
+											value:2,
+										}
+									],
+								},
+								{
+									uid:"tableSelect",
+									title:"Question 3",
+									description:"This is a description",
+									type:"table-select",
+									required:true,
+									columns:[
+										{title:"Poco",value:1},
+										{title:"Normal",value:2},
+										{title:"Mucho",value:3}		
+									],
+									rows:[
+										{title:"Comer asdafsd asdf asdfasdfasdfa sdf asdf asdfa sdf asdf",uid:1},
+										{title:"Dormir",uid:2},
+										{title:"Ejercicio",uid:3}
+									],
+								},
+								{
+									uid:"star",
+									title:"Question 3",
+									description:"This is a description",
+									type:"stars",
+									required:true,
+									options:[
+										{value:1,tooltip:"Ninguno"},
+										{value:2},
+										{value:3},
+										{value:4},
+									],
+									rows:[
+										{title:"Comer asdafsd asdf asdfasdfasdfa sdf asdf asdfa sdf asdf",uid:1},
+										{title:"Dormir",uid:2},
+										{title:"Ejercicio",uid:3}
+									],
+								},
+
 								{
 									uid:"Comentarios",
 									title:"Comentarios",
@@ -190,26 +289,71 @@
 									rows:1
 								}
 							]
+						},
+						{
+							title:"Section ocultable según sus cuestiones",
+							description:"This is a test",
+							questions:[
+								{
+									uid:"Comentarios",
+									title:"Comentarios",
+									type:"text",
+									placeholder:"Escribe aquí tu información",
+									rows:1,
+									visibleFnc:function(data){
+										result=data.result;
+										return result["2/1"]!=undefined && result["2/1"].value!=undefined && result["2/1"].value==1;
+									},
+								}
+							]
 						}
 					]
 				}
 				
+								
 				this.result={}
 				
 				$translate.use('es');
 				
 				this.reset=false;
 				
+				$timeout(function(){
+					mc.model=mc.model2;
+				},1000);
+				
 				this.onFinish=function(result){
 					console.debug(result);
 				}
+				
+				this.cancel=function(){
+					alert("Cancel");
+				}
 			});
 		</script>
+		
+		<style>
+			.question_tableSelect_column_1_title{
+				background-color: #ffebeb;
+			}
+			
+			.question_tableSelect_column_1_item{
+				background-color: #ffebeb;
+				color:red;
+			}
+		</style>
 	</head>
 	
 	
-	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
-		<il-survey model="mc.model" result="mc.result" reset="mc.reset" on-finish="mc.onFinish(result)"></il-survey>
+	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em; background-color: #EEE;">
+		<il-survey 
+			model="mc.model" 
+			result="mc.result"
+			reset="mc.reset"
+			on-finish="mc.onFinish(result)"
+			divide-sections="false"
+			can-cancel="true"
+			on-cancel="mc.cancel()"
+			></il-survey>
 		<button ng-click="mc.reset=!mc.reset">Reset</button>
 	</body>
 </html>

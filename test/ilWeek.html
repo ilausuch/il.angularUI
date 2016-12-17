@@ -64,13 +64,35 @@
 					console.debug("Change!",item);
 				}
 				
+				this.onClick=function(item){
+					console.debug("Click!",item);
+				}
+				
+				this.preChange=function(item,callback){
+					console.debug("Change?",item);
+					callback(confirm("¿Cambiar?"));
+				}
+				
+				this.addNew=function(date){
+					console.debug("Nuevo!",date.day());
+					mc.$timeout(function(){
+						mc.events.push({
+							title: 'Nueva asignatura',
+							day: (7+date.day()-moment.localeData().firstDayOfWeek())%7,
+							start: {h:date.hour(),m:date.minutes()},
+							end: {h:date.hour()+1,m:date.minutes()}
+						})
+					})
+					
+
+				}
 			});
 		</script>
 	</head>
 	
 	
 	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
-		<il-week data="mc.events" on-change="mc.onChange(item)" editable="true" weekends="true" min-time="'07:30:00'" overlap="true">
+		<il-week data="mc.events" on-change="mc.onChange(item)" on-click="mc.onClick(item)" editable="true" weekends="true" min-time="'07:00:00'" overlap="true" pre-change="mc.preChange(item,callback)" on-click-out="mc.addNew(date)" interval="'00:30:00'">
 		</il-week>
 		<br>
 		<button class="btn" ng-click="mc.add()">Añadir</button>

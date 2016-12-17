@@ -1,10 +1,11 @@
 <form class="form-inline" >
 	<div class="form-group" style="width: 100%">
 		<div class="input-group"  style="width: 100%">
-			<div class="input-group-addon" style="padding: 0px; width: 2.5em" ng-click="show=true">
-				<button class="btn" style="padding: 0px 1em 0px 1em"><span class="glyphicon glyphicon-th-list"></span></button>
+			<div class="input-group-addon" style="padding: 0px; width: 2.5em" ng-click="show=true" ng-show="innerShow">
+				<button class="btn" style="padding: 0px 1em 0px 1em" ng-if="!innerLabel"><span class="glyphicon glyphicon-th-list"></span></button>
+				<span ng-if="innerLabel" style="padding: 1em">{{innerLabel}}</span>
 			</div>
-			<input type="text" class="form-control" id="exampleInputAmount" placeholder="{{'Select one'|translate}}" readonly="true" ng-model="model[field][labelField]" style="background-color: white; cursor:pointer" ng-click="show=true">
+			<input type="text" class="form-control" id="exampleInputAmount" placeholder="{{placeholder|translate}}" readonly="true" ng-model="model[field][labelField]" style="background-color: white; cursor:pointer" ng-click="show=true">
 			
 			<div class="input-group-addon" style="padding: 0px; width: 2.5em" ng-if="canDelete" ng-click="delete()">
 				<button class="btn" style="padding: 0px 1em 0px 1em"><span class="glyphicon glyphicon-trash"></span></button>
@@ -16,7 +17,7 @@
 <il-modal show="show" title="title" footer-visible="false" size="modalSize" top="top||0">
 	<table il-table 
 		search="true" model="list" columns="columns" 
-		class="table table-striped" items-per-page="itemsPerPage||5"
+		class="table table-striped" items-per-page="itemsPerPage||5" show-pagination="showPagination"
 		on-click-item="onSelectItem(item)"
 	></table>
 </il-modal>

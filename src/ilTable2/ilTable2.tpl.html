@@ -1,4 +1,156 @@
-<div>
-	Hola mundo
-	<table border=1><tr ng-repeat="item in model" ng-transclude></tr></table>
-</div>
+<table class="" id="{{id}}">
+	<thead>
+		<tr ng-if="showHeader" class="head">
+			<td colspan="{{columns.length}}" class="head">
+				<h1>{{headerTitle}}&nbsp;</h1>
+				<div style="position: relative">
+					<div class="buttons">
+						<button ng-repeat="button in headerButtons" class="button" tooltip="{{button.tooltip}}" ng-click="button.fnc({model:model,mc:mc,externalInfo:externalInfo,buttons:headerButtons})">
+							<span>
+								<span ng-if="button.icon" class="glyphicon glyphicon-{{button.icon}}" aria-hidden="true"></span>
+								<i ng-if="button.awesomeIcon" class="fa fa-{{button.awesomeIcon}}"></i>
+								
+								{{button.title}}
+						</span>
+						</button>
+						<button ng-if="showDownload" ng-csv="operations.exportCSV()" csv-header="operations.exportCSV_header()" filename="test.csv" field-separator=";" class="button"><span class="glyphicon glyphicon-cloud-download"></span> download</span>
+						</button>
+						
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr ng-if="showSearch" class="search">
+			<td colspan="{{columns.length}}">
+				<il-input inner-icon="'search'" model="filter" field="'cad'" placeholder="'search...'" class="ilInput">
+				</il-input>
+			</td>
+		</tr>
+		<tr ng-transclude class="columnTitle" ng-show="showColumnTitles"></tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="item in results=(model | filter:filter.check) | orderBy:sort.filter:sort.by.reverse | ilTable2Slice : showPagination : pagination.page : itemsPerPage" ng-class="{'selected':select.isSelected(item),'clickable':row.isClickable(item)}">
+		<td ng-repeat="c in columns" ng-click="row.click(item,c)" class="field field-{{c['field']}}">
+			<il-input 
+				ng-if="c.type=='ilInput'" 
+				type="c['il-input-type']" 
+				
+				model="currentModel(item)" 
+				field="c.field" 
+				
+				only-text="!(editAll || editingItem==item)"
+				
+				select-options="c['select-options']" 
+				select-label-field="c['select-label-field']"
+				select-label-fnc="c['select-label-fnc']" 
+				select-label-field="c['select-value-field']"
+				select-value-fnc="c['select-value-fnc']" 
+				placeholder="c['placeholder']"
+				required="c['required']"
+				inner-label="c['inner-label']"
+				inner-icon="c['inner-icon']"
+				inner-awesome-icon="c['inner-awesome-icon']"
+				verify-show="c['verify-show']"
+				verify-fnc="c['verify-fnc']"
+				verify-group="c['verify-group']"
+				verify-if-void="c['verify-if-void']"
+				on-verify="c['on-verify']"
+				text-verify-int="c['text-verify-int']"
+				text-verify-float="c['text-verify-float']"
+				on-change="c['on-change']"
+				on-change-only-when-validate="c['on-change-only-when-validate']"
+				hide-border="c['hide-border']"
+				text-rows="c['text-rows']"
+				autocomplete-search-method="c['autocomplete-search-method=']"
+				date-show-year-combo="c['date-show-year-combo']"
+				date-min-year="c['date-min-year']"
+				date-max-year="c['date-max-year']"
+				date-can-change-month="c['date-can-change-month']"
+				date-available-dates="c['date-available-dates']"
+				date-select-only-available-dates="c['date-select-only-available-dates']"
+				date-fix-modal="c['date-fix-modal']"
+				date-start-at="c['date-start-at']"
+				date-hide-input="c['date-hide-input']"
+				date-available-dates="c['date-available-dates']"
+				time-seconds="c['time-seconds']"
+				z="c['z']"
+				modal-on-top="c['modal-on-top']"
+				checkbox-max="c['checkboxMax']"
+				checkbox-min="c['checkbox-min']"
+				checkbox-modal="c['checkbox-modal']"
+				checkbox-modal-z-index="c['checkbox-modal-z-index']"
+				checkbox-style="c['checkbox-style']"
+				checkbox-modal-close-on-select="c['checkbox-modal-close-on-select']"
+				boolean-true="c['boolean-true']"
+				boolean-false="c['boolean-false']"
+				boolean-true-html="c['boolean-true-html']"
+				boolean-false-html="c['boolean-false-html']"
+				custom-label-fnc="c['custom-label-fnc']"
+				custom-open-callback="c['custom-open-callback']"
+			></il-input>
+			
+			<span ng-if="c.type=='basic' && c.transform==undefined">{{item[c.field]}}</span>
+			
+			<div ng-if="c.type=='render' && c.renderer!=undefined" ng-bind-html="c.renderer(item,c)|ilTable2Sanitice"></div>
+
+			<div ng-if="c.type=='include' && (c['edit-include']==undefined || !(editAll || editingItem==item))" ng-include="c['include']"></div>
+			<div ng-if="c.type=='include' && c['include']==undefined && (c['edit-include']==undefined || !(editAll || editingItem==item))">{{item[c.field]}}</div>
+
+			<div ng-if="c.type=='include' && c['edit-include']!=undefined && (editAll || editingItem==item)" ng-include="c['edit-include']"></div>
+
+			
+			
+			<div ng-if="c.type=='select'">
+				<span class="glyphicon glyphicon-check" style="cursor:pointer" aria-hidden="true" ng-if="select.isSelected(item)" ng-click="select.select(item)"></span>
+				<span class="glyphicon glyphicon-unchecked" style="cursor:pointer" aria-hidden="true" ng-if="!select.isSelected(item)" ng-click="select.select(item)"></span>
+			</div>
+			
+			<div ng-if="c.type=='buttons'" class="rowButtons">
+				<div ng-if="editingItem!=item">
+					
+					<span ng-if="row.showEdit(item,c)" class="glyphicon glyphicon-pencil button" aria-hidden="true" ng-click="edition.edit(item)" style="cursor: pointer"></span>
+					<span ng-if="row.showDelete(item,c)" class="glyphicon glyphicon-trash button" aria-hidden="true" ng-click="edition.delete(item)" style="cursor: pointer"></span>
+					<span ng-repeat="button in c['custom']" ng-click="button.fnc(item)" class="customButton button {{button.class}}" tooltip="{{button.tooltip}}" style="cursor: pointer">
+						<span ng-if="button.icon" class="glyphicon glyphicon-{{button.icon}}" aria-hidden="true"></span>
+						<i ng-if="button.awesomeIcon" class="fa fa-{{button.awesomeIcon}} button awesomeButton" ></i>
+						{{button.title}}
+					</span>
+					
+				</div>
+				<div ng-if="editingItem==item">
+					<span style="cursor: pointer" class="glyphicon glyphicon-ok rowButton" aria-hidden="true" ng-click="edition.ok(item)"></span>
+					<span style="cursor: pointer" class="glyphicon glyphicon-remove rowButton" aria-hidden="true" ng-click="edition.cancel(item)"></span>
+				</div>
+			</div>
+
+		</td>
+		
+	</tr>
+	</tbody>
+	<tfoot>
+		<tr ng-if="showFooter" class="footer">
+			<td colspan="{{columns.length}}">
+				<span ng-if="showPagination">Viewing {{pagination.realRows()}} items / </span> <span ng-if="results.length<model.length">{{results.length}} filtered / </span>{{model.length}} in total
+			</td>
+		</tr>
+		<tr ng-if="showPagination" class="paginationFooter">
+			<td colspan="{{columns.length}}" style="text-align: center">
+				<pagination total-items="results.length" items-per-page="itemsPerPage" ng-model="pagination.page" max-size="10" class="pagination-sm" boundary-links="true" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" style="margin:0px"></pagination>
+				<div ng-show="showItemsPerPage">
+					<span class="dropdown" dropdown on-toggle="toggled(open)">
+						<a href class="dropdown-toggle" dropdown-toggle>
+							{{itemsPerPage}}
+						</a>
+						<ul class="dropdown-menu">
+							<li ng-repeat="choice in itemsPerPageOptions">
+								<a ng-click="pagination.changeItemsPerPage(choice)">{{choice}}</a>
+							</li>
+						</ul>
+					</span>
+					Items per page
+				</div>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+

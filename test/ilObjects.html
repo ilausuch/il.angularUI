@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html class="bg">
+	<head>
+		<meta charset="utf-8" />
+		
+		<script type="text/javascript" src="ilObjects.js"></script>
+		<script type="text/javascript" src="ilArray.js"></script>
+			
+		<script>
+			
+			User=function(src){
+				
+				this.project=projects.getByField(this.projectId,"id")
+				
+				this.print=function(){
+					console.debug(this.name+" "+this.age);
+					return true;
+				}
+				
+				this.onPreUpdate=function(callback){
+					console.debug("Preupdate",this);
+					
+					if (this.$sandbox.name!="Tom")
+						callback();
+				}	
+							
+				this.onUpdate=function(callback){
+					console.debug("Updated",this);
+				}
+				
+				this.checkVerifier=function(field,value,obj){
+					
+					if (value==undefined)
+						return false;
+						
+					if (field=="age")
+						return value<100;
+							
+					return true;
+				}
+				
+				this.constructor(src);
+			}
+			
+			ilObject.setup("User",["name","age","projectId"]);
+			//User.prototype=new ilObject(User,["name","age","projectId"]);
+			
+			Project=function(src){
+				this.constructor(src);
+			}
+			Project.prototype=new ilObject(Project,["id","name"])
+			
+			projects=ilObjectsFromArray(Project,[{id:1,name:"project name"}])
+			
+			var a=new User({name:"John",age:"37",projectId:1});
+			var b=new User({name:"Mary",age:"33",projectId:1});
+			
+			
+			users=ilObjectsFromArray(User,[{name:"John",age:"37",projectId:1},{name:"Mary",age:"33",projectId:1}])
+			
+			console.debug(users);
+			
+			console.debug("------------------------------");
+			console.debug("Try to update a with 'Tim' name, it will update");
+			a.prepareSandbox();
+			a.$sandbox.name="Tim";
+			a.updateFromSandbox();
+			console.debug(a);
+			
+			console.debug("------------------------------");
+			console.debug("Try to update b with 'Tom' name, it wont update");
+			b.prepareSandbox();
+			b.$sandbox.name="Tom";
+			b.updateFromSandbox();
+			console.debug(b);
+			
+			console.debug("------------------------------");
+			var c=new User();
+			c.prepareSandbox();
+			c.$sandbox.name="Sam";
+			console.debug("check sandbox, it must be false",c.checkSandbox(),c.$sandbox);
+			c.$sandbox.age=20
+			c.$sandbox.projectId=1;
+			console.debug("check sandbox, it must be true",c.checkSandbox(),c.$sandbox);
+			console.debug("check object, it must be false",c.checkThis(),c.$sandbox);
+			c.updateFromSandbox();
+			console.debug("check object, it must be true",c.checkThis(),c.$sandbox);
+			
+			console.debug("------------------------------");
+			var d=new User();
+			d.prepareSandbox();
+			d.$sandbox.name="Sam";
+			d.$sandbox.age=120;
+			d.$sandbox.projectId=1;
+			console.debug("check sandbox, it must be false because age must be <100",d.checkSandbox(),d.$sandbox);
+			
+			d.$sandbox.age=20;
+			console.debug("check sandbox, it must be true because age is <100",d.checkSandbox(),d.$sandbox);
+			
+			
+			
+		</script>
+	</head>
+	<body>
+		See console
+	</body>
+</html>

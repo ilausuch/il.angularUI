@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="format-detection" content="telephone=no" />
-		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, target-densitydpi=device-dpi" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
 		<meta name="msapplication-tap-highlight" content="no" />
-		<title>test ilAdvancedCombo</title>
+		<title>test table2</title>
 		
 		<!-- Angular -->
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
@@ -14,21 +14,78 @@
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize.min.js"></script>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bower-angular-translate/2.6.1/angular-translate.min.js"></script>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
 		
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>		
 		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"/>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
 		
-		<script type="text/javascript" src="../dist/ilTable.min.js"></script>
-		<script type="text/javascript" src="../dist/ilDetail.min.js"></script>
-		<script type="text/javascript" src="../dist/ilModal.min.js"></script>
-		<script type="text/javascript" src="../dist/ilAdvancedCombo.min.js"></script>
+		<!-- excel export -->
+		<!--<script type="text/javascript" src="//ilscdn.s3.amazonaws.com/others/excellentexport.min.js"></script>-->
+			
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ng-csv/0.3.6/ng-csv.min.js"></script>
+		
+		
 		<script type="text/javascript" src="../dist/ilInput.min.js"></script>
 		<script type="text/javascript" src="../dist/ilTable2.min.js"></script>
-
+		<link rel="stylesheet" href="../dist/ilTable2.css"/>
+		
+		
+		<style>
+			.coloredButton{
+				color: blue;
+			}
+		</style>
+		
 		<script>
-			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.table','il.ui.table2','il.ui.modal','il.ui.advancedCombo','il.ui.input']);
+			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.input','il.ui.table2','ngCsv']);
 			var mc;
+			
+			
+			
+			/*
+			//----------------------------------------------------------------
+			//----------------------------------------------------------------
+			//----------------------------------------------------------------
+			//----------------------------------------------------------------
+			//----------------------------------------------------------------
+			
+			app.directive('ilTable4', function() {
+				return{
+					restrict: 'E',
+					replace:true,
+			        transclude:true,
+					controller:function ($scope,$timeout,$attrs,$transclude,$sce) {
+						this.sce=$sce;
+			            
+					},
+				    link: function (scope, iElm, iAttrs, controller) {
+																	  
+					},
+
+			        scope:{
+				        model:'=',
+			        },
+			        template:'<table><tr ng-repeat="item in model" ng-transclude></table>'
+				}
+			});
+			
+			app.directive('ilTable4Content', function() {
+				return{
+					restrict: 'E',
+			        transclude: true,
+			        replace:true,
+			        
+					controller:function ($scope,$timeout,$attrs,$transclude) {
+					},
+			        scope:{
+				        title:"=?"
+			        },
+			        template:'<div ng-transclude></div>'
+				}
+			});
+			*/
+			
 
 			app.controller("MainController", function($rootScope,$scope,$timeout,$http,$q){
 				mc=this;
@@ -38,75 +95,347 @@
 				this.$http=$http;
 				this.$q=$q;
 
-				this.columns=[
-					{
-						title:"Name",
-						field:"name",
-						required:true
-					},
-					{
-						title:"Lastname",
-						field:"lastname"
-					},
-					{
-						title:"Complete name",
-						type:"func",
-						func:function(item){
-			                return item.name+" "+item.lastname;
-			            }
-					}
-				];
-
+				
 				this.items=[];
+				this.values=[];
+				this.sex=[
+					{label:'Man',value:0},
+					{label:'Woman',value:1},
+				];
 				
-				for (var i=0; i<100; i++)
-					this.items.push({name:"name "+i,lastname:"lastname "+i});
-					
-				
-				
-				this.edit=true;
-				
-				this.verify=function(model,value){
-					console.debug("Verify",model,value);
-					return true;
+				for (var i=0; i<2; i++){
+					mc.items.push({id:i,name:"name "+i*100,lastname:"lastname "+i,value:i,sex:mc.sex[i%2]});
+					mc.values.push(i);
 				}
 				
-				this.onVerify=function(valid,model,value){
-					console.debug("Verify?",valid,model,value);
+				mc.addNewItem=function(){
+					mc.items.push({id:0,name:"name 0101",lastname:"lastname 0101",sex:mc.sex[0]});
 				}
 				
-				this.verifyTime=function(model,value){
-					console.debug("Verify",model,value);
-					return value.h<12;
-				}
+				mc.editAll=false;
+				mc.pagination=false;
 				
-				this.pets=[
-					{label:"Cat",value:"cat"},
-					{label:"Dog",value:"dog"}
+				mc.customButtons=[
+					{
+						icon:'envelope',
+						fnc:function(item){
+							console.debug("Custom button!",item);
+							alert("Custom button")
+						}
+					},
+					{
+						title:"Send message",
+						tooltip:"Mi tooltip",
+						class:"coloredButton",
+						fnc:function(item){
+							console.debug("Custom button!",item);
+							alert("Custom text button")
+						}
+					},
+					{
+						awesomeIcon:"anchor",
+						fnc:function(item){
+							console.debug("Custom awesome button",item);
+							alert("Custom awesome button");
+						}
+					}
 				]
 				
-				this.addPet=function(){
-					this.pets.push({label:'other',value:'other'});
+				mc.headerButtons=[
+					{
+						awesomeIcon:"bar-chart",
+						title:"Chart",
+						tooltip:"Botón chart",
+						fnc:function(info){
+							console.debug("Custom awesome button");
+							console.debug("info",info);
+						}
+					},
+					{
+						awesomeIcon:"plus",
+						title:"Add",
+						tooltip:"Botón plus",
+						fnc:function(info){
+							console.debug("Custom awesome button");
+							console.debug("info",info);
+							mc.addNewItem();
+						}
+					}
+				]
+				
+				mc.renderer_sex=function(item,column){
+					if (item.sex.value==1)
+						return '<i style="color:pink" class="fa fa-female"></i>';
+					else
+						return '<i style="color:cyan" class="fa fa-male"></i>';
 				}
 				
-				this.values=[];
-				for(i=0;i<100;i++)
-					this.values.push(i);
+				mc.extraInfo="Hola es un test de extra info";
 				
-				this.model=[{
-					number:"3",
-					date:new Date(),
-					pet:this.pets[1]
-				}]
+				mc.loadData=function(){
+					mc.data2=[{"IdCaso":"1","Descripcion":"Nos gustaría que se revisen la aplicaciones de inscripción para el TIFG y para el ECIE porque vamos a abrir una nueva convocatoria. En concreto, el ECIE nos falló la última vez. La aplicación les decía a ellos que sí estaban inscritos pero a nosotros no nos aparecían en la lista de inscritos. \n\nMuchas gracias.\n\nUn saludo,\n\nRaquel","IdTipo":"1","IdEdificio":"2","IdUbicacion":"1","IdEstado":"2","PersonalIdSolicitante":"8701","Extension":"2013","IdTipoIP":"94","Solicitante":undefined,"Tipo":"Incidencia","Area":"Aplicaciones para los Servicios Universitarios","Servicio":"Aplicación Gestión funciones","TipoIP":"Error en la aplicación","Fecha":"2016-04-26T08:59:23.043+02:00","TecnicoAsignado":"","PersonalIdAutor":"8701","Autorizacion":"true","IdPuestoAsignado":"386","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"249","IdArea":"3","Comentarios":"26/04/2016 Cambiado de técnico por Lorena Giner Martí","Estado":"Asignada","Edificio":"Edificio Luis Campos Górriz","Autor":"Raquel Nielfa Toribio","Periodica":"false","FechaTope":"2016-05-02T08:59:23.043+02:00","Despacho":"Servicio de Idiomas","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"327","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"},{"IdCaso":"13231","Descripcion":"Las encuestas del profesorado NO ESTAN ACTUALIZADAS DESDE EL 2013!!! Como directora de departamento necesito conocer las evaluaciones del profesorado para poder hacer una correcta asignación del POD y elaborar los informes de seguimiento que nos solicita RRHH","IdTipo":"2","IdEdificio":"1","IdUbicacion":"1","IdEstado":"2","PersonalIdSolicitante":"958","Extension":"1469","IdTipoIP":"82","Solicitante":"Eugenia González Rosende","Tipo":"Solicitud","Area":"Aplicaciones para el PDI. y Gestión Docente","Servicio":"Gestión Docente POD","TipoIP":"Informe de datos","Fecha":"2016-04-19T12:14:15.717+02:00","TecnicoAsignado":"","PersonalIdAutor":"958","Autorizacion":"true","IdPuestoAsignado":"386","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"240","IdArea":"4","Comentarios":"19/04/2016 Cambiado de técnico por Nicolás Berruti López","Estado":"Asignada","Edificio":"Seminario Salud","Autor":"Eugenia González Rosende","Periodica":"false","FechaTope":"2016-04-25T12:14:15.717+02:00","Despacho":"469","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"84","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"},{"IdCaso":"11204","Descripcion":"Desde la ESET nos piden listados de alumnos que se han presentado al TIFG y los que no. Desde el Servicio de Idiomas sólo podemos hacerlo por convocatorias, pero no es lo que nos piden y además perderíamos datos. Entiendo que igual no nos podéis sacar presentado/no presentado sino superado/pendiente de realizar, que es la información que nos aparece en las fichas de los alumnos y pendiente de realizar significa no superado y no presentado. Si nos lo puedes pasar como nos piden en la ESET perfecto, sino con que nos paséis un listado superado/pendiente creo que sería suficiente y ya se lo explico yo a Sara Barquero.\nGracias!","IdTipo":"2","IdEdificio":"2","IdUbicacion":"1","IdEstado":"2","PersonalIdSolicitante":"3017","Extension":"2013","IdTipoIP":"106","Solicitante":"Sara María Matoses Jaen","Tipo":"Solicitud","Area":"Informes","Servicio":"Informes titulación / alumnos / personal","TipoIP":"Informe de alumnos","Fecha":"2016-03-01T13:07:29.003+01:00","TecnicoAsignado":"","PersonalIdAutor":"3017","Autorizacion":"true","IdPuestoAsignado":"386","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"256","IdArea":"2","Comentarios":"10/03/2016 Cambiado de técnico por María José Torralba Solaz","Estado":"Asignada","Edificio":"Edificio Luis Campos Górriz","Autor":"Sara María Matoses Jaen","Periodica":"false","FechaTope":"2016-03-07T13:07:29.003+01:00","Despacho":"Idiomas","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"796","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"},{"IdCaso":"8349","Descripcion":"Hola, \n\nPor favor, quitar de la aplicación Flex del listado de informes del comedor el informe de Incidencias del comedor sin comedor POR Día. Preguntar a Lorena Giner.\n\nGracias","IdTipo":"1","IdEdificio":"16","IdUbicacion":"1","IdEstado":"2","PersonalIdSolicitante":"3857","IdTipoIP":"98","Solicitante":"Teresa Jara Santos","Tipo":"Incidencia","Area":"Colegios","Servicio":"Comedor colegios","TipoIP":"Error en la aplicación","Fecha":"2016-01-21T12:06:55.143+01:00","TecnicoAsignado":"","PersonalIdAutor":"3580","Autorizacion":"false","IdPuestoAsignado":"386","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"252","IdArea":"17","Comentarios":"21/01/2016 Cambiado de técnico por Lorena Giner Martí: Iván és un informe que està posat a mà al llistat. És el menú de la intranet Acceso comedor.  Quan tingues un moment ho vem.\n\nGràcies","Estado":"Asignada","Edificio":"Colegio Alicante","Autor":"Lorena Giner Martí","Periodica":"false","FechaTope":"2016-01-27T12:06:55.143+01:00","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"327","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"},{"IdCaso":"6011","Descripcion":"Buenos días:\nEn mi intranet aparecen 15 solicitudes/incidencias sin responder entre las fechas 26/7/14 y 6/10/15 todas ellas porque el alumnado no podía visualizar sus horarios. Me indican mis compañeros que se respondió en todos los casos a los alumnos y se solucionó la incidencia. ¿Es posible cancelar esas solicitudes?\nPor otro lado, en Elche son las Vicedecanas de las Facultades y, en su defecto, las coordinadoras, las que introducen los horarios de los alumnos. ¿Sería posible que las incidencias por falta de visualización de horarios se asignen al responsable de cada titulación? He comprobado que no están en el listado de técnicos.\n\nMuchas gracias. Un saludo.","IdTipo":"1","IdEdificio":"21","IdUbicacion":"1","IdEstado":"2","PersonalIdSolicitante":"2749","Extension":"67006","FechaModificacion":"2015-11-27T15:19:59.36+01:00","IdTipoIP":"84","Solicitante":"Sara González Sánchez","Tipo":"Incidencia","Area":"Aplicaciones para los Servicios Universitarios","Servicio":"Aplicación incidencias / solicitudes","TipoIP":"Error en formulario de la intranet","Fecha":"2015-11-27T09:56:17.35+01:00","TecnicoAsignado":"","PersonalIdAutor":"2749","Autorizacion":"false","IdPuestoAsignado":"386","PersonalIdModificador":"2943","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"241","IdArea":"3","Estado":"Asignada","Edificio":"Edificio Reyes Católicos","Autor":"Sara González Sánchez","Periodica":"false","FechaTope":"2015-12-03T09:56:17.35+01:00","Despacho":"planta baja 9","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"386","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"},{"IdCaso":"3817","Descripcion":"con safari no puedo acceder a los partes de informática, Me toca abrir otra sesión en chrome.","IdTipo":"1","IdEdificio":"2","IdUbicacion":"1","IdEstado":"30","PersonalIdSolicitante":"4936","Respuesta":"Hola,\n\nSeguramente se trate de la cache del navegador.\n\nAcceda al menú del safari -> preferencias -> pestaña privacidad. Y allí, debajo del botón \"Eliminar todos los datos de los sitios web\" aparece \"Detalles...\" Pulse y busque \"ceu\" en el buscador y seleccionando los dos elementos que aparecen pulse en \"eliminar\"\n\nMantengo abierto el parte por si no se solucionase\n\nUn saludo","FechaModificacion":"2016-01-12T19:54:19.413+01:00","IdTipoIP":"84","Solicitante":"Francisco Suay Pérez","Tipo":"Incidencia","Area":"Aplicaciones para los Servicios Universitarios","Servicio":"Aplicación incidencias / solicitudes","TipoIP":"Error en formulario de la intranet","Fecha":"2015-10-27T12:52:17.297+01:00","TecnicoAsignado":"","PersonalIdAutor":"4936","Autorizacion":"false","IdPuestoAsignado":"386","PersonalIdModificador":"2623","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"241","IdArea":"3","Comentarios":"27/10/2015 Cambiado de técnico por Lorena Giner Martí: El mateix que li passava a Gerardo i a la xica de Madrid.","Estado":"Contestado","Chat":"27/10/2015 Técnico: Hola,\n\nSeguramente se trate de la cache del navegador.\n\nAcceda al menú del safari -> preferencias -> pestaña privacidad. Y allí, debajo del botón \"Eliminar todos los datos de los sitios web\" aparece \"Detalles...\" Pulse y busque \"ceu\" en el buscador y seleccionando los dos elementos que aparecen pulse en \"eliminar\"\n\nMantengo abierto el parte por si no se solucionase\n\nUn saludo\n12/01/2016 Solicitante: Ya puedo. Cierra el parte. Gracias.","Edificio":"Edificio Luis Campos Górriz","Autor":"Francisco Suay Pérez","Periodica":"false","FechaTope":"2015-11-02T12:52:17.297+01:00","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"386","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"},{"IdCaso":"2346","Descripcion":"prueba ivan","IdTipo":"2","IdEdificio":"19","IdUbicacion":"1","IdEstado":"4","PersonalIdSolicitante":"2623","Respuesta":"aasdasd","FechaModificacion":"2015-10-05T17:16:43.053+02:00","IdTipoIP":"81","Solicitante":"Iván Carlos Lausuch Sales","Tipo":"Solicitud","Area":"Aplicaciones para el PDI. y Gestión Docente","Servicio":"Gestión Docente POD","TipoIP":"Acceso a la aplicación","Fecha":"2015-10-05T11:46:35.39+02:00","TecnicoAsignado":"","PersonalIdAutor":"2623","Autorizacion":"false","IdPuestoAsignado":"386","IdDepartamento":"50","EnvioEmailCambioEstado":"true","IdServicio":"240","IdArea":"4","Comentarios":"05/10/2015 Cambiado de técnico por Iván Carlos Lausuch Sales","Estado":"En proceso","Chat":"05/10/2015 Técnico: comentario 1\n05/10/2015 Técnico: prueba 2\n05/10/2015 Técnico: aasdasd","Edificio":"Rectorado/Gerencia","Autor":"Iván Carlos Lausuch Sales","Periodica":"false","FechaTope":"2015-10-09T11:46:35.387+02:00","Virtual":"0","Nivel":"2","Ubicacion":"Puesto de trabajo","IdSede":"2","Sede":"Valencia","Compras":"false","IdPuestoResponsable":"84","IdPuestoAprobador":"1455","PermiteEscalado":"true","PermitirEsperaAprobacion":"1","PersonalIdTecnicoAsignado":"2623"}];
+				}
+				
+				mc.data2=[];
+				$timeout(function(){
+					mc.loadData();
+					
+					$timeout(function(){
+						mc.data2[0].IdCaso="1";
+						mc.data2[0].Solicitante="Raquel Nielfa Toribio";
+						if ($ilControllers!=undefined && $ilControllers.myTable!=undefined)
+							$ilControllers.myTable.update();
+					},5000)
+					
+				},1000);
+				
+				
+				mc.onClickItem=function(item,column){
+					console.debug("click",item,column);
+				}
+				
+				mc.deleteFnc=function(item,callback){
+					callback();
+				}
+				
+				mc.onDelete=function(item){
+					console.debug("Delete",item);
+				}
+				
+				
+				//---------------------------------
+				// table 3
+				//--------------------------------
+				
+				this.addElementData3=function(i){
+					var obj={
+						val:(i+1)*100000,
+						name:"name "+i
+					};
+					
+					Object.defineProperty(obj,"calc",{
+						get:function(){
+							var dt = new Date();
+							return this.val+dt.getSeconds();
+						},
+						set:function(value){
+							
+						}
+					})
+					
+					mc.data3.push(obj);
+				}
+				
+				mc.data3=[];
+				for (var i=0; i<5; i++){
+					this.addElementData3(i);
+				}
+				
+				setInterval(function(){
+					mc.$timeout(function(){
+						$ilControllers.table3.update()
+					})
+				}, 500)
+				
+				mc.$timeout(function(){
+					mc.canDelete3=true;	
+				})
+				
+				mc.controller3={
+					canDeleteFnc:function(item){
+						return (item.val/100000)%2!=0;
+					},
+				
+					canEditFnc:function(item){
+						return (item.val/100000)%2!=0;
+					}
+				}
+				
+				$rootScope.canEditFnc3=mc.canEditFnc3;
+
+				mc.onEdit3=function(item){
+					console.debug("Editing",item);
+				}
+				
+				mc.onDelete3=function(item){
+					console.debug("Delete",item);
+				}
+				
+				mc.onSelect3=function(item,list){
+					console.debug("select",item,list);
+				}
+				
 			});
 		</script>
+		
+		<style>
+			
+			.ilTable2 .head{
+				background-color:#274F64;
+				color:white;
+			}
+			
+			.ilTable2 .field-id{
+				color:blue;
+			}
+			
+		</style>
 	</head>
 	
-	
 	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
-		<il-table2 model="mc.model">
-			<td>bla bla</td>
-			<td>asdsd</td>
-		</il-table2>
+		<div>
+			<il-table2 model="mc.data3" class="table table-striped ilTable2min" eid="'table3'" external-controller="mc.controller3"
+				edit-inline=false
+				can-edit="mc.controller3.canEditFnc(item)"
+				on-edit="mc.onEdit3(item)"
+				auto-delete=false
+				can-delete="mc.controller3.canDeleteFnc(item)"
+				on-delete="mc.onDelete3(item)"
+				on-selected="mc.onSelect3(item,list)"
+				select-multiple=false
+				show-column-titles=true
+				show-footer=false
+				show-items-per-page=false
+				header-title="'Prueba'"
+				
+			>
+			 	<il-table2-column type="'select'"></il-table2-column>
+				<il-table2-column 
+			        title="'Value'"
+			        field="'val'">
+			    </il-table2-column>
+				<il-table2-column 
+			        title="'Name'"
+			        field="'name'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Calculated'"
+			        field="'calc'"
+			        filter-disabled="false"
+			        >
+			    </il-table2-column>
+			    <il-table2-column type="'buttons'"></il-table2-column>
+			</il-table2>
+			
+			<table>
+				<tr ng-repeat="item in mc.data3">
+					<td>{{item.calc}}</td>
+				</tr>
+			</table>
+			
+			<button ng-click="mc.addElementData3(10);" class="btn">Add</button>
+			<button ng-click="$ilControllers.table3.update()" class="btn">Click to change one value</button>
+			
+			<!--
+			<il-table2 model="mc.items" class="table table-striped ilTable2"
+				edit-all="mc.editAll"
+				show-search=true
+				show-pagination=mc.pagination
+				select-on-click=false
+				select-multiple=true
+				show-header=true
+				show-download=true
+				delete-confirm=true
+				header-buttons=mc.headerButtons
+				custom-fnc=mc.customFnc
+				mc="mc"
+				external-info="mc.extraInfo"
+				on-delete="mc.onDelete(item)"
+				delete-fnc="mc.deleteFnc(item,callback)"
+			>
+				<il-table2-column type="'select'"></il-table2-column>
+				<il-table2-column type="'basic'" title="'Id'" field="'id'"></il-table2-column>
+				<il-table2-column type="'render'" title="'Sex'" renderer="mc.renderer_sex"></il-table2-column>
+				
+				<il-table2-column type="'ilInput'" title="'Name'" il-input-type="'text'" field="'name'"></il-table2-column>
+				<il-table2-column type="'ilInput'" title="'Lastname'" il-input-type="'password'" field="'lastname'"></il-table2-column>
+				<il-table2-column type="'ilInput'" title="'Value'"  il-input-type="'select'" field="'value'" select-options="mc.values"></il-table2-column>
+				<il-table2-column type="'ilInput'" title="'Sex'" il-input-type="'select'" field="'sex'" select-options="mc.sex" select-label-field="'label'" search-method="'startWith'"></il-table2-column>
+				
+
+				<il-table2-column type="'include'" title="'Template'"  include="'template.html'" edit-include="'templateEdit.html'"></il-table2-column>
+				<il-table2-column type="'include'" title="'Template 2'" field="'id'" edit-include="'templateEdit.html'"></il-table2-column>
+
+
+				<il-table2-column type="'buttons'" can-edit=true can-delete=true custom="mc.customButtons"></il-table2-column>
+			</il-table2>
+			
+			
+			
+			
+			<il-table2 model="mc.data2" class="table table-striped ilTable2"
+				edit-all="mc.editAll"
+				show-search=true
+				show-pagination=mc.pagination
+				select-on-click=false
+				select-multiple=true
+				show-header=true
+				title="'My table'"
+				show-download=true
+				delete-confirm=true
+				header-buttons=mc.headerButtons
+				custom-fnc=mc.customFnc
+				on-click-item="mc.onClickItem(item,column)"
+				show-clickable-row="true"
+				eid="'myTable'"
+				mc="mc"
+				external-info="mc.extraInfo"
+			>
+				<il-table2-column 
+			        title="'Categoría'"
+			        field="'Tipo'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Número'"
+			        field="'IdCaso'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Alta'"
+			        field="'Fecha'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Solicitante'"
+			        field="'Solicitante'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Servicio'"
+			        field="'Servicio'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Estado'"
+			        field="'Estado'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Nivel'"
+			        field="'Nivel'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Tope'"
+			        field="'FechaTope'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Comprometido'"
+			        field="'FechaComprometido'">
+			    </il-table2-column>
+			    
+			</il-table2>
+			
+			<button ng-click="mc.editAll=!mc.editAll">Edit all</button>
+			<button ng-click="mc.pagination=!mc.pagination">Pagination</button>
+			<button ng-click="$ilControllers.myTable.select.select(mc.data2[1])">Select all</button>
+			
+			-->
+			
+			
+		</div>
 	</body>
 </html>

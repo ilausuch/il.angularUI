@@ -1,0 +1,314 @@
+
+.ilSurvey{
+	background-color: white;
+	max-width: 960px;
+	margin: auto;
+	text-align: left;	
+	padding-bottom: 2em;
+}
+
+.ilSurvey > .preHeader{
+	padding-bottom: 2em;	
+}
+
+.ilSurvey > .preHeader > .html{
+	padding: 1em;
+}
+
+.ilSurvey > .preHeader > .template{
+	
+}
+
+.ilSurvey > .postHeader{
+	padding-bottom: 2em;	
+}
+
+.ilSurvey > .postHeader > .html{
+	padding: 1em;
+}
+
+.ilSurvey > .postHeader > .template{
+	
+}
+
+.ilSurvey > .header{
+	color:white;
+	background-color: #4C9ED9;
+	padding: 0.2em;
+	padding-left: 1.4em;
+}
+
+.ilSurvey > .header > .title{
+	font-size: 200%;
+}
+
+
+/*
+Section, header and footer	
+*/
+.ilSurvey > .section{
+	padding-bottom: 2em;	
+}
+
+.ilSurvey > .section > .header{
+	margin-bottom:3em;
+}
+
+.ilSurvey > .section > .header > .title{
+	font-size: 200%;	
+	background-color: #BAE2FF;
+	margin-bottom:1em;
+	padding: 0.2em;
+	padding-left: 0.8em;	
+}
+
+.ilSurvey > .section > .header > .staticHTML{
+	margin: 0px 1.4em;
+}
+
+.ilSurvey > .section > .header > .staticTemplate{
+	margin: 0px 1.4em;
+}
+
+.ilSurvey > .section > .footer {
+	margin: 0px 1.4em;
+	margin-bottom: 1em;
+}
+
+.ilSurvey > .section > .footer > .staticHTML{
+
+}
+
+.ilSurvey > .section > .footer > .staticTemplate{
+
+}
+
+/*
+Question basics	
+*/
+.ilSurvey > .section > .question{
+	font-size: 120%;
+	margin: 0px 1.4em;
+}
+
+.ilSurvey > .section > .question > .normal{
+	margin-bottom: 4em;
+}
+
+.ilSurvey > .section > .question > .normal > .title{
+	font-weight: bold;
+}
+
+.ilSurvey > .section > .question > .normal > .check{
+	color: green;
+}
+
+
+.ilSurvey > .section > .question > .normal > .error{
+	color:red;
+}
+
+.ilSurvey > .section > .question > .normal > .description{
+	font-style: italic;
+	color: #555;
+	padding-bottom: 0.5em;
+}
+
+.ilSurvey > .section > .question > .normal > .body{
+	margin-top: 0.5em
+}
+
+/*
+Text	
+*/
+
+.ilSurvey > .section > .question > .normal > .body > .text{
+	
+}
+
+.ilSurvey > .section > .question > .normal > .body > .text > .text{
+	
+}
+
+.ilSurvey > .section > .question > .normal > .body > .text > .multipleRow{
+	
+}
+
+.ilSurvey > .section > .question > .normal > .body > .text > .oneRow{
+	
+}
+
+
+/*
+Select
+*/
+
+.ilSurvey > .section > .question > .normal > .body > .select{
+	padding-top: 0.5em;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .item{
+	padding-bottom: 0.5em;
+	color: #555;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .item > .icon{
+	font-size: 150%;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .item > .text{
+	padding-left: 0.3em;
+	position: relative;
+	bottom: 0.15em;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .comment{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .comment > .label{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .comment > .commentText{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .comment > .commentMultipleRow{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .select > .comment > .oneRow{
+
+}
+
+/*
+Combobox	
+*/
+.ilSurvey > .section > .question > .normal > .body > .combobox{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .combobox select{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .combobox > .comment{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .combobox > .comment > .label{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .combobox > .comment > .commentText{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .combobox > .comment > .multipleRow{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .combobox > .comment > .oneRow{
+
+}
+
+/*
+Multi select
+*/
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect{
+	padding-top: 0.5em;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .item{
+	padding-bottom: 0.5em;
+	color: #555;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .item > .icon{
+	font-size: 150%;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .item > .text{
+	padding-left: 0.3em;
+	position: relative;
+	bottom: 0.15em;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .comment{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .comment > .label{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .comment > .commentText{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .comment > .commentMultipleRow{
+
+}
+
+.ilSurvey > .section > .question > .normal > .body > .multiselect > .comment > .oneRow{
+
+}
+
+/*
+Table select
+*/
+
+.ilSurvey > .section > .question > .normal > .body > .tableSelect{
+	padding-top: 0.5em;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .tableSelect > table{
+	width: 100%;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .tableSelect > table > thead > tr > th{
+	text-align: center;	
+}
+
+.ilSurvey > .section > .question > .normal > .body > .tableSelect > table > tbody > tr > td{
+	padding: 0.5em;
+	border-bottom: 1px solid silver;
+}
+
+
+.ilSurvey > .section > .question > .normal > .body > .tableSelect > table > tbody > tr > .rowItem{
+	text-align: center;	
+}
+
+.ilSurvey > .section > .question > .normal > .body > .tableSelect > table > tbody > tr > .rowItem > .icon{
+	font-size: 120%;
+	cursor: pointer;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .stars{
+	padding-top: 0.5em;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .stars >table >tbody >tr >td >span >span.star-on{
+	cursor: pointer;
+	color:orange;
+}
+
+.ilSurvey > .section > .question > .normal > .body > .stars >table >tbody >tr >td >span >span.star-off{
+	cursor: pointer;
+	color:gray;
+}
+
+
+/*
+	Static content
+*/
+.ilSurvey > .section > .question > .staticHTML{
+	margin-bottom: 1em;
+}
+
+.ilSurvey > .section > .question > .staticTemplate{
+	margin-bottom: 4em;
+}

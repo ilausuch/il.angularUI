@@ -1,0 +1,38 @@
+<div class="panel panel-{{panelStyle}}">
+	<div class="panel-heading" ng-if="headerTitle">
+		<div style="float:left">{{headerTitle}}</div>
+		<div ng-if="canClose" ng-click="onClose()" style="float:right;cursor:pointer; margin-left: 1em">
+			<i class="fa fa-close"></i>
+		</div>
+		<div ng-if="canDelete" ng-click="onDelete()" style="float:right;cursor:pointer; margin-left: 1em">
+			<i class="fa fa-trash"></i>
+		</div>
+		<div ng-if="canEdit" ng-click="onEdit()" style="float:right;cursor:pointer; margin-left: 1em">
+			<i class="fa fa-pencil"></i>
+		</div>
+		<div ng-repeat="button in buttons" ng-click="button.callback(info())" style="float:right;cursor:pointer; margin-left: 1em" tooltip="{{button.tooltip}}">
+			<i class="fa fa-{{button.icon}}"></i>
+		</div>
+		<div style="clear:both"></div>
+		
+	</div>
+	<div class="panel-body">
+		<div style="text-align:right;" ng-if="!headerTitle && (canEdit || canDelete)">
+			<div ng-if="canClose" ng-click="onClose()" style="float:right;cursor:pointer; margin-left: 1em">
+				<i class="fa fa-close"></i>
+			</div>
+			<div ng-if="canDelete" ng-click="onDelete()" style="float:right;cursor:pointer;margin-left: 1em">
+				<i class="fa fa-trash"></i>
+			</div>
+			<div ng-if="canEdit" ng-click="onEdit()" style="float:right;cursor:pointer;margin-left: 1em">
+				<i class="fa fa-pencil"></i>
+			</div>
+			<div ng-repeat="button in buttons" ng-click="button.callback(info())" style="float:right;cursor:pointer; margin-left: 1em" tooltip="{{button.tooltip}}">
+				<i class="fa fa-{{button.icon}}"></i>
+			</div>
+			
+			<div style="clear:both"></div>
+		</div>
+		<ng-transclude></ng-transclude>
+	</div>
+</div>

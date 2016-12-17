@@ -1,0 +1,61 @@
+<div>
+	<div style="position: relative; background-color: rgb(249, 249, 249); padding: 0.5em; border-radius: 5px 5px 0px 0px; -moz-border-radius: 5px 5px 0px 0px; -webkit-border-radius: 5px 5px 0px 0px; ">
+		<div style="position: relative; float: left; top: 5px;" ng-hide="checked">
+			<b>Options:</b>
+			<span style="padding: 0px 1em;">
+				<input type="checkbox" ng-model="firstRowHeader"> First row is header
+			</span>
+			
+			
+			<span style="padding: 0px 1em;">
+				Column split by
+				<select ng-model="columnSplit" ng-options="item.label for item in columnSplitOptions">
+				</select>
+			</span>
+		</div>
+		<div style="position: relative; float: left; top: 5px;" ng-show="checked">
+			<b>Total rows:</b> {{model.length}}
+			
+		</div>
+		
+		<div style="float: right;">
+			<button class="btn btn-default btn-sm" ng-click="check()" ng-if="!checked"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Check</button>
+			<button class="btn btn-default btn-sm" ng-click="uncheck()" ng-if="checked"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Back</button>
+			<button class="btn btn-default btn-sm" ng-click="confirm()" ng-if="checked"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Confirm</button>
+		</div>
+		
+		<div style="clear: both"></div>
+	</div>
+	
+	<div ng-if="validHeaders!=true" class="alert alert-danger" role="alert">{{validHeaders}}</div>
+	
+	<textarea placeholder="Copy here your excel or cvs" style="width: 100%; height: 20em" ng-model="inputText" ng-hide="checked"></textarea>
+	
+	<table ng-if="checked" class="table table-striped">
+		<tr ng-if="firstRowHeader">
+			<th ng-repeat="v in headers">{{v}}</th>
+			<th>Status</th>
+		</tr>
+		<tr ng-repeat="item in model">
+			<td ng-repeat="column in headers">
+				<div class="input-group input-group-sm">
+					
+					<span ng-if="!_checkValue(item[column],column)" class="input-group-addon" id="sizing-addon3" ng-click="showError(_checkValueMsg(item[column],column))" style="cursor:help;color:red"><span class='fa fa-exclamation-triangle'></span></span>
+					
+					<span ng-if="_columnConfig(column).type=='readonly'">{{item[column]}}</span>
+					
+					<input ng-if="_columnConfig(column).type=='text'" type="text" class="form-control" placeholder="{{column}}" ng-model="item[column]" aria-describedby="sizing-addon3">
+				
+					<select ng-if="_columnConfig(column).type=='list'" class="form-control" placeholder="{{column}}" ng-model="item[column]" aria-describedby="sizing-addon3" ng-options="item for item in _columnConfig(column).values"></select>
+						
+					<select ng-if="_columnConfig(column).type=='listObjects'" class="form-control" placeholder="{{column}}" ng-model="item[column]" aria-describedby="sizing-addon3" ng-options="item[_columnConfig(column).labelField] for item in _columnConfig(column).values"></select>
+				</div>
+				
+			</td>
+			<td>
+				<span ng-if="_checkItem(item)==''" style="color:green"><i class='fa fa-check'></i> {{okItemMsg}}</span>
+				<span ng-if="_checkItem(item)!=''" style="color:red"><i class='fa fa-exclamation-triangle' ng-click="showError(_checkItem(item))" style="cursor:help"></i> {{errorItemMsg}}</span>
+			</td>
+		</tr>
+	</table>
+</div>

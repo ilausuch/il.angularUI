@@ -1,0 +1,285 @@
+/***************************************************
+Normal	
+****************************************************/
+.ilTable2{
+	border-radius: 2px;
+	-webkit-box-shadow:0 1px 4px rgba(0,0,0,0.3);
+	box-shadow:0 1px 4px rgba(0,0,0,0.3);	
+}
+
+.ilTable2 .head{
+	background-color: #EEEEEE;
+}
+
+.ilTable2 .head h1{
+	font-size: 20px;
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+.ilTable2 .head .buttons{
+	position: absolute; 
+	right: 0px; 
+	top: -17px; 
+	font-size: 120%;
+}
+
+.ilTable2 .head .buttons span{
+	cursor: pointer;
+}
+
+.ilTable2 .head .button{
+	border: 0px none; 
+	background-color: transparent;
+	position: relative;
+	top:-5px;
+	
+	padding-left: 1em;
+}
+
+.ilTable2 .head .downloadButton{
+	
+}
+
+.ilTable2 .search{
+	background-color: #EEEEEE;
+}
+
+.ilTable2 .search .ilInput div{
+	margin-bottom: 0px;
+}
+
+.ilTable2 .columnTitle{
+	background-color: #EEE;
+}
+
+.ilTable2 .selected {
+	background-color: antiquewhite !important;
+}
+
+.ilTable2 .clickable {
+	cursor:pointer;
+}
+
+.ilTable2 .clickable:hover
+{
+    background-color: rgba(0, 0, 255, 0.1);
+}
+
+
+.ilTable2 .field {
+	padding: 6px;
+}
+
+.ilTable2 .rowButtons{
+	
+}
+
+.ilTable2 .rowButtons .button{
+	cursor: pointer;
+	padding:0em 0.2em;
+}
+
+.ilTable2 .rowButtons .customButton{
+	
+}
+
+.ilTable2 .rowButtons .customButton{
+	
+}
+
+
+
+.ilTable2 .footer{
+	background-color: #EEE;
+}
+
+.ilTable2 .paginationFooter{
+	
+}
+
+.ilTable2 .columnTitle{
+	cursor:pointer;
+	position:relative;
+}
+
+.ilTable2 .columnTitle .background{
+	background-color: rgba(0,0,0,0); 
+	position: fixed; 
+	top:0px; 
+	left:0px; 
+	right:0px; 
+	bottom: 0px; 
+	z-index:1000;
+}
+
+.ilTable2 .columnTitle .config{
+	background-color: #F9F9F9; 
+	border:1px solid gray;
+	position: absolute; 
+	top:2em; 
+	z-index:1001;
+	padding:0.5em;
+	width:20em;
+	border-radius: 2px;
+	-webkit-box-shadow:0 1px 4px rgba(0,0,0,0.3);
+	box-shadow:0 1px 4px rgba(0,0,0,0.3);	
+}
+
+.ilTable2 .columnTitle .config .filterList{
+	background-color: white;
+	padding: 0.4em;
+	overflow: auto;
+	max-height: 10em;
+}
+
+
+
+/***************************************************
+Minimized	
+****************************************************/
+
+.ilTable2min{
+	border-radius: 2px;
+	-webkit-box-shadow:0 1px 4px rgba(0,0,0,0.3);
+	box-shadow:0 1px 4px rgba(0,0,0,0.3);	
+	margin-bottom: 0px;
+}
+
+.ilTable2min .head{
+	background-color: #EEEEEE;
+	padding: 0.1em 0.5em;
+}
+
+.ilTable2min .head h1{
+	font-size: 20px;
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+.ilTable2min .head .buttons{
+	position: absolute; 
+	right: 0px; 
+	top: -20px; 
+	font-size: 120%;
+}
+
+.ilTable2min .head .buttons span{
+	cursor: pointer;
+}
+
+.ilTable2min .head .button{
+	border: 0px none; 
+	background-color: transparent;
+	position: relative;
+	top:-5px;
+	
+	padding-left: 1em;
+}
+
+.ilTable2min .head .downloadButton{
+	
+}
+
+.ilTable2min .search{
+	background-color: #EEEEEE;
+}
+
+.ilTable2min .search td{
+	padding: 3px;
+}
+
+.ilTable2min .search .ilInput div{
+	margin-bottom: 0px;
+}
+
+.ilTable2min .columnTitle{
+	background-color: #EEE;
+	padding: 3px;
+}
+
+
+.ilTable2min .selected {
+	background-color: antiquewhite !important;
+}
+
+.ilTable2min .clickable {
+	cursor:pointer;
+}
+
+.ilTable2min .clickable:hover
+{
+    background-color: rgba(0, 0, 255, 0.1);
+}
+
+
+.ilTable2min .field {
+	padding: 6px;
+}
+
+.ilTable2min .rowButtons{
+	
+}
+
+.ilTable2min .rowButtons .button{
+	cursor: pointer;
+	padding:0em 0.2em;
+}
+
+.ilTable2min .rowButtons .customButton{
+	
+}
+
+.ilTable2min .rowButtons .customButton{
+	
+}
+
+
+
+.ilTable2min .footer{
+	background-color: #EEE;
+}
+
+.ilTable2min .paginationFooter{
+	
+}
+
+.ilTable2min .paginationFooter td{
+	padding: 5px 0px 0px 0px;
+}
+
+
+.ilTable2min .columnTitle{
+	cursor:pointer;
+	position:relative;
+}
+
+.ilTable2min .columnTitle .background{
+	background-color: rgba(0,0,0,0); 
+	position: fixed; 
+	top:0px; 
+	left:0px; 
+	right:0px; 
+	bottom: 0px; 
+	z-index:1000;
+}
+
+.ilTable2min .columnTitle .config{
+	background-color: #F9F9F9; 
+	border:1px solid gray;
+	position: absolute; 
+	top:2em; 
+	z-index:1001;
+	padding:0.5em;
+	width:20em;
+	border-radius: 2px;
+	-webkit-box-shadow:0 1px 4px rgba(0,0,0,0.3);
+	box-shadow:0 1px 4px rgba(0,0,0,0.3);	
+}
+
+.ilTable2min .columnTitle .config .filterList{
+	background-color: white;
+	padding: 0.4em;
+	overflow: auto;
+	max-height: 10em;
+}

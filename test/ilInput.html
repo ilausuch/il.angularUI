@@ -104,15 +104,17 @@
 				this.model={
 					number:Math.round(Math.random()*100),
 					date:new Date(),
-					pet:this.pets[1]
+					pet:this.pets[1],
+					textarea:"asdadsasd",
 				}
 				
 				this.verifyGroup=new ilInputVerificationGroup();
 				
 				this.dates=[
 					moment(),
-					moment("2015-11-01"),
-					moment("2015-11-30")
+					moment([moment().year(),moment().month(),1]),
+					moment([moment().year(),moment().month(),15]),
+					moment([moment().year(),moment().month(),17]),
 					/*
 					moment().add(1,'days'),
 					moment().add(2,'days'),
@@ -129,15 +131,80 @@
 				//this.model.date2=moment().add("month",1);
 				
 				this.startAt=moment().add(1,'month');
+				
+				this.customCallback=function(model,value,field){
+					model[field]=prompt("Nuevo texto",value);
+				}
+				
+				this.modelTest={
+					test:undefined
+				}
+				
+				this.cleanTest=function(){
+						mc.modelTest={}
+				}
+				
 			});
 		</script>
 	</head>
 	
 	
 	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
+		
+		<p><input type="checkbox" ng-model="mc.readOnly">ReadOnly</p>
+		
+		<il-input
+			type="'text'"
+			label="'text'"
+			model="mc.model"
+			field="'textarea2'"
+			required=true
+			read-only="mc.readOnly"
+		></il-input>
+		
+		<il-input
+			type="'password'"
+			label="'password'"
+			model="mc.model"
+			field="'textarea2'"
+			required=true
+			read-only="mc.readOnly"
+		></il-input>
+
+		
 		<il-input
 			model="mc.model"
 			field="'checkbox'"
+			type="'checkbox'"
+			select-options="mc.checkboxOptions"
+			select-label-field="'label'"
+			label="'Select more'"
+			required="true"
+			checkbox-max="4"
+			checkbox-min="2"
+			description="'Max 4, min 2'"
+			checkbox-modal="true"
+			checkbox-modal-close-on-select=true
+			read-only="mc.readOnly"
+		></il-input>
+		
+		<il-input
+			model="mc.model"
+			field="'checkbox'"
+			type="'checkbox'"
+			select-options="mc.checkboxOptions"
+			select-label-field="'label'"
+			label="'Select one or more'"
+			required="true"
+			checkbox-max="4"
+			checkbox-modal="true"
+			verify-if-void=true
+			read-only="mc.readOnly"
+		></il-input>
+		
+		<il-input
+			model="mc.model"
+			field="'checkbox2'"
 			type="'checkbox'"
 			select-options="mc.checkboxOptions"
 			select-label-field="'label'"
@@ -145,15 +212,42 @@
 			required="true"
 			checkbox-max="1"
 			checkbox-min="1"
-			description="'Max 2, min 1'"
+			description="'Max 1, min 1'"
+			read-only="mc.readOnly"
 		></il-input>
 		
+		<il-input
+			type="'custom'"
+			label="'Custom field'"
+			model="mc.model"
+			field="'textarea'"
+			custom-label-fnc="model[field]"
+			custom-open-callback="mc.customCallback(model,value,field)"
+			required=true
+			read-only="mc.readOnly"
+		></il-input>
+		
+				
+		<il-input
+			type="'custom'"
+			label="'Custom field objects'"
+			model="mc.model"
+			field="'pet2'"
+			custom-label-fnc="model[field].label"
+			custom-open-callback="mc.customCallback2(model,value,field)"
+			required=true
+			verify-if-void=true
+			read-only="mc.readOnly"
+		></il-input>
+
+
 		<il-input
 			model="mc.model"
 			field="'textarea'"
 			type="'textarea'"
 			text-rows="2"
 			label="'Text area'"
+			read-only="mc.readOnly"
 		>
 		</il-input>
 		<table class="table">
@@ -163,14 +257,17 @@
 						model="mc.model"
 						field="'number'"
 						only-text="mc.edit"
-						label="'Text not empty'"
+						label="'Name'"
 						required="true"
 						required-visible="false"
-						inner-label="'hola'"
+						inner-label="'Name'"
 						verify-fnc="mc.verify(model,value)"
 						on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
 						verify-group="mc.verifyGroup"
-						placeholder="'Ecrive aquí el número'"
+						placeholder="'Ecribe aquí el número'"
+						verify-show-icon="false"
+						read-only="mc.readOnly"
+						
 					>	
 					</il-input>
 				</td>
@@ -184,13 +281,14 @@
 						verify-fnc="mc.verifyTime(model,value)"
 						inner-awesome-icon="'clock-o'"
 						time-seconds="true"
+						read-only="mc.readOnly"
 					>	
 					</il-input>
 				</td>
 				<td>
 					<il-input
 						model="mc.model"
-						field="'pet'"
+						field="'pet3'"
 						type="'select'"
 						label="'Select an pet (Object)'"
 						only-text="mc.edit"
@@ -201,7 +299,7 @@
 						select-options="mc.pets"
 						select-label-field="'label'"
 						select-label-fnc="item.label+' ('+model.number+')'"
-						
+						read-only="mc.readOnly"
 					>	
 					</il-input>
 					</br>
@@ -218,9 +316,9 @@
 						select-options="mc.pets"
 						select-label-field="'label'"
 						select-value-field2="'value'"
+						read-only="mc.readOnly"
 					>	
 					</il-input>
-					<!-- select-value-field="'value'"-->
 				</td>
 				
 				<td>
@@ -234,6 +332,8 @@
 						required="true"
 						select-options="mc.values"
 						verify-group="mc.verifyGroup"
+						placeholder="'Select one'"
+						read-only="mc.readOnly"
 					>	
 					</il-input>
 					</br>
@@ -249,6 +349,7 @@
 						select-options="mc.values"
 						verify-group="mc.verifyGroup"
 						placeholder="'Escribe aquí'"
+						read-only="mc.readOnly"
 					>	
 					</il-input>
 				</td>
@@ -261,9 +362,9 @@
 						label="'Select a date'"
 						only-text="mc.edit"
 						required="true"
-						date-locale="'es'"
 						inner-awesome-icon="'calendar'"
 						date-show-year-combo="true"
+						read-only="mc.readOnly"
 					>	
 					</il-input>
 				</td>
@@ -276,8 +377,8 @@
 						label="'Select a date and time'"
 						only-text="mc.edit"
 						required="true"
-						date-locale="'es'"
 						inner-awesome-icon="'calendar'"
+						read-only="mc.readOnly"
 					>	
 					</il-input>
 				</td>
@@ -293,6 +394,7 @@
 			verify-fnc="mc.verify(model,value)"
 			on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
 			text-max-length="3"
+			read-only="mc.readOnly"
 		>	
 		</il-input>
 		<il-input
@@ -306,7 +408,7 @@
 			on-verify="mc.onVerify(valid,model,value); mc.validated1=valid"
 			on-change="mc.onChangeTest()"
 			on-change-only-when-validate="mc.onChangeTestValidated()"
-			
+			read-only="mc.readOnly"
 		>	
 		</il-input>
 		<il-input
@@ -319,6 +421,7 @@
 			boolean-false-html="'<span class=\'label label-danger\'>No</span>'"
 			verify-show="false"
 			hide-border="true"
+			read-only="mc.readOnly"
 		>	
 		</il-input>
 		Validated this? {{mc.validated1}}
@@ -331,25 +434,27 @@
 		
 		<div style="max-width: 300px">
 			<il-input
-				
+				date-hide-input="true"
 				model="mc.model"
 				field="'date2'"
 				type="'date'"
 				label="'Select a date'"
 				only-text="mc.edit"
 				required="true"
-				date-locale="'es'"
 				inner-awesome-icon="'calendar'"
 				date-show-year-combo="false"
 				date-can-change-month="false"
 				date-fix-modal="true"
 				date-available-dates="mc.dates"
+				read-only="mc.readOnly"
 			>	
 			</il-input>
 		</div>
 		
 		
-			
-		
+		<hr style="margin-top: 20em">
+		<h3>Ejemplo de modelo</h3>
+		<il-input type="'select'" select-options="mc.pets" select-label-field="'label'" model="mc.modelTest" field="'test'" required="true"></il-input>
+		<button ng-click="mc.cleanTest()" class="btn">Limpiar modelo</button>
 	</body>
 </html>

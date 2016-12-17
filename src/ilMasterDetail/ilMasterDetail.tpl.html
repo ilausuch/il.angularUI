@@ -1,0 +1,19 @@
+<il-table2 
+	eid="eid_table"
+	model="model" 
+	class="table table-striped ilTable2"
+	on-click-item="table.onClickItem(item,column)"
+>
+	<div ng-transclude></div>
+</il-table2>
+
+<il-modal show="modal.show()"
+	header-title="modal.title"
+	on-succes="modal.onSuccess()"
+>
+	<div class="row">
+	  <div class="{{modal.columnClass()}}" ng-repeat="col in columns">
+		  <il-input type="input.type(col)" label="col.title" model="modal.model.$sandbox" field="col.field"></il-input>
+	  </div>
+	</div>
+</il-modal>

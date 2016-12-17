@@ -21,7 +21,10 @@
 	</div>
 	<div ng-if="type=='password'">
 		*********
-	</div> 
+	</div>
+	<div ng-if="type=='custom'">
+		{{_selectLabelFnc(model[field])}}
+	</div>
 </div>
 
 <div ng-if="!onlyText" class="form-group has-feedback" ng-class="{'has-success':_validated && undefinedIs(verifyShow,true) && feedbackVisible(), 'has-error':!_validated && undefinedIs(verifyShow,true) && feedbackVisible()}"> 
@@ -30,7 +33,7 @@
 	</label> 
 	<p ng-if="description"><i>{{description|translate}}</i></p>
 	
-	<div class="input-group" style="width: 100%">
+	<div class="input-group" style="width: 100%" ng-hide="type=='date' && dateHideInput">
 		<span class="input-group-addon" ng-if="innerLabel">{{innerLabel}}</span> 
 		<span class="input-group-addon" ng-if="innerIcon">
 			<span class="glyphicon glyphicon-{{innerIcon}}"></span>
@@ -39,33 +42,35 @@
 			<span class="fa fa-{{innerAwesomeIcon}}"></span>
 		</span> 
 		
-		<input ng-if="type=='text'" type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" name="{{field}}" maxlength="{{textMaxLength||10000}}"> 
-		<input ng-if="type=='password'" type="password" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" maxlength="{{textMaxLength||10000}}"> 
+		<input ng-if="type=='text'" type="text" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" name="{{field}}" maxlength="{{textMaxLength||10000}}" ng-readonly="readOnly"> 
+		<input ng-if="type=='password'" type="password" class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" maxlength="{{textMaxLength||10000}}" ng-readonly="readOnly"> 
 		
-		<div ng-if="type=='time'" class="form-control" ng-click="time_openModal()">
+		<select ng-if="type=='select'" class="form-control" ng-model="model[field]" ng-options="_selectValueFnc(item) as _selectLabelFnc(item) for item in selectOptions" ng-change="_onChange()" style="-webkit-appearance: none; -moz-appearance:none;padding: 0px" ng-readonly="readOnly" ng-disabled="readOnly">
+			<option ng-show="placeholder"  value="">{{placeholder}}</option>
+		</select>
+		
+		<input ng-if="type=='autocomplete'" type="text" class="form-control" ng-model="model[field]" typeahead="_selectValueFnc(item) as _selectLabelFnc(item) for item in selectOptions | filter:autocomplete_filter($viewValue)" typeahead-editable="false" typeahead-on-select="autocomplete_onChange()" placeholder="{{placeholder}}" ng-readonly="readOnly"> 
+		
+		<div ng-if="type=='time'" class="form-control" ng-click="time_openModal()" ng-style="{'cursor': readOnly_cursor()}" ng-disabled="readOnly">
 			<span ng-if="!timeSeconds">{{model[field]|filterTime}}</span>
 			<span ng-if="timeSeconds">{{model[field]|filterTimeSeconds}}</span>
 		</div> 
 		
-		<select ng-if="type=='select'" class="form-control" ng-model="model[field]" ng-options="_selectValueFnc(item) as _selectLabelFnc(item) for item in selectOptions" ng-change="_onChange()" style="-webkit-appearance: none; -moz-appearance:none;padding: 0px"></select>
-		
-		<input ng-if="type=='autocomplete'" type="text" class="form-control" ng-model="model[field]" typeahead="_selectValueFnc(item) as _selectLabelFnc(item) for item in selectOptions | filter:autocomplete_filter($viewValue)" typeahead-editable="false" typeahead-on-select="autocomplete_onChange()" placeholder="{{placeholder}}"> 
-				
-		<div ng-if="type=='date'" class="form-control" ng-click="date_openModal()" style="cursor: pointer">
+		<div ng-if="type=='date'" class="form-control" ng-click="date_openModal()" ng-style="{'cursor': readOnly_cursor()}" ng-disabled="readOnly">
 			{{model[field]|filterDate}}
 		</div>
-		<div ng-if="type=='dateTime'" class="form-control" ng-click="dateTime_openModal()" style="cursor: pointer">
+		<div ng-if="type=='dateTime'" class="form-control" ng-click="dateTime_openModal()" ng-style="{'cursor': readOnly_cursor()}" ng-disabled="readOnly">
 			{{model[field]|filterDateTime}}
 		</div>
-		<div ng-if="type=='boolean'" class="form-control">
-			<div ng-if="model[field]==booleanTrue" ng-click="boolean_tonggle()" style="cursor: pointer" ng-bind-html="booleanTrueHtml | ilSanitize"></div>
-		<div ng-if="model[field]!=booleanTrue" ng-click="boolean_tonggle()" style="cursor:pointer" ng-bind-html="booleanFalseHtml | ilSanitize"></div> 
+		<div ng-if="type=='boolean'" class="form-control" ng-style="{'cursor': readOnly_cursor(),'background-color':readOnly_backgroundColor()}">
+			<div ng-if="model[field]==booleanTrue" ng-click="boolean_tonggle()" ng-disabled="readOnly" ng-bind-html="booleanTrueHtml | ilSanitize"></div>
+			<div ng-if="model[field]!=booleanTrue" ng-click="boolean_tonggle()" ng-disabled="readOnly" ng-bind-html="booleanFalseHtml | ilSanitize"></div> 
 	</div> 
 
 	
-	
-	<div ng-if="type=='checkbox'"
-		style="padding:1em; border:1px solid silver"
+	<div ng-if="type=='checkbox' && !checkboxModal"
+		style="{{checkboxStyle}}"
+		ng-style="{'cursor': readOnly_cursor(),'background-color':readOnly_backgroundColor()}"
 		>
 		<p ng-repeat="item in selectOptions"
 			ng-click="checkbox_select(item)"
@@ -78,24 +83,35 @@
 		</p>
 	</div>
 	
+	<div ng-if="type=='checkbox' && checkboxModal" class="form-control" ng-click="checkbox_openModal()" 
+		ng-style="{'cursor': readOnly_cursor(),'background-color':readOnly_backgroundColor()}"
+			>
+		<span ng-repeat="item in selectOptions" class="label label-info" style="margin-right: 0.5em" ng-if="checkbox_checkOptions(item)">{{_selectLabelFnc(item)|translate}}</span>
+	</div>
+
+	
 	<div ng-if="type=='textarea'">
 		<textarea class="form-control" ng-model="model[field]" ng-change="_onChange()"  placeholder="{{placeholder}}" rows="{{textRows}}"
-			style="width: 100%; padding: 0.5em" ng-class="{'has-success':_validated && undefinedIs(verifyShow,true) && feedbackVisible(), 'has-error':!_validated && undefinedIs(verifyShow,true) && feedbackVisible()}"
+			style="width: 100%; padding: 0.5em" ng-class="{'has-success':_validated && undefinedIs(verifyShow,true) && feedbackVisible(), 'has-error':!_validated && undefinedIs(verifyShow,true) && feedbackVisible()}" ng-readonly="readOnly" maxlength="{{textMaxLength||10000}}"
 		>
 		</textarea>
 	</div>
 	
-	<span class="glyphicon glyphicon-ok form-control-feedback" ng-if="_validated && requiredIconVisible && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
-	<span class="glyphicon glyphicon-remove form-control-feedback" ng-if="!_validated && requiredIconVisible && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
+	<div ng-if="type=='custom'" ng-click="custom_openCallback()" class="form-control" ng-style="{'cursor': readOnly_cursor()}" ng-disabled="readOnly">
+		{{custom_LabelFunction()}}
+	</div>
+	
+	<span class="glyphicon glyphicon-ok form-control-feedback" ng-if="_validated && requiredIconVisible && verifyShowIcon && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
+	<span class="glyphicon glyphicon-remove form-control-feedback" ng-if="!_validated && requiredIconVisible && verifyShowIcon && undefinedIs(verifyShow,true) && feedbackVisible()" aria-hidden="true"></span> 
 				
 </div> 
 
 <!-- MODALS --> 
 
 <div ng-if="type=='date'||type=='dateTime'" style="position: relative" ng-show="date_showModal || dateFixModal"> 
-	<div style="position: absolute; border-color: silver; z-index: {{z}}; left: 0px; right: 0px;" ng-style="modalStyle"> 
-		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver"> 
-			<tr> 
+	<div style="border-color: silver; left: 0px; right: 0px; position: absolute; top:0px" ng-style="modalStyle()" ng-style="{'z-index':z}"> 
+		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver; background-color: white"> 
+			<tr style="border-bottom: 1px solid #DDD"> 
 				<td>
 					<span ng-if="dateCanChangeMonth" ng-click="date_previousMonth()" style="cursor: pointer">&lt;</span>
 				</td> 
@@ -121,9 +137,10 @@
 	</div> 
 </div> 
 
-<div ng-if="type=='time'||type=='dateTime'" style="position: relative" ng-show="time_showModal"> 
-	<div style="position: absolute; border-color: silver; z-index: {{z}}; left: 0px; right: 0px;" ng-style="modalStyle" ng-show="time_step=='h'"> 
-		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver"> 
+<div ng-if="type=='time'||type=='dateTime'" style="position: relative" ng-show="time_showModal"
+	> 
+	<div style="border-color: silver; left: 0px; right: 0px; position: absolute; top:0px" ng-style="modalStyle()"  ng-show="time_step=='h'"> 
+		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver; background-color: white"> 
 			<tr> 
 				<td colspan="{{hours[0].length}}">??:00<span ng-if="timeSeconds">:00</span>
 				</td> 
@@ -133,8 +150,8 @@
 			</tr> 
 		</table> 
 	</div> 
-	<div style="position: absolute; border-color: silver; z-index: {{z}}; left: 0px; right: 0px;" ng-style="modalStyle" ng-show="time_step=='m'"> 
-		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver"> 
+	<div style="border-color: silver; left: 0px; right: 0px; position: absolute; top:0px" ng-style="modalStyle()"  ng-show="time_step=='m'"> 
+		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver; background-color: white"> 
 			<tr> 
 				<td colspan="{{minutes[0].length}}">{{time_selected.h}}:??
 					<span ng-if="timeSeconds">:00</span>
@@ -148,9 +165,8 @@
 			</tr> 
 		</table> 
 	</div> 
-
-	<div style="position: absolute; border-color: silver; z-index: {{z}}; left: 0px; right: 0px;" ng-style="modalStyle" ng-show="time_step=='s'"> 
-		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver"> 
+	<div style="border-color: silver; left: 0px; right: 0px; position: absolute; top:0px" ng-style="modalStyle()" ng-show="time_step=='s'"> 
+		<table class="table table-condensed" style="text-align: center !important; border:1px solid silver; background-color: white"> 
 			<tr> 
 				<td colspan="{{minutes[0].length}}">{{time_selected.h|twoDigits}}:{{time_selected.m|twoDigits}}:??</td> 
 			</tr> 
@@ -163,7 +179,23 @@
 		</table> 
 	</div> 
 </div>
-<!--
+
+<div ng-if="type=='checkbox' && checkboxModal" ng-show="chekbox_showModal" style="background-color: rgba(0,0,0,0); position: fixed; top:0px; left:0px; right:0px; bottom: 0px;" ng-style="{'z-index':checkboxModalZIndex}" ng-click="checkbox_openModal()"></div>
+
+<div ng-if="type=='checkbox' && checkboxModal" style="position: relative;" ng-style="{'z-index':checkboxModalZIndex}" ng-show="chekbox_showModal"> 
+
+	<div style="position: absolute; border: 1px solid silver; left: 0px; right: 0px; background-color: white; padding:1em" ng-style="{'z-index':z}">
+		<p ng-repeat="item in selectOptions"
+			ng-click="checkbox_select(item)"
+			style="cursor:pointer;"
+				
+			>
+			<span class="glyphicon glyphicon-unchecked" ng-if="!checkbox_checkOptions(item)"></span>
+			<span class="glyphicon glyphicon-check" ng-if="checkbox_checkOptions(item)"></span>
+			{{_selectLabelFnc(item)|translate}}
+		</p>
+	</div>
+	<div style="position: absolute; top: 0.2em; right: 0.5em; cursor: pointer" ng-click="checkbox_openModal()" ng-style="{'z-index':z+1}">
+		X
 	</div>
 </div>
--->

@@ -16,6 +16,7 @@
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.min.js"></script>
 
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>		
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"/>
 		
 		<script type="text/javascript" src="../dist/ilTable.min.js"></script>
 		<script type="text/javascript" src="../dist/ilDetail.min.js"></script>
@@ -48,7 +49,7 @@
 				this.show=false;
 				this.show2=false;
 				
-				this.text="Hola";
+				this.text="This is my text";
 				
 				this.end=function(success){
 					if (success)
@@ -64,19 +65,17 @@
 	
 	
 	<body ng-app="app" ng-controller="MainController as mc" style="padding:1em">
-		<button ng-click="mc.show=true">Muestra 1</button>
-		<button ng-click="mc.show=false">Oculta 1</button>
-		<button ng-click="mc.show2=true">Muestra 2</button>
-		<button ng-click="mc.show2=false">Oculta 2</button>
-		
 		<il-modal 
 			show="mc.show" 
-			title="'Hola mundo'" 
-			cancel-label="'Cancelar'" 
-			success-label="'Guardar'"
+			title="'This is my title'" 
+			cancel-label="'Cancel'" 
+			success-label="'Save'"
 			on-cancel="mc.end(false)"
 			on-success="mc.end(true)"
 			auto-close="true"
+			custom-icon-class="'fa-bed'"
+			custom-icon-color="'magenta'"
+			success-disabled="mc.text==''"
 		>
 			<input ng-model="mc.text">
 			<p>{{mc.text}}</p>
@@ -84,23 +83,40 @@
 		
 		<il-modal 
 			show="mc.show2" 
-			title="'Hola mundo 2'" 
-			cancel-label="'Cancelar'" 
-			success-label="'Guardar'"
-			on-cancel="mc.end(false)"
-			on-success="mc.end(true)"
-			auto-close="true"
+			is-message=true
+			is-info=true
 		>
-			<input ng-model="mc.text">
-			<p>Prueba 2 modal</p>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus.</p>
 		</il-modal>
 		
-	
+		<il-modal 
+			show="mc.show3" 
+			is-message=true
+			is-alert=true
+		>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus.</p>
+		</il-modal>
+		
+		<il-modal 
+			show="mc.show4"
+			is-loading=true
+		>
+		</il-modal>
+		
+		<button ng-click="mc.show=true">Open modal 1</button>
+		<button ng-click="mc.show2=true">Open Info</button>
+		<button ng-click="mc.show3=true">Open Alert</button>
+		<button ng-click="mc.show4=true">Open loading</button>
+		
+		
+		
+	<p>
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus. Sed tempus mauris nec diam facilisis placerat. Nullam posuere ex quam, eget fermentum orci consectetur ac. Integer est nunc, luctus sit amet nisl in, tristique feugiat est. Pellentesque mattis nisl ipsum, at vehicula lorem bibendum varius. Suspendisse non tortor eget lorem porta tempus ut vitae dui. Donec hendrerit in urna eget tempus. In posuere blandit euismod. Cras eget eleifend nibh, at fermentum magna. Maecenas iaculis diam in porta fringilla. In id consectetur est, eget volutpat sem.
 
 Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam volutpat elementum pretium. Aenean blandit urna vel rutrum volutpat. Cras ornare volutpat viverra. Nunc fermentum mauris lorem, vel venenatis purus luctus eget. Suspendisse sed suscipit massa. Vestibulum lacinia dolor sit amet est mollis fermentum eu a purus. Donec imperdiet enim porta nisi faucibus imperdiet. Phasellus ut nibh eu dui interdum tempor. Donec ultricies lectus vehicula tellus mollis ullamcorper. Integer augue mi, porta at ornare a, faucibus at leo. Vestibulum feugiat nunc sit amet neque vestibulum lacinia in nec risus. Vivamus mattis, sapien in hendrerit tempor, nibh ligula congue nunc, a efficitur dolor sem ac erat. Vestibulum in scelerisque dui. Proin aliquet commodo ligula, ac dictum turpis semper eleifend.
 
 Pellentesque vel lectus ac lectus ullamcorper mollis. Maecenas interdum, dui eget pretium molestie, libero ipsum finibus ex, eu molestie dui dolor tincidunt elit. Quisque pulvinar magna et purus interdum consequat. Nullam fermentum libero euismod metus tristique pretium. Maecenas est lorem, posuere vulputate consequat a, maximus non quam. Aenean aliquet commodo dignissim. Proin venenatis, mauris eu maximus tincidunt, ante nulla placerat eros, vel accumsan enim eros sit amet enim. Phasellus facilisis vehicula turpis, in pretium turpis venenatis nec. Fusce ex lacus, feugiat sed condimentum eget, aliquet nec lacus. Nullam interdum ante non tincidunt fermentum. Ut id cursus velit. Nunc gravida interdum volutpat. Pellentesque ac semper tortor. Donec pulvinar condimentum mauris nec suscipit.
+	</p>
 	</body>
 </html>

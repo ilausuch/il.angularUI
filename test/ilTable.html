@@ -121,7 +121,7 @@
 		<table il-table
 	        model="mc.items" columns="mc.columns"
 	        editable="true" click-to-edit="true"
-	        items-per-page="5" items-per-page-options="[5,20,50]"
+	        items-per-page="5" items-per-page-options="[5,20,50]" show-pagination="true"
 	        autoupdate="true" on-autoupdate="mc.c.onSave(item)" autoupdate-prompt="true"
 	        select="true" on-select="mc.c.onSelect(items)" select-multiple="true"
 	        delete="true" on-delete="mc.c.onDelete(item)"

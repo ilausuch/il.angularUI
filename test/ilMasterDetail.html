@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="bg">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+		<meta name="msapplication-tap-highlight" content="no" />
+		<title>test ilModal</title>
+		
+		<!-- Angular -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/i18n/angular-locale_es-es.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bower-angular-translate/2.6.1/angular-translate.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.min.js"></script>
+		
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
+
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>		
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"/>
+		
+		<script type="text/javascript" src="../dist/ilTable2.min.js"></script>
+		<script type="text/javascript" src="../dist/ilMasterDetail.min.js"></script>
+		<script type="text/javascript" src="../dist/ilModal.min.js"></script>
+		<script type="text/javascript" src="../dist/ilInput.min.js"></script>
+		<script type="text/javascript" src="ilObjects.js"></script>
+		<script type="text/javascript" src="ilArray.js"></script>
+
+		<link rel="stylesheet" href="../dist/ilTable2.css"/>
+		
+		<style type="text/css">
+			.ilDetail_key_td{
+				font-weight: bold;
+				text-align: right;
+				padding-right: 2em;	
+			}
+
+			.mini{
+				width: 2em;
+			}
+		</style>
+
+		<script>
+			
+			Person = function (src) {
+			    this.onInit = function (isNew) {
+			
+			    }
+			
+			    this.constructor(src);
+			}
+			
+			ilObject.setup("Person");
+			
+			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.masterDetail','il.ui.table2','il.ui.modal','il.ui.input']);
+			var mc;
+
+			app.controller("MainController", function($rootScope,$scope,$timeout,$http,$q){
+				mc=this;
+				this.$rootScope=$rootScope;
+				this.$scope=$scope;
+				this.$timeout=$timeout;
+				this.$http=$http;
+				this.$q=$q;
+				
+				this.model=[
+					new Person({name:"Ivan",lastName:"aaaa"}),
+					new Person({name:"Niko",lastName:"bbbb"})
+				]
+				
+			});
+		</script>
+	</head>
+	
+	
+	<body ng-app="app" ng-controller="MainController as mc" style="padding:1em">
+		<il-master-detail model="mc.model"
+			eid="'md'"
+			table-show-search="true"
+			modal-
+		>
+			<il-table2-column 
+		        title="'Name'"
+		        field="'name'">
+		    </il-table2-column>
+		
+		    <il-table2-column 
+		        title="'Lastname'"
+		        field="'lastName'">
+		    </il-table2-column>
+		</il-master-detail>
+		
+		<!--
+		<il-table2 eid="myTable">
+			<il-table2-column 
+		        title="'Name'"
+		        field="'name'"
+		        visible="false" //TODO
+		        modal-editable="true"//TODO
+		        modal-visible="false"//TODO
+		        >
+		    </il-table2-column>
+		
+		    <il-table2-column 
+		        title="'Lastname'"
+		        field="'lastName'">
+		    </il-table2-column>
+		</il-table2>
+		
+		<il-modal eid="myModal">
+			<il-table-form table="myTable" modal="myModal">
+				<il-table2-column 
+			        title="'Name'"
+			        field="'name'">
+			    </il-table2-column>
+			
+			    <il-table2-column 
+			        title="'Lastname'"
+			        field="'lastName'">
+			    </il-table2-column>
+			</il-table-form>
+		</il-modal>
+		-->
+
+		
+	</body>
+</html>

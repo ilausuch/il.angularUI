@@ -2,7 +2,7 @@
 <html class="bg">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="format-detection" content="telephone=no" />
+		<meta name="format-detection" content="telephonev=no" />
 		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, target-densitydpi=device-dpi" />
 		<meta name="msapplication-tap-highlight" content="no" />
 		<title>test ilUploader</title>
@@ -19,9 +19,16 @@
 		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"/>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
 		
-		<script type="text/javascript" src="http://api.filepicker.io/v2/filepicker.js"></script>
+		<script type="text/javascript" src="http://api.filepicker.io/v1/filepicker.js"></script>
+		
+		
+		<script type="text/javascript" src="https://s3.eu-central-1.amazonaws.com/desarrollo.aplicaciones/cdn/others/ng-file-upload.min.js"></script>
+		<script type="text/javascript" src="https://s3.eu-central-1.amazonaws.com/desarrollo.aplicaciones/cdn/others/ng-file-upload-shim.min.js"></script>
+		
+		<script type="text/javascript" src="../dist/ilModal.min.js"></script>
 		<script type="text/javascript" src="../dist/ilUpload.min.js"></script>
-
+		
+		
 		<script>
 			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.upload']);
 			var mc;
@@ -76,6 +83,8 @@
 														{
 															services: ['COMPUTER', 'FACEBOOK', 'CLOUDAPP']
 														});
+														
+				this.uploadSystem2=new ilUpload_basic("https://uploads.ceu.es/upload.backend.php?path=temp&public=1");
 				
 				this.onChange=function(list){
 					console.debug("EVENT","On Change!",list);
@@ -116,7 +125,7 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">Múltiple files</div>
 			<div class="panel-body">
-				<il-upload model="mc.model" field="'files'" system="mc.uploadSystem" multiple="true" on-change="mc.onChange(list)" user-fields="mc.fields"></il-upload>
+				<il-upload model="mc.model" field="'files'" system="mc.uploadSystem" multiple="true" on-change="mc.onChange(list)" user-fields="mc.fields" forbidden-link-msg="'No puedes abrir este archivo, está protegido'" disabled="false" can-delete="true"></il-upload>
 			</div>
 		</div>
 		
@@ -134,5 +143,11 @@
 			</div>
 		</div>
 
+		<div class="panel panel-default">
+			<div class="panel-heading">One file (basic)</div>
+			<div class="panel-body">
+				<il-upload model="mc.model" field="'files2'" system="mc.uploadSystem2" multiple="false" on-change="mc.onChange(list)" user-fields="mc.fields"></il-upload>
+			</div>
+		</div>
 	</body>
 </html>

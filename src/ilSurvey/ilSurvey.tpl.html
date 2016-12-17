@@ -1,59 +1,165 @@
-<div>
-	<div ng-repeat="section in model.sections" ng-if="currentSection==section">
-		<div class="alert alert-info" role="alert">
-			<h2 ng-bind-html="section.title"></h2>
-			<p ng-if="section.description" ng-bind-html="section.description" style="font-style: italic;">
-				
-			</p>
+<div class="ilSurvey">
+			
+	<div ng-if="model.survey.preHeader" class="preHeader">
+		<div ng-if="model.survey.preHeader.html" class="html" ng-bind-html="model.survey.preHeader.html"></div>
+		<div ng-if="model.survey.preHeader.template" class="template" ng-include="model.survey.preHeader.template"></div>
+	</div>
+	<div ng-if="model.survey.header" class="header">
+		<div class="title" ng-bind-html="model.survey.header.title"></div>
+	</div>
+	<div ng-if="model.survey.postHeader" class="postHeader">
+		<div ng-if="model.survey.postHeader.html" class="html" ng-bind-html="model.survey.postHeader.html"></div>
+		<div ng-if="model.survey.postHeader.template" class="template" ng-include="model.survey.postHeader.template"></div>
+	</div>
+	
+	<div ng-repeat="(sectionNumber,section) in model.sections" ng-if="(currentSection==section || !divideSections) && checkVisibleSection(section)" class="section">
+		<div class="header">
+			<div class="title">
+				<span ng-if="autoNumber || autoSectionNumber">{{sectionNumber+1}}. </span>
+				<span ng-bind-html="section.title"></span>	
+			</div>
+			<div ng-if="section.description" class="staticHTML" ng-bind-html="section.description"></div>
+			<div ng-if="section.template" class="staticTemplate" ng-include="section.template"></div>
 		</div>
 		
-		<div class="panel" ng-class={'panel-success':checkQuestion(question),'panel-default':checkQuestionDefault(question),'panel-danger':checkQuestionError(question)} ng-repeat="question in section.questions">
-			<div class="panel-heading">
-				<p ng-bind-html="question.title"></p>
-				<p ng-if="question.description " ng-bind-html="question.description"  style="font-style: italic;">
-				</p>
-			</div>
-			<div class="panel-body">
+		<div ng-repeat="(questionNumber,question) in section.questions" class="question" ng-if="checkVisibleQuestion(question)">
+			<div ng-if="question.type!='label' && question.type!='template'" class="normal">
+				<span ng-if="autoNumber || autoQuestionNumber">{{sectionNumber+1}}.{{questionNumber+1}}. </span>
+				<span ng-bind-html="question.title" class="title"></span>
+				<span ng-if="!question.required">{{optionalText}}</span>
+				<span ng-if="checkQuestion(question)" class="fa fa-check check"></span>
 				
-				<div ng-if="question.type=='select'">
-					<div ng-repeat="option in question.options">
-						<div><input type="radio" name="question_{{question.uid}}" value="{{option.value}}" ng-model="result[question.uid].value"> {{option.title}}</div>
-						<div ng-if="option.comments && result[question.uid].value==option.value" style="margin: 0.6em 1.2em">
-							
-							<textarea ng-if="!option.commentsRows || option.commentsRows>1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].comments" rows="{{option.commentsRows||4}}"></textarea>
-							
-							<input ng-if="option.commentsRows==1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].optionComments">
+				<div ng-bind-html="question.description" class="description"></div>
+				
+				<div ng-if="!checkQuestion(question) && showValidation" class="error"><span class="fa fa-exclamation-triangle"></span> {{question.verifyText||question.verfyTextFnc(result[question.uid])||requiredErrorText}}</div>
+				
+				<div class="body">
+					
+					<div ng-if="question.type=='text'" class="text">
+						<textarea ng-if="!question.rows || question.rows>1" placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value" rows="{{question.rows||4}}" class="text multipleRow"></textarea>
+						
+						<input ng-if="question.rows && question.rows==1" placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value" class="text oneRow">
+					</div>
+					
+					<div ng-if="question.type=='select'" class="select">
+						<div ng-repeat="option in question.options">
+							<div class="item" style="cursor:pointer" ng-click="result[question.uid].value=option.value">
+								<!--
+								<input type="radio" name="question_{{question.uid}}" value="{{option.value}}" ng-model="result[question.uid].value"> 
+								-->
+								<span class="{{radioIconSelected}} icon" aria-hidden="true" ng-if="option.value==result[question.uid].value"></span>
+								<span class="{{radioIconUnselected}} icon" aria-hidden="true" ng-if="option.value!=result[question.uid].value"></span>
+								
+								<span class="text">{{option.title}}</span>
+							</div>
+							<div ng-if="option.comments && result[question.uid].value==option.value" class="comment">
+								
+								<span class="label" ng-if="option.commentsTitle">{{option.commentsTitle}}</span>
+								
+								<textarea ng-if="!option.commentsRows || option.commentsRows>1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].comments" rows="{{option.commentsRows||4}}" class="text multipleRow"></textarea>
+								
+								<input ng-if="option.commentsRows==1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].optionComments" class="text oneRow">
+							</div>
 						</div>
 					</div>
-				</div>
-				
-				<div ng-if="question.type=='multiselect'">
-					<div ng-repeat="option in question.options">
-						<div><input type="checkbox" name="question_{{question.uid}}" value="{{option.value}}" ng-model="result[question.uid][option.value].value"> {{option.title}}</div>
-						<div ng-if="option.comments && result[question.uid][option.value].value" style="margin: 0.6em 1.2em">
-							<textarea placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid][option.value].comments" rows="4"></textarea>
+					
+					<div ng-if="question.type=='combobox'" class="combobox">
+						<select ng-model="result[question.uid].value" ng-options="item.value as item.title for item in question.options"></select>
+						<div ng-repeat="option in question.options" ng-if="option.comments && result[question.uid].value==option.value" class="comment">
+							<span class="label" ng-if="option.commentsTitle">{{option.commentsTitle}}</span>
+							
+							<textarea ng-if="!option.commentsRows || option.commentsRows>1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].comments" rows="{{option.commentsRows||4}}" class="text multipleRow" class="commentText commentOneRow"></textarea>
+						
+							<input ng-if="option.commentsRows==1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].optionComments" class="text oneRow">
+							
 						</div>
 					</div>
-				</div>
-				
-				<div ng-if="question.type=='text'">
 					
-					<textarea ng-if="!question.rows || question.rows>1" placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value" rows="{{question.rows||4}}"></textarea>
+					<div ng-if="question.type=='multiselect'" class="multiselect">
+						<div ng-repeat="option in question.options" class="item">
+							<div ng-click="multiSelectClick(question,option)" style="cursor:pointer">
+								<!--<input type="checkbox" name="question_{{question.uid}}" value="{{option.value}}" ng-model="result[question.uid][option.value].value">-->
+								<span class="{{checkboxIconSelected}} icon" aria-hidden="true" ng-if="result[question.uid][option.value].value"></span>
+								<span class="{{checkboxIconUnselected}} icon" aria-hidden="true" ng-if="!result[question.uid][option.value].value"></span>
+								
+								{{option.title}}
+							</div>
+							<div ng-if="option.comments && result[question.uid][option.value].value" class="comment">
+								<!--
+								<textarea placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid][option.value].comments" rows="4"></textarea>
+								-->
+								<span class="label" ng-if="option.commentsTitle">{{option.commentsTitle}}</span>
+								
+								<textarea ng-if="!option.commentsRows || option.commentsRows>1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid][option.value].comments" rows="{{option.commentsRows||4}}" class="text multipleRow"></textarea>
+								
+								<input ng-if="option.commentsRows==1" placeholder="{{option.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid][option.value].optionComments" class="text oneRow">
+							</div>
+						</div>
+					</div>
 					
-					<input ng-if="question.rows && question.rows==1" placeholder="{{question.placeholder}}" style="width: 100%" ng-model="result[question.uid].value">
-				</div>
-				<div ng-if="question.comments" style="margin: 0.6em 0em">
-					<textarea ng-if="!question.commentsRows || question.commentsRows>1" placeholder="{{question.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].questionComments" rows="{{question.commentsRows||4}}"></textarea>
+					<div ng-if="question.type=='table-select'" class="tableSelect">
+						<table>
+							<thead>
+								<tr>
+									<th></th>
+									<th ng-repeat="column in question.columns" class="question_{{question.uid}}_column_{{column.value}}_title">
+										{{column.title}}
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="row in question.rows">
+									<td>
+										{{row.title}}
+									</td>
+									<td ng-repeat="column in question.columns" class="rowItem question_{{question.uid}}_column_{{column.value}}_item">
+										<span class="{{radioIconSelected}} icon" aria-hidden="true" ng-if="result[question.uid][row.uid].value==column.value"></span>
+										<span class="{{radioIconUnselected}} icon" aria-hidden="true" ng-if="result[question.uid][row.uid].value!=column.value" ng-click="tableSelectClick(question,row,column)"></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					
-					<input ng-if="question.commentsRows==1" placeholder="{{question.commentsPlaceholder}}" style="width: 100%" ng-model="result[question.uid].questionComments">
+					<div ng-if="question.type=='stars'" class="stars">
+						<table>
+							<tbody>
+								<tr ng-repeat="row in question.rows">
+									<td>
+										{{row.title}}
+									</td>
+									<td class="rowItem question_{{question.uid}}" nowrap="nowrap">
+										<span ng-repeat="option in question.options">
+											<span class="{{starIconSelected}} icon star-on" aria-hidden="true"  ng-if="result[question.uid][row.uid].value>=option.value" ng-click="starClick(question,row,option)" tooltip="{{option.tooltip}}"></span>
+											<span class="{{starIconUnselected}} icon star-off" aria-hidden="true" ng-if="!result[question.uid][row.uid].value || result[question.uid][row.uid].value<option.value" ng-click="starClick(question,row,option)" tooltip="{{option.tooltip}}"></span>
+										</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
+			
+			<div ng-if="question.type=='label'" class="staticHTML" ng-bind-html="question.html"></div>
+			<div ng-if="question.type=='template'" class="staticTemplate" ng-include="question.template"></div>
 		</div>
-
-		<div style="text-align: center">
-			<button class="btn btn-primary" ng-if="!isFirstSection()" ng-click="goPreviousSection()"><span class="glyphicon glyphicon-chevron-left"></span> {{'Previous'|translate}}</button>
-			<button class="btn" ng-if="!isLastSection()" ng-class="{'btn-primary':checSection(section)}" ng-disabled="!checSection(section)" ng-click="goNextSection()">{{'Next'|translate}} <span class="glyphicon glyphicon-chevron-right"></span></button>
-			<button class="btn" ng-if="isLastSection()" ng-class="{'btn-primary':checSection(section)}" ng-disabled="!checSection(section)" ng-click="send()">{{'Finish'|translate}} <span class="glyphicon glyphicon-send"></span></button>
+		
+		<div class="footer" ng-if="section.footer">
+			<div ng-if="section.footer.html" class="staticHTML" ng-bind-html="section.footer.html"></div>
+			<div ng-if="section.footer.template" class="staticTemplate" ng-include="section.footer.template"></div>
+		</div>
+		
+		<div style="text-align: center" ng-if="divideSections">
+			<button class="btn btn-primary" ng-if="!isFirstSection()" ng-click="goPreviousSection()"><span class="glyphicon glyphicon-chevron-left"></span> {{previousText||'Previous'|translate}}</button>
+			<button class="btn" ng-if="!isLastSection()" ng-class="{'btn-primary':checkSection(section)}" ng-disabled="!checkSection(section)" ng-click="goNextSection()">{{nextText||'Next'|translate}} <span class="glyphicon glyphicon-chevron-right"></span></button>
+			<button class="btn" ng-if="isLastSection()" ng-class="{'btn-primary':checkSection(section)}" ng-disabled="!checkSection(section)" ng-click="send()">{{finishText||'Finish'|translate}} <span class="glyphicon glyphicon-send"></span></button>
 		</div>	
+	</div>
+	
+	<div style="text-align: center" ng-if="!divideSections">
+			<button class="btn"  ng-class="{'btn-primary':checkSection()}" ng-disabled="!checkSection(section)" ng-click="send()">{{finishText||'Finish'|translate}} <span class="glyphicon glyphicon-send"></span></button>
+			<button class="btn" ng-click="onCancel()" ng-if="canCancel">{{cancelText||'Cancel'|translate}}
+		</div>
 	</div>
 </div>

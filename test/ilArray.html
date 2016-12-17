@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html class="bg">
+	<head>
+		<meta charset="utf-8" />
+		
+		<script type="text/javascript" src="ilArray.js"></script>
+			
+		<script>
+			model=[
+				{label:"Cat", value:1},
+				{label:"Parrot",value:4},
+				{label:"Dog",value:3},
+				{label:"carrot", value:2},
+				{label:"Big dog",value:3},
+			];
+			
+			model2=[
+				model[0],
+				model[1],
+				{label:"Cow", value:1},
+				{label:"Bull", value:2}
+			];
+			
+			console.debug("Initial","model",model,"model2",model2);
+			
+			function test1(){
+				obj={label:"Monkey",value:5};
+				model.add(obj)
+				console.debug("Add obj",model,model.length);
+				
+				setTimeout(function(){
+					model.add(obj)
+					console.debug("Try to add again",model,model.length);
+					
+					setTimeout(function(){
+						model.add(obj,true)
+						console.debug("Force to add",model,model.length);
+					});
+				})
+			}
+			
+			function test2(){
+				console.debug("Model 2",model2);
+				
+				
+				setTimeout(function(){
+					model.addArray(model2,true)
+					console.debug("Added model 2 (don't show last item)",model,model.length);
+					
+					setTimeout(function(){
+						model.del(model2[3]);
+						console.debug("Delete object",model,model.length);
+					})
+				});
+			}
+			
+			function test3(){
+				console.debug("Search",model.search(model[2]));
+				console.debug("SearchByField",model.searchByField("label",model[2]["label"]));
+			}
+			
+			
+			console.debug("----------------------------");
+			model.sortAlphabeticallyByField("label");
+			console.debug(model);
+			
+			function testRet(model){
+				var list2=[];
+				
+				model.forEach(function(item){
+					list2.add(item);
+				})	
+				
+				return list2;
+			}
+			
+			var model2=testRet(model);
+			console.debug(model2);
+			model=model2;
+			model.forEach(function(item){
+				console.debug(item);
+			})
+			
+		</script>
+	</head>
+	<body>
+		See console
+	</body>
+</html>

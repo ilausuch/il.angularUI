@@ -1,0 +1,28 @@
+<table class="table table-striped">
+	<tr ng-repeat="(pos,item) in model">
+		<td style="padding: 1em;cursor:pointer" class="selector" ng-click="_onClick(pos,item)">
+			<span ng-if="labelField">{{item[labelField]}}</span>
+			<span ng-if="labelFnc" ng-bind-html="labelFnc({item:item,pos:pos})|ilListSanitize"></span>
+		</td>
+		<td ng-if="canSort" style="width: 1em">
+			<button class="btn  btn-info btn-sm" ng-click="up(pos,item)" ng-if="pos>0">
+				<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+			</button>
+		</td>
+		<td  ng-if="canSort" style="width: 1em; padding-left: 0.5em; padding-right: 0.5em;">
+			<button class="btn btn-info btn-sm" ng-click="down(pos,item)" ng-if="pos<model.length-1">
+				<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+			</button>
+		</td>
+		<td style="width: 1em; padding-left: 0.5em; padding-right: 0.5em;">
+			<button class="btn btn-info btn-sm" ng-click="delete_(pos,item)" ng-if="canDelete">
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+			</button>
+		</td>
+		<td style="width: 1em; padding-left: 0.5em; padding-right: 0.5em;" ng-repeat="button in extraButtons">
+			<button class="btn btn-info btn-sm" ng-click="_extraButtonClick(pos,item,button)">
+				<span class="glyphicon glyphicon-{{button.icon}}" aria-hidden="true"></span>
+			</button>
+		</td>
+	</tr>
+</table>

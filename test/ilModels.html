@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html class="bg">
+	<head>
+		<meta charset="utf-8" />
+		
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/i18n/angular-locale_es-es.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bower-angular-translate/2.6.1/angular-translate.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.min.js"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>		
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css"/>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment-with-locales.min.js"></script>
+		
+		
+		<script type="text/javascript" src="../dist/ilInput.min.js"></script>
+		
+		
+		<script type="text/javascript" src="ilModels.js"></script>
+		<script type="text/javascript" src="ilArray.js"></script>
+
+
+		<script>
+						
+			function validateAge(value){
+				return value==parseInt(value) && value>0 && value<100;
+			}
+			
+			ilModelFieldInputConfiguration=function(config){
+				this.label=config.label;
+				if (config.visible==undefined)
+					this.visible=true;
+				else
+					this.visible=config.visible;
+			}
+			
+			
+			ilModel.setup(
+			{
+				name:"Person",
+				fields:[
+					new ilModelField("id", "int", {
+						pk:true, 
+						readOnly:true,
+						auto:true,
+					}),
+					new ilModelField("name","string",{
+						required:true,
+						allowEmpty:false,
+						maxLen:20
+					}),
+					new ilModelField("age","int",{
+						validateFnc:validateAge
+					}),
+					new ilModelField("email","string", {
+						required:true,
+						validateFnc:ilModelValidations.email
+					}),
+					new ilModelField("date","datetime", {
+						derivated:{
+							name:"dateMoment",
+							toDerivated:function(value){
+								return new moment(value);
+							},
+							fromDerivated:function(value){
+								return value.toISOString();
+							}
+						},
+						ilInputConfig:new ilModelFieldInputConfiguration({
+							label:"Date"
+						})
+					}),
+					new ilModelField("country_fk","int",{
+						/*
+						derivated:{
+							name:"country",
+							toDerivated:function(value){
+								return Country.get({id:value});
+							},
+							fromDerivated:function(value){
+								if (value==undefined || value.data==undefined)
+									return undefined;
+									
+								return value.data.id;
+							}
+						},
+						*/
+					})
+					   		
+				],
+				cache:new ilModelCache({
+					autoInsert:true,
+					
+					collections:{
+						/*
+						all: ilModelCollection.createAuto(function(callback){
+							Person.$dataProviders.myOData.all(callback);
+						}),
+						*/
+						
+						test:ilModelCollection.createAuto(function(callback){
+							mc.$timeout(function(){
+								callback([new Person({id:100,name:"Pedro",age:16,email:"asd@as.sd.ds"})]);
+							},1000)
+						}),
+					}
+				}),
+				dataProviders:{
+					myProvider:{ //handl provider
+						init:function(parentClass,name){
+							
+						},
+						all:function(){
+							console.debug("Person all provider");
+							
+							var promise=new ilModelPromise();
+								
+							mc.$timeout(function(){
+								promise.ready(Person.getCollection().data);
+							},1000)
+							
+							return promise;
+						},
+						query:function(query){
+							var promise=new ilModelPromise();
+							
+							console.debug("!!!!",query);
+							
+							mc.$timeout(function(){
+								promise.ready([new Person({id:100,name:"Pedro",age:16,email:"asd@as.sd.ds"})]);
+							},1000)
+							
+							return promise;
+						}
+					}
+				},
+				options:{
+					defaultDataProvider:"myProvider"
+				},
+				associations:{
+					Country:ilModelAssociation.one("Country",{country_fk:"id"}),
+				}
+			})
+			
+			ilModel.setup(
+			{
+				name:"Country",
+				fields:[
+					new ilModelField("id","int",{
+						pk:true,
+						readOnly:true,
+						auto:true
+					}),
+					new ilModelField("name","string",{	
+					}),
+				],
+				dataProviders:{
+					myProvider:{ //handl provider
+						init:function(parentClass,name){
+							
+						},
+						
+						get:function(pk,options){
+							var promise=new ilModelPromise();
+							
+							if (pk.id<0){
+								promise.error("Id must be positive");
+								return promise;
+							}
+							
+							mc.$timeout(function(){
+								promise.ready(new Country({id:pk.id,name:"Aleatorio "+pk.id}));
+							},1000);
+							
+							return promise;
+						},
+						
+						all:function(options){
+							var promise=new ilModelPromise();
+							
+							mc.$timeout(function(){
+								var list=[];
+								
+								for (var k=20; k<30; k++)
+									list.add(new Country({id:k,name:"Aleatorio "+k}))
+									
+								promise.ready(list);
+							},1000);
+							
+							return promise;
+						},
+						
+						create:function(data){
+							var promise=new ilModelPromise();
+							
+							mc.$timeout(function(){
+								promise.ready({id:parseInt((""+Math.random()).substr(2)),name:data.name});
+							},1000);
+							
+							return promise;
+						},
+						
+						modify:function(pk,data){
+							var promise=new ilModelPromise();
+							
+							mc.$timeout(function(){
+								promise.ready({id:pk.id,name:data.name});
+							},1000);
+							
+							return promise;
+						},
+						
+						remove:function(pk){
+							var promise=new ilModelPromise();
+							
+							mc.$timeout(function(){
+								promise.ready();
+							},1000);
+							
+							return promise;
+						}
+					}
+				},
+			    options: {
+			        defaultDataProvider:"myProvider"
+			    },
+				associations:{
+					People:ilModelAssociation.multiple("Person",{id:"country_fk"})
+				}
+			})
+			
+			
+			var app = angular.module('app', ['ui.bootstrap','ngSanitize','pascalprecht.translate','il.ui.input']);
+			var mc;
+
+			app.controller("MainController", function($rootScope,$scope,$timeout,$http,$q){
+				mc=this;
+				this.$rootScope=$rootScope;
+				this.$scope=$scope;
+				this.$timeout=$timeout;
+				this.$http=$http;
+				this.$q=$q;
+				
+				ilModelConfiguration.setupDefaultAngularContext($http,$timeout);
+				
+				
+				mc.country1=new Country({id:1,name:"Spain"});
+				mc.country2=new Country({id:2,name:"France"});
+				mc.person1=new Person({id:4,name:"Ivan",email:"asd@asd.ds.sd",date:"2013-02-04",country_fk:10});
+				mc.person2=new Person({id:2,name:"Niko",email:"asd@asd.ds.sd"});
+				
+				// Ejemplo de colleccion automática
+				/*
+				var col=new ilModelCollection({
+					updateFnc:function(promise,params){
+						//mc.$timeout(function(){
+							//promise.ready([mc.country1,mc.country2]);
+							promise.ready(mc.country1);
+						//},2000);
+					}
+				})
+				
+				var promise=col.load({value:2}).then(function(data,owner){
+					console.debug("Data",data,"owner",owner);	
+				});
+				
+				console.debug(promise);
+				*/
+				
+				
+				/*
+				//Ejemplo de colección manual
+				
+				var col=new ilModelCollection();
+				col.add([mc.person1,mc.person2]);
+				console.debug(col.data);
+				*/
+				
+				//Ejemplo de obtención de un objeto desde un data provider
+				/*
+				Country.getDataProvider("myProvider").get({id:1}).then(
+					function(data){
+						console.debug("Country.myProvider data",data);
+					},
+					function(error){
+						console.debug("Country.myProvider error",error);
+					}
+				)
+				*/
+				
+				//Ejemplo de obtención de un objeto desde un data provider con error
+				/*
+				Country.getDataProvider("myProvider").get({id:-11}).then(
+					function(data){
+						console.debug("Country.myProvider data",data);
+					},
+					function(error){
+						console.debug("Country.myProvider error",error);
+					}
+				)
+				*/
+
+				//Ejemplo de obtención de una lista de objetos desde un data provider
+				/*
+				Country.getDataProvider("myProvider").all().then(
+					function(data){
+						console.debug("Country.myProvider data",data);
+					},
+					function(error){
+						console.debug("Country.myProvider error",error);
+					}
+				)
+				*/
+				
+				//Ejemplo de obtención de una collección desde un data provider
+				/*
+				mc.collection=new ilModelCollection({
+					updateFnc:function(promise,params){
+						Country.getDataProvider("myProvider").all().then(promise);
+					}
+				})
+				
+				mc.collection.load().then(
+					function(data){
+						console.debug("Country.myProvider data as collection",data);
+					},
+					function(err){
+						console.debug("Country.myProvider error as collection",error);
+					}
+				)
+				
+				
+				//Ejemplo de colección extrayendo de otra colección
+				mc.collection=new ilModelCollection({
+					updateFnc:function(promise,params){
+						var data=Person.getCollection("global").extract(function(item){
+							return item.country_fk==params.fk;
+						})
+						
+						promise.ready(data);
+					}
+				})
+				*/
+				
+				
+				
+				
+				/*
+				//Save using confirmSanbox
+				mc.person1.prepareSandbox();
+				mc.person1.$sandbox.name="MMMMM";
+				
+				console.debug("Confirm Sandbox");
+				
+				mc.person1.confirmSandbox(function(info){
+						var promise=new ilModelPromise();
+						
+						console.debug("Saving...",info);
+						mc.$timeout(function(data){
+							console.debug("Saved");
+							promise.ready(data);
+						},2000)
+						
+						return promise;
+					}).then(function(data){
+						console.debug("Saved and control to angular");
+					})
+				*/
+				
+				/*
+					
+				//Save using save
+				mc.person1.prepareSandbox();
+				mc.person1.$sandbox.name="MMMMM";
+				
+				console.debug("Confirm Sandbox");
+				
+				mc.person1.save().then(function(data){
+					console.debug("Saved and control to angular");
+				})
+				*/
+				
+				//ConfirmSandobx without save funcion
+				/*
+				var person=new Person();
+				
+				person.$sandbox.name="Pedro";
+				person.$sandbox.email="test@google.com";
+				
+				console.debug(person);
+				person.confirmSandbox();
+				*/
+				
+				/*
+				//Test de creación, modificación y borrado	
+				
+				var country=new Country();
+				country.$sandbox.name="Portugal";
+				console.debug("Pre create",country,country.name);
+				country.save().then(function(data){
+					console.debug("Saved and control to angular",country,data);
+					
+					country.prepareSandbox();
+					country.$sandbox.name="Italy";
+					console.debug("Pre save",country,country.name);
+					country.save().then(function(data){
+						console.debug("Saved and control to angular",country,data);
+
+						console.debug("Pre remove",country);
+						country.remove().then(function(country){
+							console.debug("Removed",country);
+							country.prepareSandbox();
+						})
+
+					});
+					
+				});
+				*/
+				
+				
+				
+				/*
+				var query=
+					new ilModelFieldQuery.And([
+						new ilModelFieldQuery.Equals("id",mc.person1.country_fk),
+						new ilModelFieldQuery.Equals("id",mc.person1.country_fk)
+					]);
+				*/
+				
+				Country.all().then(function(data){
+					var c1=new ilModelCollection();
+					window.c1=c1;
+					console.debug("{");
+					var c2=c1.extractCollection(function(item){return true});
+					window.c2=c2;
+					console.debug("}");
+					
+					
+					c1.add(data[0]);
+					
+					console.debug(c1);
+					console.debug(c2);
+				})
+			
+				return;
+				
+				console.debug("Get",Person.$cache.getCollection().get({id:2}))
+				
+				console.debug("Extract",Person.$cache.getCollection().extract(function(item){return item.name=="Ivan"}))
+				
+				console.debug("createSubCollection (sync collection)",
+					Person.$cache.registerCollection(
+						"myList",
+						Person.$cache.getCollection().extractCollection(
+							function(item){
+								return item.name=="Ivan"
+							}
+						))
+				)
+				
+				mc.person2=new Person({id:5,name:"Jose",email:"asd@asd.ds.sd"});
+				console.debug("update sync collection",Person.$cache.getCollection("myList").load(),Person.$cache.getCollection("myList").data);	
+				
+				
+				console.debug("Create async collection myAsyncList")
+				var collection=Person.$cache.registerCollection(
+					"myAsyncList",
+					ilModelCollection.createAsync(function(callback,extra){
+						    console.debug("Simulating async loading data myAsyncList");
+						    mc.$timeout(function(){
+							    callback(
+									[
+										new Person({id:6,name:"Lorena",email:"asd@asd.ds.sd"}),
+										new Person({id:7,name:"Simon",email:"asd@asd.ds.sd"}),
+									]
+								)
+						    },1000);
+					    },
+					    {
+						    test:"This is an extra info"
+					    }
+					)
+				);
+				/*
+				var collection=Person.$cache.registerCollection(
+					"myAsyncList",
+					new ilModelCollection({
+					    updateAsyncFnc:function(callback,extra){
+						    console.debug("Simulating async loading data myAsyncList");
+						    mc.$timeout(function(){
+							    callback(
+									[
+										new Person({id:6,name:"Lorena",email:"asd@asd.ds.sd"}),
+										new Person({id:7,name:"Simon",email:"asd@asd.ds.sd"}),
+									]
+								)
+						    },1000);
+					    },
+					    extra:{
+						    test:"This is an extra info"
+					    }
+					})
+				);
+				*/
+				
+				collection.load(
+					function(store){
+						console.debug("Data recieved and stored in myAsyncList",store.data);
+					}
+				)
+				
+				
+				console.debug("Create automatic async collection");
+				Person.$cache.getCollection("test").load(function(store){
+					console.debug("Data recievend in test store ",store.data);
+				})
+				
+				mc.$timeout(function(){
+					mc.collection=Person.$cache.collections.global;	
+				})
+				
+				console.debug(mc.collection);
+			});
+			
+			
+			
+		</script>
+	</head>
+	<body ng-app="app" ng-controller="MainController as mc" class="bg" style="padding: 2em">
+		<p>See console for more details</p>
+		
+		<!--		
+		<il-input type="'text'" label="'Nombre'" model="mc.obj1.$sandbox" field="'name'" required="mc.obj1.getField('name').required" verify-if-void="!mc.obj1.getField('name').allowEmpty" verify-fnc="mc.obj1.validateSandboxField('name',false)"></il-input>
+		<p></p>
+		
+		<il-input type="'text'" label="'Edad'" model="mc.obj1.$sandbox" field="'age'" required="mc.obj1.getField('age').required" verify-if-void="!mc.obj1.getField('age').allowEmpty"  verify-fnc="mc.obj1.validateSandboxField('age',false)"></il-input>
+		<p></p>
+		
+		<il-input type="'text'" label="'Email'" model="mc.obj1.$sandbox" field="'email'" required="mc.obj1.getField('email').required" verify-if-void="!mc.obj1.getField('email').allowEmpty"  verify-fnc="mc.obj1.validateSandboxField('email',false)"></il-input>
+		
+		<span ng-show="!mc.obj1.validateSandbox(false)" style="color:red">Error en el conjunto</span>
+		
+		<hr>
+		
+		-->
+		<div ng-repeat="person in mc.collection.data">
+			<button class="btn" ng-click="person.prepareSandbox(); mc.personEdit=person">{{person.name}}</button>
+		</div>
+		
+		<div ng-repeat="field in mc.personEdit.$fields">
+			<il-input ng-if="field.config.ilInputConfig.visible" type="'text'" label="field.config.ilInputConfig.label" model="mc.personEdit.$sandbox" field="field.name" required="mc.personEdit.getField(field.name).required" verify-if-void="!mc.personEdit.getField(field.name).allowEmpty" verify-fnc="mc.personEdit.validateSandboxField(field.name,false)"></il-input>
+		</div>
+
+		
+	</body>
+</html>

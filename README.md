@@ -32,14 +32,22 @@ Add a label over the input field
 ```html
 <il-input model="data" field="'name'" label="'Name'"></il-input>
 ```
+### Description
 
-### placeholder
+Description is a text bottom label to detail 
+```html
+<il-input model="data" field="'name'" label="'Name'" description="'Enter your name'"></il-input>
+```
 
-Set placeholder when input is empty
+### Placeholder
+
+Placeholder allows show text inside input when it's empty
 
 ```html
 <il-input model="data" field="'name'" label="'Name'" placeholder="'Enter your name'"></il-input>
 ```
+
+
 
 
 ### Required control
@@ -57,8 +65,11 @@ Set placeholder when input is empty
 * **inner-label** allows to add a text inside input. 
 
 ```html
-<il-input model="data" field="'name'" label="'Name'" inner-label="'My name'"></il-input>
+<il-input model="data" field="'name'" label="'Name'" inner-label="'Name'"></il-input>
 ```
+
+![Text example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/text.png "Text example")
+
 
 * **inner-icon** allows to add a bootstrap icon. For instance to use bootstrap user icon 'glyphicon glyphicon-user'
 ```html
@@ -71,11 +82,13 @@ Set placeholder when input is empty
 ```
 
 
+
 ### Verifications
 * **verify-show**: Shows color border and right-top icon according to the status. By default is true.
 * **verify-fnc**: Define a function to verify the content of the field
 * **verify-group**: Declare the Verification Group. See bellow
-* **verify-if-void**: Define if verfy fnc is called when field is empty. By default is false
+* **
+* **: Define if verfy fnc is called when field is empty. By default is false
 
 ```html
 <il-input model="data" field="'age'" verfy-fnc="verifyAge(model,value)" verify-if-void="true"></il-input>
@@ -87,6 +100,7 @@ function verifyAge(model,value){
 	&& value>0; //Is positive
 }
 ```
+
 #### Events
 * **on-verify**: this is an event called when verification status has changed
 
@@ -114,6 +128,40 @@ function nameChanged(model,value){
 	console.debug("Name changed to",value);
 }
 ```
+#### Verification groups
+You can verify all inputs in a form using verification groups.
+First create a 
+
+```js
+$scope.verifyGrroup=new ilInputVerificationGroup();
+```
+
+To check all items use method check()
+
+```js
+if ($scope.verifyGrroup.check())
+	//do something
+```
+
+In this ejemple, button save only is visible when verification is ok.
+
+```html
+<il-input model="data" field="'name'" verify-group="verifyGroup"></il-input>
+
+<il-input model="data" field="'age'" verfy-fnc="verifyAge(model,value)" verify-if-void="true" verify-group="verifyGroup"></il-input>
+
+<button ng-disable="!verifyGroup.check()">Save</button>
+```
+```js
+$scope.verifyGrroup=new ilInputVerificationGroup();
+
+function verifyAge(model,value){
+	return value!=undefined //Value is valid
+	&& parseInt(value)==value //Is an integer
+	&& value>0; //Is positive
+}
+```
+
 
 ### Others
 * **hide-border**: If true border are hidden, by default is false.
@@ -131,8 +179,10 @@ Its similar to text type, but with more rows
 * **text-rows**: Number of rows to view. By default 5
 
 ```html
-<il-input type="'textarea'" model="data" field="'password'"></il-input>
+<il-input type="'textarea'" model="data" field="'largeText'"></il-input>
 ```
+
+![Textarea example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/textarea.png "Textarea example")
 
 ## select
 
@@ -153,9 +203,19 @@ Its similar to text type, but with more rows
 	model="data" field="'lang'" 
 	label="'Select a language'"
 	select-options="list" 
+
+
+----------
+
+
+----------
+
+
 	select-label-field="'label'" 
 	select-value-field="'code'" ></il-input>
 ```
+
+![Select example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/select.png "Select example")
 
 Use functions to create complex labels and values. You can access to item and model values.
 
@@ -211,6 +271,7 @@ Date options:
 * **date-fix-modal**: Date calendar selector is always opened.
 * **date-locale**: Define locale information (be careful, modifies moment.js locale and it's global!).
 * **date-start-at**: Moment value that defines month and year calendar witch start 
+* **date-hide-input**: Hide input field. It must used only with date-fix-modal
 ```html
 <il-input
 	model="date"
@@ -259,8 +320,12 @@ Other options
 ## checkbox
 Define a checkbox selector with one or more options to select.
 
-* **checkboxMax**: How may items can be selected
-* **checkboxMin**: Min items selected to verify 
+* **checkbox-max**: How may items can be selected
+* **checkbox-min**: Min items selected to verify
+* **checkbox-modal**: Boolean, shows the checkbox list of items in a modal, and selected in a list of labels
+* **checkbox-modal-z-index**: z-index of checkbox modal
+* **checkbox-style** (optional): Style of div container. If you no whant border set checkbox-style="' '"
+* **checkbox-modal-close-on-select** (optional, by default false) : closes moda when select one option
 
 ```html
 <script>
@@ -280,17 +345,47 @@ Define a checkbox selector with one or more options to select.
 	label="'Select your pet'"
 	checkbox-max="2"
 	checkbox-min="1"
+	checkbox-modal="true"
 	description="'You can select two max'"
 ></il-input>
 ```
 
+![Checkbox example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/checkbox.png "Checkbox example")
+
+
+**Usign modals**
+
+```html
+<script>
+	list=[
+		{name:"Cat"},
+		{name:"Dog"},
+		{name:"Bird"},
+		{name:"Mouse"},
+	]
+</script>
+<il-input
+	model="data"
+	field="'checkbox'"
+	type="'checkbox'"
+	select-options="list"
+	select-label-field="'name'"
+	label="'Select your pet'"
+	checkbox-max="4"
+	checkbox-min="2"
+	description="'Max 4, min 2'"
+	checkbox-modal="true"
+></il-input>
+```
+![Modal checkbox example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/checkbox_modal.png "Modal checkbox example")
+
 ## boolean
 Define a boolean selector where true and false are html's
 
-* **booleanTrue**: True value, by default is 'true'
-* **booleanFalse**: False value, by default is 'false'
-* **booleanTrueHtml**: True html renderer
-* **booleanFalseHtml**: False html renderer
+* **boolean-true**: True value, by default is 'true'
+* **boolean-false**: False value, by default is 'false'
+* **boolean-true-html**: True html renderer
+* **boolean-false-html**: False html renderer
 
 ```html
 <il-input
@@ -304,6 +399,33 @@ Define a boolean selector where true and false are html's
 	hide-border="true"
 	>	
 </il-input>
+```
+
+## custom
+Define a boolean selector where true and false are html's
+
+* **custom-label-fnc**: Funtion that returns text to print. Params are: model,value,field
+* **custom-open-callback**: Function call when user click on input field. Params are: model,value,field
+
+```html
+<script>
+$scope.model={
+	name:"John",
+}
+
+$scope.customCallback=function(model,value,field){
+	model[field]=prompt("Change value",value);
+}
+</script>
+
+<il-input
+	type="'custom'"
+	label="'My custom field'"
+	model="model"
+	field="'name'"
+	custom-label-fnc="model[field]"
+	custom-open-callback="customCallback(model,value,field)"
+></il-input>
 ```
 
 # ilTable
@@ -320,7 +442,7 @@ There are several types of columns you can use. All columns have common attribut
 
 * **title**: Title of column
 * **field**: Field in model
-* **Required**: If is required (if you are editing)
+* **required**: If is required (if you are editing)
 
 This example is a **text** column:
 ```html
@@ -460,7 +582,8 @@ Shows a text created by function. It's not editable. You can use **item** fields
 
 ### Pagination
 
-* **items-per-page**: Number of items in each page
+* **show-pagination** (Optional, by default is true)
+* **items-per-page**: Number of items in each page. If this attribute isn't configured, pagination is hidden
 * **items-per-page-options**: Array of number of items per page options
 
 ```html
@@ -707,9 +830,141 @@ function onChange(item){
 # ilDetail
 
 # ilModal
-# ilWeek
-# ilYearCalendar
+
+Allows create modal popups.
+
+* Basic modal: It's the basic transluced modal with title, body and buttons footer
+* Message modal: Shows a message. Can use a awessome font icon
+* Loading modal: Shows loading message. Can not be closed by user
+
+## Options
+
+### Visibility
+
+* **show** : Variable to control when modal will be visible. Modal controls this variable
+
+### Basic Options
+
+* **title-visible** (optinal, by default true in basic modal): Control title visibility
+* **close-visible** (optinal, by default true): Control visibility in title with x icon, only if **titleVisible** is true
+* **footer-visible** (optional, by default true): Control footer visibility
+* **title** (optional): Title of modal, only if **titleVisible** is true
+* **auto-close** (optional, by default true): Modal can close itself when click on cancel button or in x icon
+* **cancel-visible** (optinal, by default true): Controls footer cancel button visibility
+* **cancel-label** (optinal, by default 'cancel')
+* **on-cancel** (optional): Callback when user click footer cancel button
+* **success-visible** (optinal, by default true): Controls footer cancel button visibility
+* **success-label** (optinal, by default 'save changes')
+* **on-success** (optional): Callback when user click footer success button
+* **success-disabled** (optional, by default false): Controls success button disabled property
+
+### Advanced Options
+
+* **z** (optional, by default 100): z-index of modal, background uses z-1
+* **top** (optional, by default 20px): top margin
+* **size** (optional, by default 600px): width of modal
+
+### Message Options & title icons
+
+* **is-message** : true for message modal
+* **is-info** (optional, by default false): Show info icon in blue
+* **is-alert** (optional, by default false): Show alert icon in red
+* **is-question** (optional, by default false): Show question icon in blue
+* **is-confirm** (optional, by default false): Show check icon in green
+* **custom-icon-class** (optional): Show custom icon using a Awesome font icon class
+* **custom-icon-color** (optional): If are using custom-icon-class can change color of icon.
+
+### Loading Options
+
+* **is-loading**: true for loading modal
+* **wait-mesage** (optional): wait message text
+
+## Example 1. Basic modal
+
+![ilModal example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilmodal1.png "ilModal example")
+
+```html
+<script>
+	$scope.text="This is my text";
+</script>
+
+<button ng-click="showModal=true"></button>
+
+<il-modal 
+	show="showModal" 
+	title="'This is my title'"
+	on-success="save()"
+>
+	<input ng-model="text">
+	<p>{{text}}</p>
+</il-modal>
+```
+
+## Example 2. Info
+
+![ilModal example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilModal2.png "ilModal example")
+
+```html
+<il-modal 
+	show="showModal" 
+	is-message=true
+	is-info=true
+>
+	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus.</p>
+</il-modal>
+```
+
+## Example 3. Alert
+
+![ilModal example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilModal3.png "ilModal example")
+
+```html
+<il-modal 
+	show="showModal" 
+	is-message=true
+	is-alert=true
+>
+	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur semper tellus, ac mollis justo facilisis vel. Nullam lobortis placerat turpis, id mattis urna euismod a. Praesent vel velit lacus.</p>
+</il-modal>
+```
+
+## Example 4. Loading
+
+![ilModal example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilModal4.png "ilModal example")
+
+```html
+<il-modal 
+	show="showModal" 
+	is-loading=true
+>
+</il-modal>
+```
+
+## Example 5. Custom icons
+
+![ilModal example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilModal5.png "ilModal example")
+
+```html
+<script>
+	$scope.text="This is my text";
+</script>
+
+<button ng-click="showModal=true"></button>
+
+<il-modal 
+	show="showModal" 
+	title="'This is my title'"
+	on-success="save()"
+	custom-icon-class="'fa-bed'"
+	custom-icon-color="'magenta'"
+>
+	<input ng-model="text">
+	<p>{{text}}</p>
+</il-modal>
+```
+
 # ilUpload
+
 Allows upload files using different cloud uploaders, such as [filepicker](https://www.filepicker.com/)
 
 ## Options
@@ -807,6 +1062,20 @@ $scope.model={
 	}
 ```
 
+## Basic system
+The basic upload system calls to "upload" url with POST method sending a file. You must have a server-side script.
+
+It's simple:
+
+```js
+$scope.uploadSystem=new ilUpload_basic("<UPLOAD URL>");
+```
+It requires
+
+* [ng-file-upload](https://github.com/danialfarid/ng-file-upload) library.
+*  ilModal library
+
+Both libraries must preceded to ilUpload.min.js in script list
 
 ## Creating your own system
 
@@ -838,9 +1107,724 @@ function ilUpload_FilePiker(secret,config){
 
 ```
 
+# ilList
+It's a sortable list of objects.
+
+![ilList example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilList.png "ilList example")
+
+## Options
+
+* **model**: model as list of objects
+* **label-field**: The field that will printed
+* **on-click** (optional): Callback to interact when a list item is clicked. Parameters:
+	* pos: positión of clicked item
+	* item: clicked item 
+* **can-sort** (optional, by default false): If user can sort the list
+* **can-delete** (optional, by default false): If user can delete an item
+* **on-delete** (optional): Callback when user has pushes the delete buton
+	*  pos: positión of clicked item
+	* item: clicked item 
+* **auto-delete** (optional, by default true): Component remove the element automatically
+* **delete-confirm** (optional): Message showed to user to confirm the delete operation
+
+## Example
+
+```js
+$scope.model=[
+	{label:"Cat"},
+	{label:"Dog"},
+	{label:"Parrot"},
+]
+```
+
+```html
+<il-list
+	model="model"
+	label-field="'label'"
+	can-sort=true
+></il-list>
+```
+
 # ilSurvey
 
+# ilWeek
+
+# ilYearCalendar
+
+# ilPanel
+Draws a bootstrap panel with content
+
+* **title**: Title of panel
+* **panel-style** (optional, by default is default): Style of panel (primary, success, info, warning and danger)
+* **can-close** (optional, by default is false): Appears a cross on the top-right corner
+* **on-close** (mandatory if **can-close** is true): Callback called when user click on cross
+* **can-delete** (optional, by default is false): Appears a trash on the top-right corner.
+* **on-delete** (mandatory if **can-delete** is true): Callback called when user click on trash
+* **can-edit** (optional, by default is false): Appears a pencil on the top-right corner to edit
+* **on-edit** (mandatory if **can-edit** is true): Callback called when user click on pencil
+* **buttons** (optional): Extra buttons than apears on the top-right
+
+Basic example:
+```html
+<il-panel title="'My title'" panel-style="'primary'">
+This is the content in HTML
+</il-panel>
+```
+
+## Using buttons
+![ilPanel example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilPanel.png "ilPanel example")
+
+```html
+<script>
+	$scope.onDelete=function(){
+	}
+	$scope.onEdit=function(){
+	}
+	$scope.buttons=[
+		{
+			icon:"cog",
+			callback:function(){
+				alert("Configuration!");
+			}
+		}
+	]
+</script>
+
+<il-panel title="'My panel'" can-delete="true" on-delete="onDelete()" can-edit="true" on-edit="onEdit()" buttons="buttons">
+This is the content
+</il-panel>
+
+``` 
+
+### Using comands in ng-repeat
+If you are using il-panel inside a ng-repeat and you whant to call edit or delete callbacks with current ng-repeat item, see this example:
+
+```html
+<script>
+	$scope.onDelete=function(item){
+	}
+	$scope.onEdit=function(item){
+	}
+	$scope.list=[
+		{title:"item1", content:"content1"},
+		{title:"item2", content:"content2"},
+		
+	]
+</script>
+
+<il-panel ng-repeat="item in list" 
+	title="item.title" 
+	can-delete="true" on-delete="onDelete(item)" 
+	can-edit="true" on-edit="onEdit(item)"
+>
+	This is the content: {{item.content}}
+</il-panel>
+
+``` 
+
+### Using buttons in ng-repeat
+
+If you are using il-panel inside a ng-repeat and you whant to call edit, delete and button callbacks with current ng-repeat item, see this example:
+
+```html
+<script>
+	$scope.onDelete=function(item){
+	}
+	$scope.onEdit=function(item){
+	}
+	$scope.list=[
+		{title:"item1", content:"content1"},
+		{title:"item2", content:"content2"},
+	]
+	
+	$scope.list.forEach(function(item){
+		item.buttons=[
+			{
+				item:this,
+				icon:"cog",
+				callback:function(){
+					//access: this.item
+				}
+			}
+		]
+	});
+</script>
+
+<il-panel ng-repeat="item in list" 
+	title="item.title" 
+	can-delete="true" on-delete="onDelete(item)" 
+	can-edit="true" on-edit="onEdit(item)"
+	buttons="item.buttons"
+>
+	This is the content: {{item.content}}
+</il-panel>
+
+``` 
+
+# ilLoadingButton
+
+This is a button than it's self converted into a loading text when is pressed.
+
+* **button-label**: The button text
+* **button-style**: Bootstrap style (primary, success, info, warning and danger)
+* **loading-text** (optional, by default "loading...")
+* **enabled** (optional, by default is true): if button is enabled
+* **on-click**: Callback will be called when user click the button.
+
+##Example
+
+```html
+<script>
+$scope.verify=function(callback){
+	//If text is void, the button doesn't change to loading
+	//Callback returns false
+	if ($scope.text==undefined || $scope.text=="")
+		return false;
+	
+	//This simule a WebService call.
+	//When finish loading operation, you must call to callback if operation is OK and call bacllback with error text as param if operation is KO
+	$timeout(function(){
+		callback();
+	},1000);
+	
+	//Return true to change button to loading
+	return true;
+}
+</script>
+
+<input ng-model="text"></input>
+
+<il-loading-button button-label="'Verify'" loading-text="'Verifing...'" on-click="verify(callback)"></il-loading-button>
+```
 
 
-# Use in forms
+# ilSearch
+This is a simple input that allows filter an array of objects using any of their fields and with acute and case insensitive.
 
+![ilSearch example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilSearch.png "ilSearch example")
+
+```html
+<script>
+$scope.model=[
+	{label:"Cat",value:1},
+	{label:"Castor",value:2},
+	{label:"Dog",value:3},
+	{label:"Parrot",value:4},
+]
+</script>
+
+<il-search
+	model="mc.model"
+	fields="['label']"
+	on-filter="list=result"
+	method="'startWith'"
+></il-search>
+
+<table class="table">
+	<tr ng-repeat="item in list">
+		<td>{{item.label}}</td>
+	</tr>
+</table>
+```
+
+## Basic configuration
+
+ * **model**: Original list
+ * **fields**: List of fields to filter
+ * **on-filter(result)**: Callback to get result of filter
+ * **method** (optional, by default is normal): Methods to filter (See il.angularExtends - ilArraySearch)
+	 * normal
+	 * startWith or sw
+	 * anyWord or aw
+	 * completeWord or '='
+
+## Advanced configuration
+If you need more control you can define advanced configuration instead of define fields.
+
+```html
+<script>
+$scope.config = [
+	{
+		field:'value',
+		method:'fnc',
+		filter:function(fieldValue,searchCad){
+			//Check if is integer
+			if (isNaN(parseInt(searchCad * 1)))
+				return false;
+				
+			//Integer comparation
+			return searchCad<fieldValue;
+
+		}
+	}
+]
+</script>
+
+<il-search
+	model="mc.model"
+	config="config"
+	on-filter="list=result"
+	method="'startWith'"
+></il-search>
+```
+
+For more information See il.angularExtends - ilArraySearch
+
+# ilCVSTable
+Allows to paste a CVS and transform to array of objects. Allow check and correct values too.
+
+From this:
+![ilCvsTable example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilCVSTable1.png "ilCvsTable example")
+
+To this:
+![ilCvsTable example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilCVSTable2.png "ilCvsTable example")
+
+##Basic usage
+
+* **on-confirm(items)**: Callback to get result when user confirms. Only valid items are returned 
+
+```HTML
+<script>
+$scope.onConfirm=function(items){
+	//Do something with items
+}
+</script>
+<il-cvs-table 
+	on-confirm="onConfirm(items)" 
+></il-cvs-table>
+```
+
+##Working with headers
+
+* **transform-header(value)**: Transform header name to other. Value is the name of header
+* **check-header(header)**: check if headers are correct. Header is an array. **transform-header** is called previous so it'll recieve a transformed header
+
+```HTML
+<script>
+$scope.onConfirm=function(items){...}
+
+$scope.transformHeader=function(value){
+	//Transform all headers to lower case
+	return value.toLowerCase();
+}
+
+$scope.checkHeader=function(header){
+	//Check if all required headers are in list
+	var required=["name","email"];
+	for (var r in required){
+		var found=false;
+		header.some(function(h){
+			if (required[r]==h){
+				found=true;
+				return true;
+			}
+		})
+		
+		if (!found)
+			return false;
+	}
+	return true;
+}
+
+</script>
+
+<il-cvs-table 
+	transform-header="transformHeader(value)"
+	check-header="checkHeader(header)"
+	on-confirm="onConfirm(items)" 
+></il-cvs-table>
+```
+
+##Column config
+
+* **column-config**: Object with columns to controll
+
+For each column the configuration is:
+
+* **type**: Type of column, by default is text
+	* text: Text entry
+	* list: List of values
+	* listObject: List of objects
+	* readonly: Readonly, cannot modify value
+* **check(value)**:Check function than returns true if value is correct or a message with error
+* **transform(value)**: Transform function. Returns the transformed value (after check function)
+* **values**: Values in case of list or listObject type
+* **labelField**: Lavbel field in case of listObject type
+
+```javascript
+$scope.ages=[];
+for(var i=1; i<100; i++)
+	$scope.ages.push(""+i);
+
+$scope.sex=[
+	{label:"Man",value:1},
+	{label:"Woman",value:2}
+]
+				
+$scope.columnConfig={
+	id:{
+		type:"readonly",
+	},
+	age:{
+		type:"list",
+		values:mc.ages,
+		check:function(value){
+			if (value<=0)
+				return "Age must be >0";
+		}
+	},
+	email:{
+		type:"text",
+		check:function(value){
+			if (!validateEmail(value))
+				return "Invalid email";
+		}
+	},
+	sex:{
+		type:"listObjects",
+		values:mc.sex,
+		labelField:"label",
+		check:function(value){
+			if (typeof value === 'object')
+				return true;
+			else{
+				if ( mc.sex[value-1]==undefined)
+					return "Values 1 or 2";
+				else
+					return true;
+			}
+		},
+		transform:function(value){
+			return mc.sex[value-1];
+		}
+	}
+}
+```
+
+```HTML
+<il-cvs-table 
+	transform-header="transformHeader(value)"
+	check-header="checkHeader(header)"
+	column-config="columnConfig"
+	on-confirm="onConfirm(items)" 
+></il-cvs-table>
+```
+
+## Aditional item check
+
+* **check-item(item,header)**: Function to check whole item. Returns true if is correct or msg if is invalid.
+
+---
+
+#ilTable2
+It is similar to ilTable, most important difference is that columns are declared in HTML and you have css full control. Additionaly you have all power of ilInput
+
+Complete example:
+
+![ilTable2 example](https://ilscdn.s3.amazonaws.com/il.angularUI/doc/ilTable2.png "ilTable2 example")
+
+Script data inizialization example:
+```HTML
+<script>
+$scope.data.items=[];
+$scope.data.values=[];
+$scope.data.sex=[
+	{label:'Man',value:0},
+	{label:'Woman',value:1},
+];
+
+for (var i=0; i<20; i++){
+	$scope.data.items.push({id:i,name:"name "+i*100,lastname:"lastname "+i,value:i,sex:mc.sex[i%2]});
+	$scope.data.values.push(i);
+}
+
+$scope.customButtons=[
+	{
+		icon:'envelope',
+		fnc:function(item){
+			console.debug("Custom button!",item);
+		}
+	},
+	{
+		awesomeIcon:"anchor",
+		fnc:function(item){
+			console.debug("Custom awesome button",item);
+		}
+	}
+]
+
+$scope.renderer_sex=function(item,column){
+	if (item.sex.value==1)
+		return '<i style="color:pink" class="fa fa-female"></i>';
+	else
+		return '<i style="color:cyan" class="fa fa-male"></i>';
+}
+
+</script>
+```
+
+HTML table configuration:
+
+```HTML
+<il-table2 
+	model="data.items" 
+	class="table table-striped ilTable2"
+	title="'My table'"
+	show-header=true
+	show-search=true
+	show-pagination=true
+	select-on-click=false
+	select-multiple=true
+	show-download=true
+	delete-confirm=true
+	header-buttons=headerButtons
+>
+	<il-table2-column 
+		type="'select'">
+	</il-table2-column>
+	
+	<il-table2-column 
+		title="'Id'"
+		field="'id'">
+	</il-table2-column>
+	
+	<il-table2-column
+		type="'render'"
+		title="'Sex'" 
+		renderer="renderer_sex">
+	</il-table2-column>
+				
+	<il-table2-column 
+		title="'Name'"
+		type="'ilInput'"
+		il-input-type="'text'"
+		field="'name'">
+	</il-table2-column>
+	
+	<il-table2-column 
+		title="'Lastname'" 
+		type="'ilInput'"
+		il-input-type="'password'"
+		field="'lastname'">
+	</il-table2-column>
+	
+	<il-table2-column
+		title="'Value'"
+		type="'ilInput'"
+		il-input-type="'select'"
+		field="'value'"
+		select-options="data.values">
+	</il-table2-column>
+	
+	<il-table2-column 
+		title="'Sex'" 
+		type="'ilInput'"
+		il-input-type="'select'"
+		field="'sex'"
+		select-options="data.sex"
+		select-label-field="'label'"
+		search-method="'startWith'">
+	</il-table2-column>
+	
+	<il-table2-column 
+		title="'Template'"
+		type="'include'"
+		include="'template.html'"
+		edit-include="'templateEdit.html'"
+		>
+	</il-table2-column>
+	
+	<il-table2-column 
+		type="'buttons'"
+		can-edit=true 
+		can-delete=true 
+		custom="mc.customButtons">
+	</il-table2-column>
+</il-table2>
+```
+
+
+## Options
+
+Basic options:
+
+* **model**: List of items to show
+
+Show/hide parts:
+
+* **show-search** (by default true): Show search field
+* **show-header** (by default true): Show header (title and buttons)
+* **show-pagination** (by default true): Show pagination. If it's false, all items will showed
+* **show-footer** (by default true): Show footer
+* **show-download** (by default true): Show download button (require header visible)
+
+Header:
+*Note: Only if header is visible*
+
+* **title**: Title of table
+* **header-buttons**: It's an array of objects with this format
+	* icon: bootstrap icon
+	* awesomeIcon: Awesome icon (use instead of icon)
+	* fnc(item): Callback function when button is presed
+
+Example:
+```js
+{
+	icon:'envelope',
+	fnc:function(item){
+		console.debug("Custom button!",item);
+	}
+}
+```
+
+Pagination:
+
+* **items-per-page** (by default 5): Number of items in each page
+* **items-per-page-options** (by default [5,10,20]): List of pagination options.
+
+Click items:
+
+* **on-click-item**: Callback on click item. Params:
+	* item: clicked item
+	* column: what column has it clicked on?
+
+Selection:
+
+* **select-on-click** (by default false): Enable select item when click on it.
+* **select-multiple** (by default false): Enhable multiple selection
+* **on-selected**: Callback when selection has changed. Params:
+	* list: List of all selected items
+	* item: Last item selected or unselected, cause of event
+
+Delete
+
+* **delete-confirm** (by default true): Check with user if procede with delete 
+* **delete-confirm-text** (by default 'are your sure?'): Message to confirm.
+* **delete-fnc**: Check if item can be deleted and delete it. Returns true if item has deleted or false in other case. Params:
+	* item: Item to delete
+* **on-delete**: Callback when delete
+	* item: deleted item
+
+## Columns
+In a table there are a set of columns, some are information columns, an other are special columns. To define these use: `il-table2-column` entity
+
+Required atributtes:
+
+* **type** (by default 'basic'): column type
+	* basic
+	* ilInput: Editable column
+	* render
+	* template
+	* selection
+	* buttons
+* **title**: Title of column
+* **field**: Field Of item to show (Required only in basic and ilInput columns)
+* **search-method**: Search method
+	* 'startWith': Word must start with search cad
+	* In other case:
+
+```HTML
+<il-table2-column type="'basic'" title="'Id'" field="'id'"></il-table2-column>
+```
+
+## Basic columns
+Basic columns show a field of each item.
+
+```HTML
+<il-table2-column type="'basic'" title="'Id'" field="'id'"></il-table2-column>
+```
+
+## Editable columns (ilInput)
+Use ilInput as item-field renderer, so you can use all options of ilInput. 
+
+All ilInput are preceded by `il-input-` for instance, to define the type of ilInput use `il-input-type`
+
+```HTML
+<il-table2-column type="'ilInput'" title="'Name'" il-input-type="'text'" field="'name'"></il-table2-column>
+```
+
+## Render columns
+Render column uses a function than returns HTML code to show.
+
+* **renderer**: Function to render
+
+Column declaration
+```HTML
+<il-table2-column type="'render'" title="'Sex'" renderer="renderer_sex"></il-table2-column>
+```
+
+Render function
+```JS
+$scope.renderer_sex=function(item,column){
+	if (item.sex.value==1)
+		return '<i style="color:pink" class="fa fa-female"></i>';
+	else
+		return '<i style="color:cyan" class="fa fa-male"></i>';
+```
+
+
+## Template columns
+This column are more powerfull than render column because can use html templates to render and edit mode render.
+
+* **include**: Include template renderer. To acces to item, use `item` or `currentModel(item)`
+* **edit-include**: Include template renderer for edition. To access to edit item use `currentModel(item)`
+
+```HTML
+<il-table2-column type="'include'" title="'Template'"  include="'template.html'" edit-include="'templateEdit.html'"></il-table2-column>
+```
+
+Renderer:
+```HTML
+Hello <span style="color:olive">{{item.name}}</span>
+```
+
+Edit renderer:
+```HTML
+<input style="color:olive" ng-model="currentModel(item)['name']">
+```
+
+
+## Special columns
+
+### Select column
+This column allows to select columns and show them with a check box
+
+```HTML
+<il-table2-column type="'select'"></il-table2-column>
+```
+
+### Buttons column
+This column allows to add basic operations and custom buttons to each row
+
+* **can-edit**: Shows edit button
+* **can-delete**: Shows delete button
+* **custom**: Custom buttons
+
+```HTML
+<il-table2-column type="'buttons'" can-edit=true can-delete=true custom="customButtons"></il-table2-column>
+``` 
+
+#### Custom buttons definition
+A list of objects that represents each button.
+
+* **icon**: Bootstrap icon
+* **awesomeIcon**: Awesome icon (exluce icon)
+* **fnc** : Callback when button is clicked
+	* item: Row item clicked
+
+```JS
+$scope.customButtons=[
+	{
+		icon:'envelope',
+		fnc:function(item){
+			console.debug("Custom button!",item);
+		}
+	},
+	{
+		awesomeIcon:"anchor",
+		fnc:function(item){
+			console.debug("Custom awesome button",item);
+		}
+	}
+]
+```

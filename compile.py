@@ -16,7 +16,16 @@ def compile(name):
 	text_file = open("dist/" + name + ".min.js", "w")
 	text_file.write(js)
 	text_file.close()
-
+	
+	try:
+		file = open('src/' + name + '/' + name + '.css', 'r')
+		js=file.read()
+		text_file = open("dist/" + name + ".css", "w")
+		text_file.write(js)
+		text_file.close()
+	except:
+		pass
+		
 compile("ilTable")
 compile("ilDetail")
 compile("ilModal")
@@ -27,3 +36,10 @@ compile("ilWeek")
 compile("ilYearCalendar")
 compile("ilUpload")
 compile("ilSurvey")
+compile("ilList")
+compile("ilPanel")
+compile("ilLoadingButton")
+compile("ilSearch")
+compile("ilCVSTable")
+compile("ilCalendar")
+compile("ilMasterDetail")

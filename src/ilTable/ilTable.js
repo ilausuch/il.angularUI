@@ -63,7 +63,9 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope._search=false;
 			else
 				$scope._search=$scope.search;
-			
+				
+			if ($scope.showPagination==undefined)
+				$scope.showPagination=true;
 			
 			$scope.results=$scope.model;
 			
@@ -443,7 +445,8 @@ angular.module("il.ui.table", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              textDeleteConfirm:"=?",
 	              itemsPerPageOptions:"=?",
 	              operationsLabel:"=?",
-	              showTitleColumn:"=?"
+	              showTitleColumn:"=?",
+	              showPagination:"=?"
 			},
 			controller: controller,
 			/*emplateUrl:'src/ilTable/ilTable.tpl.html',*/

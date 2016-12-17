@@ -8,6 +8,57 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 			if ($scope.sendMessage==undefined)
 				$scope.sendMessage="You are about to send your survey, are you sure?";
 			
+			if ($scope.divideSections==undefined)
+				$scope.divideSections=true;
+				
+			if ($scope.useAwesomeIcons==undefined)
+				$scope.useAwesomeIcons=true;
+				
+			if ($scope.radioIconSelected==undefined)
+				if ($scope.useAwesomeIcons)
+					$scope.radioIconSelected="fa fa-dot-circle-o";
+				else
+					$scope.radioIconSelected="glyphicon glyphicon-check";
+			
+			if ($scope.radioIconUnselected==undefined)
+				if ($scope.useAwesomeIcons)
+					$scope.radioIconUnselected="fa fa-circle-thin";
+				else
+					$scope.radioIconUnselected="glyphicon glyphicon-unchecked";
+					
+			if ($scope.starIconSelected==undefined)
+				if ($scope.useAwesomeIcons)
+					$scope.starIconSelected="fa fa-star";
+				else
+					$scope.starIconSelected="glyphicon glyphicon-star";
+			
+			if ($scope.starIconUnselected==undefined)
+				if ($scope.useAwesomeIcons)
+					$scope.starIconUnselected="fa fa-star-o";
+				else
+					$scope.starIconUnselected="glyphicon glyphicon-star-empty";
+				
+			if ($scope.checkboxIconSelected==undefined)
+				if ($scope.useAwesomeIcons)
+					$scope.checkboxIconSelected="fa fa-check-square-o";
+				else
+					$scope.radioIconSelected="glyphicon glyphicon-check";
+			
+			if ($scope.checkboxIconUnselected==undefined)
+				if ($scope.useAwesomeIcons)
+					$scope.checkboxIconUnselected="fa fa-square-o";
+				else
+					$scope.radioIconUnselected="glyphicon glyphicon-unchecked";
+				
+			if ($scope.optionalText==undefined)
+				$scope.optionalText="(optional)";
+				
+			if ($scope.requiredErrorText==undefined)
+				$scope.requiredErrorText="This question is required";
+				
+			$scope.showValidation=true;
+			
+			
 			$scope.resetAll=function(){
 				$scope.result={};
 				
@@ -15,6 +66,9 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 					for (i in $scope.previousValues)
 						$scope.result[i]=$scope.previousValues[i];
 				
+				if ($scope.model==undefined)
+					return;
+					
 				$scope.currentSection=$scope.model.sections[0];
 				
 				$scope.model.sections.forEach(function(section){
@@ -22,8 +76,14 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 						if (question.uid==undefined)
 							question.uid=Math.floor(Math.random()*1000000)
 						
-						if (!$scope.result[question.uid])
+						if ($scope.result[question.uid]==undefined){
 							$scope.result[question.uid]={}
+							if (question.type=="multiselect"){
+								question.options.forEach(function(option){
+									$scope.result[question.uid][option.value]={value:false};
+								})
+							}
+						}
 					})
 				})
 			}
@@ -32,11 +92,19 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 				$scope.resetAll();
 			})
 			
+			$scope.$watch('model', function() {
+				$scope.resetAll();
+			})
+			
 			
 			$scope.resetAll();
 			
+			
 			$scope._checkQuestion=function(question){
 				if (question.required==undefined || !question.required)
+					return 1;
+					
+				if (!$scope.checkVisibleQuestion(question))
 					return 1;
 				
 				var result=$scope.result[question.uid];
@@ -56,6 +124,7 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 					
 				switch(question.type){
 					case "select":
+					case "combobox":
 						if (result.value==undefined || result.value=="")
 							return 0;
 						
@@ -89,7 +158,6 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 					case "multiselect":
 						var count=0;
 						var verified=0;
-						console.debug(result);
 						
 						for(var i in result){
 							if (result[i].value!=undefined && result[i].value){
@@ -102,11 +170,10 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 										break;
 									}
 									
-								console.debug(option.commentsVerify(result[i].comments));
 									
-								if (option.commentsRequired!=undefined && option.commentsRequired==true){
+								if (option!=undefined && option.commentsRequired!=undefined && option.commentsRequired==true){
 									if (result[i].comments==undefined || result[i].comments==""){
-										console.debug("*",result[i].comments);
+										
 									}
 									else
 										if (option.commentsVerify==undefined || option.commentsVerify(result[i].comments))
@@ -119,7 +186,6 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 							}
 						}
 						
-						console.debug(count,verified,commentsVerification);
 						
 						if (question.min==undefined)
 							return count>0 && commentsVerification && verified==count;
@@ -136,6 +202,23 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 						else
 							return -1;
 							
+					break;
+					
+					case "table-select":
+						
+						for (var rowi in question.rows){
+							var row=question.rows[rowi];
+							var found=false;
+							
+							for (var ri in result)
+								if (ri==row.uid && result[ri].value!=undefined)
+									found=true;	
+									
+							if (!found)
+								return -1;
+						}
+						
+						return 1;
 					break;
 				}
 				
@@ -154,17 +237,58 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 				return $scope._checkQuestion(question)==0;
 			}
 
+			$scope.checkVisibleQuestion=function(question){
+				if (question.visibleFnc!=undefined){
+					return question.visibleFnc({result:$scope.result});
+				}else
+					return true;
+			}
 			
-			
-			
-			$scope.checSection=function(section){
+			$scope.checkVisibleSection=function(section){
+				var someQuestionVisible=false;
 				for (i in section.questions)
-					if (!$scope.checkQuestion(section.questions[i])){
-						return false;
+					if ($scope.checkVisibleQuestion(section.questions[i])){
+						someQuestionVisible=true;
 						break;
 					}
+					
+				if (!someQuestionVisible)
+					return false;
+
+				if (section.visibleFnc!=undefined)
+					return section.visibleFnc({result:$scope.result});
+				else
+					return true;
+			}
+			
+			
+			
+			$scope.checkSection=function(section){
+				if (section!=undefined){
+					if (section.questions!=undefined && $scope.checkVisibleSection(section))
+						for (i in section.questions)
+							if (!$scope.checkQuestion(section.questions[i])){
+								return false;
+								break;
+							}
+							
+					return true;
+				}
+				else{
+					if ($scope.model==undefined)
+						return false;
 						
-				return true;
+					for (s in $scope.model.sections){
+						var section=$scope.model.sections[s];
+						for (i in section.questions)
+							if (!$scope.checkQuestion(section.questions[i])){
+								return false;
+								break;
+							}
+					}
+					
+					return true;
+				}
 			}
 			
 			$scope.getSectionIndex=function(section){
@@ -187,9 +311,7 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 				if ($scope.isLastSection($scope.currentSection))
 					return;
 				window.test=$scope.model.sections
-				console.debug("current",$scope.getSectionIndex($scope.currentSection),$scope.getSectionIndex($scope.currentSection)+1,$scope.currentSection,$scope.model.sections);
 				$scope.currentSection=$scope.model.sections[$scope.getSectionIndex($scope.currentSection)+1];
-				console.debug("current",$scope.getSectionIndex($scope.currentSection),$scope.currentSection);
 			}
 			
 			$scope.goPreviousSection=function(){
@@ -208,6 +330,32 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 				
 				$scope.currentSection=-1;
 			}
+			
+			$scope.multiSelectClick=function(question,option){
+				if ($scope.result[question.uid]==undefined)
+					$scope.result[question.uid]={}
+				
+				if ($scope.result[question.uid][option.value]==undefined)
+					$scope.result[question.uid][option.value]={value:true}
+				else
+					$scope.result[question.uid][option.value].value=!$scope.result[question.uid][option.value].value;
+			}
+			
+			$scope.tableSelectClick=function(question,row,column){
+				if ($scope.result[question.uid]==undefined)
+					$scope.result[question.uid]={}
+				
+				$scope.result[question.uid][row.uid]={value:column.value}
+			}
+			
+			$scope.starClick=function(question,row,option){
+				if ($scope.result[question.uid]==undefined)
+					$scope.result[question.uid]={}
+				
+				$scope.result[question.uid][row.uid]={value:option.value}
+			}
+			
+			
 		}];
 		
 		template='%%TEMPLATE%%';
@@ -221,6 +369,25 @@ angular.module("il.ui.survey", ['ngSanitize','pascalprecht.translate','ui.bootst
 				sendMessage:"=?",
 				onFinish:"&",
 				reset:"=?",
+				divideSections:"=?",
+				useAwesomeIcons:"=?",
+				radioIconSelected:"=?",
+				radioIconUnselected:"=?",
+				checkboxIconSelected:"=?",
+				checkboxIconUnselected:"=?",
+				starIconSelected:"=?",
+				starIconUnselecetd:"=?",
+				optionalText:"=?",
+				requiredErrorText:"=?",
+				previousText:"=?",
+				nextText:"=?",
+				finishText:"=?",
+				canCancel:"=?",
+				cancelText:"=?",
+				onCancel:"&",
+				autoNumber:"=?",
+				autoSectionNumber:"=?",
+				autoQuestionNumber:"=?"
 			},
 			controller: controller,
 			template:template

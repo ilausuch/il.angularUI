@@ -90,10 +90,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 
 			$scope.defaultValue("type","text");
-			/*
-			if ($scope.type==undefined)
-				$scope.type="text"
-			*/	
+			
 			if ($scope.dateLocale!=undefined)
 				moment.locale($scope.dateLocale);
 			
@@ -105,12 +102,10 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.defaultValue("dateCanChangeMonth",true);
-			$scope.defaultValue("z",10000);
+			$scope.defaultValue("z",3);
+			$scope.defaultValue("readOnly",false);
 			
-			if ($scope.modalOnTop==true)
-				$scope.modalStyle={bottom:"1em",backgroundColor:"white"};
-			else
-				$scope.modalStyle={top: "0px",backgroundColor:"white"};
+			
 			
 			if ($scope.dateStartAt!=undefined && $scope.dateStartAt._isAMomentObject!=undefined)
 				$scope.hidden_date_selected=$scope.dateStartAt;
@@ -168,12 +163,21 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.defaultValue("placeholder","");
 			$scope.defaultValue("autocompleteSearchMethod","normal");
 			$scope.defaultValue("verifyIfVoid",false);
+			$scope.defaultValue("verifyShowIcon",true);
 			$scope.defaultValue("checkboxMax",1);
 			$scope.defaultValue("checkboxMin",1);
+			$scope.defaultValue("checkboxModal",false);
 			$scope.defaultValue("requiredIconVisible",true);
 			$scope.defaultValue("textRows",5);
 			$scope.defaultValue("dateSelectOnlyAvailableDates",true);
+			$scope.defaultValue("dateHideInput",false);
+			$scope.defaultValue("checkboxModalZIndex",10);
+			$scope.defaultValue("checkboxStyle","padding:1em; border:1px solid silver");
+			$scope.defaultValue("checkboxModalCloseOnSelect",false);
+			$scope.defaultValue("verifyGroupValidIfVoid",false);
 			
+			
+			$scope.chekbox_showModal=false;
 			
 			
 			if ($scope.verifyGroup!=undefined)
@@ -214,6 +218,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				$scope.editMode=true;
 			}
 			
+			
 			$scope.$watch("model."+$scope.field,function updateModel(){
 				$scope.checkValidate();
 			});
@@ -234,98 +239,111 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			$scope.checkValidated=function(status){
 				$scope._validated=status;
 								
-				if ($scope.verifyGroup!=undefined && $scope.required)
-					$scope.verifyGroup.update($scope.field,status);
+				if ($scope.verifyGroup!=undefined)
+					if ($scope.verifyGroupValidIfVoid)
+						$scope.verifyGroup.update($scope.field,true);
+					else
+						if ($scope.required)
+							$scope.verifyGroup.update($scope.field,status);
 			}
 			
 			$scope.checkValidate=function(){
 				$scope._validated=true;
-				
-				if ($scope.verifyGroup!=undefined)
-					$scope.verifyGroup.update($scope.field,true);
 
-				
-				if ($scope.required){
-					switch($scope.type){
-						case "text":
-						case "password":
-							if ($scope.getValue()==undefined || $scope.getValue()==""){
-								$scope.checkValidated(false);
-								return;
-							}
-						break;
-						
-						case "select":
-						case "date":
-						case "dateTime":
-							if ($scope.model[$scope.field]==undefined){
-								$scope.checkValidated(false);
-								return;
-							}
-						break;
-						
-						case "autocomplete":
-							if ($scope.model[$scope.field]==undefined){
-								$scope.checkValidated(false);
-								return;
-							}else{
-								found=false;
-								for (i in $scope.selectOptions)
-									if ($scope.selectOptions[i]==$scope.model[$scope.field])
-										found=true;
-										
-								if (!found){
-									//$scope._validated=false;
-									//return;
-									$scope.checkValidated(false);
-								}
-							}
-						break;
-						case "checkbox":
-							if ($scope.model[$scope.field]==undefined){
-								$scope.checkValidated(false);
-								return;
-							}
-							
-							var len=0;
-							if (Array.isArray($scope.model[$scope.field]))
-								len=$scope.model[$scope.field].length;
-							else
-								len=1;
-							
-							if (($scope.checkboxMax==0 || len<=$scope.checkboxMax) && ($scope.checkboxMin==0 || len>=$scope.checkboxMin))
-								$scope.checkValidated(true);
-							else
-								$scope.checkValidated(false);
-						break;
-					}
-				}	
-					
-				if ($scope.type=="text" || $scope.type=="password"){
-					if ($scope.textVerifyInt && parseInt($scope.getValue())!=$scope.getValue()){
-						$scope.checkValidated(false);
-						return;
-					}
-					
-					if ($scope.textVerifyFloat && parseFloat($scope.getValue())!=$scope.getValue()){
-						$scope.checkValidated(false);
-						return;
-					}
-				}
-				
-
-				if ($scope._validated && $scope.verifyFnc!=undefined){
-					valid=$scope.verifyFnc({model:$scope.model,value:$scope.getValue()});
-
-					if (valid!=undefined)
-						$scope._validated=valid;
-						
+				try{				
 					if ($scope.verifyGroup!=undefined)
-						$scope.verifyGroup.update($scope.field,$scope._validated);	
+						$scope.verifyGroup.update($scope.field,true);
+	
+					if ($scope.required){
+						switch($scope.type){
+							case "text":
+							case "textarea":
+							case "password":
+								if ($scope.getValue()==undefined || $scope.getValue()==""){
+									$scope.checkValidated(false);
+									return;
+								}
+							break;
+							
+							case "select":
+							case "date":
+							case "dateTime":
+							case "custom":
+								if ($scope.model[$scope.field]==undefined){
+									$scope.checkValidated(false);
+									return;
+								}
+							break;
+							
+							case "autocomplete":
+								if ($scope.model[$scope.field]==undefined){
+									$scope.checkValidated(false);
+									return;
+								}else{
+									found=false;
+									for (var i in $scope.selectOptions)
+										if ($scope.selectOptions[i]==$scope.model[$scope.field])
+											found=true;
+											
+									if (!found){
+										//$scope._validated=false;
+										//return;
+										$scope.checkValidated(false);
+									}
+								}
+							break;
+							case "checkbox":
+								if ($scope.model[$scope.field]==undefined){
+									$scope.checkValidated(false);
+									return;
+								}
+								
+								var len=0;
+								if (Array.isArray($scope.model[$scope.field]))
+									len=$scope.model[$scope.field].length;
+								else
+									len=1;
+								
+								if (($scope.checkboxMax==0 || len<=$scope.checkboxMax) && ($scope.checkboxMin==0 || len>=$scope.checkboxMin))
+									$scope.checkValidated(true);
+								else
+									$scope.checkValidated(false);
+							break;
+						}
+						
+						
+						
+					}	
+						
+					if ($scope.type=="text" || $scope.type=="password"){
+						if ($scope.textVerifyInt && parseInt($scope.getValue())!=$scope.getValue()){
+							$scope.checkValidated(false);
+							return;
+						}
+						
+						if ($scope.textVerifyFloat && parseFloat($scope.getValue())!=$scope.getValue()){
+							$scope.checkValidated(false);
+							return;
+						}
+					}
+					
+	
+					if ($scope._validated && $scope.verifyFnc!=undefined){
+						var valid=$scope.verifyFnc({model:$scope.model,value:$scope.getValue()});
+	
+						if (valid!=undefined)
+							$scope._validated=valid;
+							
+						if ($scope.verifyGroup!=undefined)
+							$scope.verifyGroup.update($scope.field,$scope._validated);	
+					}
+										
+					if ($scope.onVerify!=undefined)
+						$scope.onVerify({valid:$scope._validated,model:$scope.model,value:$scope.getValue()});
+				}catch(err){
+					if (console && console.debug) console.debug("ilInput","error",err);
+					$scope.checkValidated(false);
 				}
-									
-				if ($scope.onVerify!=undefined)
-					$scope.onVerify({valid:$scope._validated,model:$scope.model,value:$scope.getValue()});
 				
 			}
 			
@@ -396,43 +414,51 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			
 			$scope.date_prepareCalendar=function(){
-				date=$scope.date_selected;
+				var date=$scope.date_selected;
 				if (date==undefined || date._isAMomentObject==undefined)
 					date=$scope.hidden_date_selected;
 					
-				firstWeekday = new Date(date.year(), date.month(), 1).getDay();
-				lastDateOfMonth = new Date(date.year(), date.month() + 1, 0).getDate();
-					
-					
-				if (firstWeekday==0)
-					firstWeekday=7;
+				var firstDay = moment([date.year(),date.month(),1]);
+				var lastDay = moment(firstDay).add(1,"month").subtract(1,"day");
+				var firstWeekday = moment.localeData().firstDayOfWeek();
+				
+				var _d=1;
 				
 				$scope.weeks=[];
-				for(w=0;w<6;w++){
+				for(var w=0;w<6;w++){
 					$scope.weeks[w]=[];
-					for(d=0;d<7;d++){
-						var _d=w*7+d-firstWeekday+2;
-						if (_d<=0 || _d>lastDateOfMonth)
-							$scope.weeks[w][d]={label:""};
-						else{
-							var nd=moment({y:date.year(),M:date.month(),d:_d,h:0,m:0,s:0});
-							$scope.weeks[w][d]={
-								date:nd,
-							};
+					for(var d=firstWeekday;d<7+firstWeekday;d++){
+						$scope.weeks[w][d]={label:""};
+						
+						if (w==0 && _d==1 && (d%7)!=firstDay.day())
+							continue;
 							
-							if ($scope.getValue()!=undefined && typeof $scope.getValue()=="object"){
-								$scope.weeks[w][d].selected=
-										nd.format("LL")==$scope.getValue().format("LL")
-							}
+						if (_d>lastDay.date())
+							continue;
+
+
+						var nd=moment({y:date.year(),M:date.month(),d:_d,h:0,m:0,s:0});
+						$scope.weeks[w][d-firstWeekday]={
+							date:nd
+						};
+						
+						if ($scope.getValue()!=undefined && typeof $scope.getValue()=="object"){
+							$scope.weeks[w][d].selected=
+									nd.format("LL")==$scope.getValue().format("LL")
 						}
 						
+						_d++;
 					}
 				}
 				
+					
 				$scope.date_updateSelectedYear();
 			}
 			
 			$scope.date_openModal=function(){
+				if ($scope.readOnly)
+					return;
+				
 				$scope.date_selected=$scope.getValue();	
 					
 				if ($scope.date_showModal==undefined || !$scope.date_showModal){
@@ -445,6 +471,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.date_selectDate=function(d){
+				if ($scope.readOnly)
+					return;
+					
 				$scope.date_showModal=false;
 										
 				if ($scope.type=="date"){
@@ -505,16 +534,16 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.date_updateSelectedYear=function(){
-				year=Math.floor($scope.date_getYear());
+				var year=Math.floor($scope.date_getYear());
 				$scope.selectors.selectedYear=year;
 			}
 			
 			$scope.date_checkDate=function(date){
-				if ($scope.dateAvailableDates==undefined || date.date==undefined)
+				if ($scope.dateAvailableDates==undefined || date==undefined || date.date==undefined)
 					return true;
 					
-				comp=$scope.date_getNumeric(date.date);
-				for (i in $scope.dateAvailableDates)
+				var comp=$scope.date_getNumeric(date.date);
+				for (var i in $scope.dateAvailableDates)
 					if (!Array.isArray($scope.dateAvailableDates[i])){
 						if ($scope.dateAvailableDates[i]==comp)
 							return true;
@@ -527,19 +556,29 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.date_getNumeric=function(date){
-				if (date!=undefined)
-					return date.date()+(date.month()+1)*100+date.year()*10000;
-				else
+				try{
+					if (date!=undefined)
+						return date.date()+(date.month()+1)*100+date.year()*10000;
+					else
+						return 0;
+				}catch(err){
 					return 0;
+				}
 			}
 			
 			$scope.time_openModal=function(){
+				if ($scope.readOnly)
+					return;
+					
 				$scope.time_showModal=true;
 				$scope.time_step="h";
 				$scope.time_selected={h:0,m:0,s:0};
 			}
 			
 			$scope.time_select=function(v){
+				if ($scope.readOnly)
+					return;
+					
 				if ($scope.time_step=="h"){
 					$scope.time_selected.h=v;
 					$scope.time_step="m";	
@@ -559,6 +598,13 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					$scope.time_selected.s=v;
 					
 				$scope.time_showModal=false;
+				
+				if ($scope.model[$scope.field]==undefined)
+					$scope.model[$scope.field]=moment();
+					
+				if (!moment.isMoment($scope.model[$scope.field].isDate))
+					$scope.model[$scope.field]=moment($scope.model[$scope.field]);
+					
 				$scope.model[$scope.field].hour($scope.time_selected.h);
 				$scope.model[$scope.field].minutes($scope.time_selected.m);
 				$scope.model[$scope.field].seconds($scope.time_selected.s);
@@ -573,6 +619,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			
 			$scope.boolean_tonggle=function(){
+				if ($scope.readOnly)
+					return;
+					
 				if ($scope.model[$scope.field]==$scope.booleanTrue)
 					$scope.model[$scope.field]=$scope.booleanFalse;
 				else
@@ -587,7 +636,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 					
 					switch ($scope.autocompleteSearchMethod){
 						case "startWith":
-							
+						case "sw":
 							return $scope.accentFold($scope._selectLabelFnc(value)).substr(0, search.length)==search;
 						break;
 						
@@ -596,8 +645,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						break;
 						
 						case "anyWord":
-							search2=search.split(" ");
-							for(i in search2){
+							var search2=search.split(" ");
+							for(var i in search2){
 								
 								if ($scope.accentFold($scope._selectLabelFnc(value)).search(search2[i])>=0)
 									return true;
@@ -608,8 +657,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						case "allWords":
 						case "normal":
 						default:
-							search2=search.split(" ");
-							for(i in search2)
+							var search2=search.split(" ");
+							for(var i in search2)
 								if ($scope.accentFold($scope._selectLabelFnc(value)).search(search2[i])<0)
 									return false;
 							
@@ -628,12 +677,12 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			
 			
 			$scope.checkbox_checkOptions=function(item){
-				val=$scope.getValue();
+				var val=$scope.getValue();
 				if (val==undefined)
 					return false;
 					
 				if (Array.isArray(val)){
-					for (i in val){
+					for (var i in val){
 						if (val[i]==item)
 							return true;
 					}
@@ -646,6 +695,9 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 			}
 			
 			$scope.checkbox_select=function(item){
+				if ($scope.readOnly)
+					return;
+					
 				if ($scope.checkbox_checkOptions(item)) {
 					if ($scope.checkboxMax==1)
 						$scope.model[$scope.field]=undefined;
@@ -676,9 +728,62 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 						
 					}
 				}
+				
+				if ($scope.checkboxModalCloseOnSelect)
+					$scope.chekbox_showModal=false;
+				
 				$scope._onChange();
 			}
 			
+			$scope.checkbox_openModal=function(){
+				if ($scope.readOnly)
+					return;
+					
+				$scope.chekbox_showModal=!$scope.chekbox_showModal;
+			}
+			
+			$scope.custom_LabelFunction=function(){
+				return $scope.customLabelFnc({model:$scope.model,value:$scope.model[$scope.field],field:$scope.field});
+			}
+			$scope.custom_openCallback=function(){
+				if ($scope.readOnly)
+					return;
+					
+				if ($scope.customOpenCallback==undefined)
+					alert("Invalid configuration of ilInput type config, require customOpenCallback");
+					
+				$scope.customOpenCallback({model:$scope.model,value:$scope.getValue(),field:$scope.field});
+			}
+			
+			$scope.readOnly_cursor=function(){
+				if ($scope.readOnly)
+					return "not-allowed";
+				else
+					return "pointer";
+			}
+			
+			$scope.readOnly_backgroundColor=function(){
+				if ($scope.readOnly)
+					return "#EEE";
+				else
+					return "white";
+			}
+			
+			$scope.modalStyle=function(){
+				var style={'z-index':$scope.z}
+				if ($scope.modalOnTop)
+					style.bottom="1em";
+				else
+					style.bottom="0px";
+					
+				style.backgroundColor=$scope.readOnly_backgroundColor();
+				
+				return style;
+			}
+			
+			$scope.zIndex=function(value){
+				return {'z-index':value+"px"};
+			}
 		}];
 		
 		template='%%TEMPLATE%%';
@@ -691,8 +796,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              type:'=?',
 	              onlyText:'=?',
 	              z:'=?',
-	              verifyShow:'=?',
 	              placeholder:"=?",
+	              readOnly:"=?",
 	              
 				  onChange:'&',
 				  onChangeOnlyWhenValidate:"&",
@@ -700,6 +805,8 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 	              onVerify:"&",
 	              verifyGroup:"=?",
 	              verifyIfVoid:"=?",
+	              verifyShow:'=?',
+	              verifyShowIcon:"=?",
 	              
 	              label:"=?",
 	              innerLabel:"=?",
@@ -726,6 +833,7 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  dateCanChangeMonth:"=?",
 				  dateFixModal:"=?",
 				  dateStartAt:"=?",
+				  dateHideInput:"=?",
 
 				  selectVerifyRequired:"=?",
 				  selectOptions:"=?",
@@ -747,10 +855,15 @@ angular.module("il.ui.input", ['ngSanitize','pascalprecht.translate','ui.bootstr
 				  
 				  checkboxMax:"=?",
 				  checkboxMin:"=?",
+				  checkboxModal:"=?",
+				  checkboxModalZIndex:"=?",
+				  checkboxModalCloseOnSelect:"=?",
+				  checkboxStyle:"=?",
 				  
 				  textRows:"=?",
 				  
-				  
+				  customLabelFnc:"&",
+				  customOpenCallback:"&"
 			},
 			controller: controller,
 			template:template

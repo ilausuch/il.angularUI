@@ -16,6 +16,10 @@ function ilUpload_CustomDemo(secret){
 function ilUpload_FilePiker(secret,config){
 	this.secret=secret;
 	
+	if (secret==undefined || secret==""){
+		alert("You must speficy the filepicker secret");
+	}
+	
 	if (config==undefined)
 		this.config={};
 	else
@@ -37,13 +41,75 @@ function ilUpload_FilePiker(secret,config){
 	//services: ['COMPUTER', 'FACEBOOK', 'CLOUDAPP']			
 }
 
-angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootstrap'])
+
+function ilUpload_basic(url,config){
+	this._isBasic=true,
+	this.url=url;
+	this.show=false;
+	this.uploading=false;
+	this.error=false;
+	this.percent="0%";
+	
+	this.pick=function(successCallback,errorCallback){
+		
+		if (!this.$scope.useBasicUpload)
+			alert("You must add ng-file-upload javascript library and il.ui.modal");
+			
+		this.uploading=false;
+		this.error=false;
+		this.show=true;
+		this.successCallback=successCallback;
+		this.errorCallback=errorCallback;
+	}
+	
+	this.upload = function(files) {
+		this.uploading=true;
+		system=this;
+		
+		files.forEach(function(file){
+			system.Upload.upload({
+				url: system.url,
+				file: file
+			}).then(function(resp) {// file is uploaded successfully
+				system.show=false;
+				
+				resp.data.filename=resp.data.name;
+				system.successCallback(resp.data);
+				
+			}, function(resp) { // handle error
+				system.error=true;
+				system.uploading=false;
+				system.errorCallback("");
+			}, function(evt) {// progress notify
+				system.percent=""+parseInt(100.0 * evt.loaded / evt.total)+ '%';
+			});
+		});
+	    
+	}
+}
+
+useBasicUpload=false;
+moduleList=['ngSanitize','pascalprecht.translate','ui.bootstrap'];
+try { 
+	angular.module("ngFileUpload");
+	angular.module("il.ui.modal");
+	moduleList.push('ngFileUpload'); 
+	moduleList.push('il.ui.modal')
+	useBasicUpload=true;
+} catch(err) {}
+
+angular.module("il.ui.upload", moduleList)
 	.directive('ilUpload', function() {
-		var controller = ['$scope','$timeout','$attrs', function ($scope,$timeout,$attrs) {
-						$scope.defaultValue=function(varName,value){
-				if ($scope[varName]==undefined)
-					$scope[varName]=value;
-			}
+		var controller = ['$scope','$timeout','$attrs'];
+		
+		if (useBasicUpload)
+			controller.push("Upload");
+		
+		controller.push(function ($scope,$timeout,$attrs,Upload) {
+			
+			$scope.useBasicUpload=useBasicUpload;
+			$scope.system.$scope=$scope;
+			$scope.system.Upload=Upload;
 			
 			$scope.defaultValue=function(varName,value){
 				if ($scope[varName]==undefined)
@@ -52,13 +118,21 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 			
 			$scope.defaultValue("multiple",false);
 			$scope.defaultValue("slim",false);
+			$scope.defaultValue("areYouSureMsg","Are you sure?");
+			$scope.defaultValue("link",true);
+			$scope.defaultValue("forbiddenLinkMsg","");
+			$scope.defaultValue("disabled",false);
+			$scope.defaultValue("canDelete",true);
 			
 			
-			if (!Array.isArray($scope.model[$scope.field]))
+			if ($scope.model!=undefined && !Array.isArray($scope.model[$scope.field]))
 				$scope.model[$scope.field]=[];
 							
 			$scope.getFiles=function(){
-				return $scope.model[$scope.field];
+				if ($scope.model==undefined)
+					return [];
+				else
+					return $scope.model[$scope.field];
 			}
 			
 			
@@ -194,7 +268,7 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 			}
 			
 			$scope.removeFile=function(file){
-				if (confirm("Are you sure?")){
+				if (confirm($scope.areYouSureMsg)){
 					list=$scope.getFiles();
 					for (i=0; i<list.length; i++)
 						if (list[i]==file)
@@ -204,8 +278,12 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 						$scope.onChange($scope.getFiles());
 				}
 			}
+			
+			$scope.showForbiddenLinkwMsg=function(){
+				alert($scope.forbiddenLinkMsg);
+			}
 		
-		}];
+		});
 		
 		template='%%TEMPLATE%%';
 		
@@ -218,7 +296,18 @@ angular.module("il.ui.upload", ['ngSanitize','pascalprecht.translate','ui.bootst
 				multiple:"=?",
 				userFields:"=?",
 				slim:"=?",
-				onChange:"&",			  
+				onChange:"&",
+				errorUploadingFileMsg:"=?",
+				retryMsg:"=?",
+				dropHereMsg:"=?",
+				selectFileMsg:"=?",
+				noFilesMsg:"=?",
+				uploadingMsg:"=?",
+				areYouSureMsg:"=?",
+				link:"=?",
+				forbiddenLinkMsg:"=?",
+				disabled:"=?",
+				canDelete:"=?"
 			},
 			controller: controller,
 			template:template
